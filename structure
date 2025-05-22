@@ -1,0 +1,98 @@
+ecommerce-admin/
+├── public/
+│   ├── index.html
+│   └── favicon.ico
+├── src/
+│   ├── components/
+│   │   ├── common/
+│   │   │   ├── Layout/
+│   │   │   │   ├── AdminLayout.jsx
+│   │   │   │   ├── Sidebar.jsx
+│   │   │   │   ├── Header.jsx
+│   │   │   │   └── Footer.jsx
+│   │   │   ├── DataTable/
+│   │   │   │   ├── DataTable.jsx
+│   │   │   │   └── TablePagination.jsx
+│   │   │   ├── Charts/
+│   │   │   │   ├── SalesChart.jsx
+│   │   │   │   └── StatsCard.jsx
+│   │   │   ├── Forms/
+│   │   │   │   ├── FormField.jsx
+│   │   │   │   └── ImageUpload.jsx
+│   │   │   └── Modals/
+│   │   │       ├── ConfirmDialog.jsx
+│   │   │       └── FormModal.jsx
+│   │   ├── dashboard/
+│   │   │   ├── DashboardOverview.jsx
+│   │   │   ├── SalesStats.jsx
+│   │   │   └── RecentOrders.jsx
+│   │   ├── products/
+│   │   │   ├── ProductList.jsx
+│   │   │   ├── ProductForm.jsx
+│   │   │   ├── ProductVariants.jsx
+│   │   │   └── ProductImages.jsx
+│   │   ├── categories/
+│   │   │   ├── CategoryList.jsx
+│   │   │   ├── CategoryForm.jsx
+│   │   │   └── ParentCategoryForm.jsx
+│   │   ├── orders/
+│   │   │   ├── OrderList.jsx
+│   │   │   ├── OrderDetails.jsx
+│   │   │   └── OrderStatusUpdate.jsx
+│   │   ├── customers/
+│   │   │   ├── CustomerList.jsx
+│   │   │   ├── CustomerDetails.jsx
+│   │   │   └── CustomerOrders.jsx
+│   │   ├── transactions/
+│   │   │   ├── TransactionList.jsx
+│   │   │   └── TransactionDetails.jsx
+│   │   ├── blog/
+│   │   │   ├── BlogList.jsx
+│   │   │   ├── BlogForm.jsx
+│   │   │   └── BlogCategoryForm.jsx
+│   │   ├── reviews/
+│   │   │   ├── ReviewList.jsx
+│   │   │   └── ReviewModeration.jsx
+│   │   └── settings/
+│   │       ├── AppSettings.jsx
+│   │       ├── SliderSettings.jsx
+│   │       └── ProfileSettings.jsx
+│   ├── pages/
+│   │   ├── Dashboard.jsx
+│   │   ├── Products.jsx
+│   │   ├── Categories.jsx
+│   │   ├── Orders.jsx
+│   │   ├── Customers.jsx
+│   │   ├── Transactions.jsx
+│   │   ├── Blog.jsx
+│   │   ├── Reviews.jsx
+│   │   ├── Settings.jsx
+│   │   └── Login.jsx
+│   ├── services/
+│   │   ├── api.js
+│   │   ├── auth.js
+│   │   ├── productService.js
+│   │   ├── orderService.js
+│   │   ├── customerService.js
+│   │   ├── transactionService.js
+│   │   └── blogService.js
+│   ├── hooks/
+│   │   ├── useAuth.js
+│   │   ├── useApi.js
+│   │   └── useLocalStorage.js
+│   ├── context/
+│   │   ├── AuthContext.jsx
+│   │   └── ThemeContext.jsx
+│   ├── utils/
+│   │   ├── constants.js
+│   │   ├── formatters.js
+│   │   ├── validators.js
+│   │   └── helpers.js
+│   ├── styles/
+│   │   ├── theme.js
+│   │   └── globals.css
+│   ├── App.jsx
+│   ├── index.js
+│   └── routes.jsx
+├── package.json
+└── README.md
