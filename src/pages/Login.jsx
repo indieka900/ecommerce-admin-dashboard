@@ -222,7 +222,7 @@ const Login = () => {
                                                     edge="end"
                                                     aria-label="toggle password visibility"
                                                 >
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                    {!showPassword ? <VisibilityOff /> : <Visibility />}
                                                 </IconButton>
                                             </InputAdornment>
                                         ),

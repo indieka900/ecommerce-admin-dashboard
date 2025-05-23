@@ -1,115 +1,126 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-    Toolbar,
-    IconButton,
-    Typography,
     Box,
+    Toolbar,
+    Typography,
+    ListItemIcon,
     Avatar,
+    Badge,
+    IconButton,
     Menu,
     MenuItem,
-    Badge,
     Divider
 } from '@mui/material';
 import {
+    Settings,
     Menu as MenuIcon,
     Notifications,
-    AccountCircle,
-    Settings,
-    Logout
+    Search,
+    Logout,
+    Person,
+    DarkMode,
 } from '@mui/icons-material';
-import { useAuth } from '../../../context/AuthContext';
+
 
 const Header = ({ onMenuClick }) => {
-    const { user, logout } = useAuth();
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [notificationAnchor, setNotificationAnchor] = useState(null);
 
-    const handleMenuOpen = (event) => {
+    const handleProfileClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
+    const handleNotificationClick = (event) => {
+        setNotificationAnchor(event.currentTarget);
     };
 
-    const handleLogout = () => {
-        handleMenuClose();
-        logout();
+    const handleClose = () => {
+        setAnchorEl(null);
+        setNotificationAnchor(null);
     };
 
     return (
-        <Toolbar>
-            {/* Mobile menu button */}
-            <IconButton
-                color="inherit"
-                edge="start"
-                onClick={onMenuClick}
-                sx={{ mr: 2, display: { md: 'none' } }}
-            >
-                <MenuIcon />
-            </IconButton>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+            <Box display="flex" alignItems="center">
+                <IconButton
+                    color="inherit"
+                    edge="start"
+                    onClick={onMenuClick}
+                    sx={{ mr: 2, display: { md: 'none' } }}
+                >
+                    <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" fontWeight="bold" color="white">
+                    Admin Dashboard
+                </Typography>
+            </Box>
 
-            {/* Title */}
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                Admin Dashboard
-            </Typography>
-
-            {/* Header actions */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                {/* Notifications */}
+            <Box display="flex" alignItems="center" gap={2}>
                 <IconButton color="inherit">
+                    <Search />
+                </IconButton>
+                
+                <IconButton color="inherit" onClick={handleNotificationClick}>
                     <Badge badgeContent={4} color="error">
                         <Notifications />
                     </Badge>
                 </IconButton>
 
-                {/* User menu */}
-                <IconButton
-                    color="inherit"
-                    onClick={handleMenuOpen}
-                    sx={{ ml: 1 }}
-                >
-                    <Avatar sx={{ width: 32, height: 32 }}>
-                        {user?.first_name?.[0] || user?.email?.[0] || 'A'}
+                <IconButton color="inherit">
+                    <DarkMode />
+                </IconButton>
+
+                <IconButton onClick={handleProfileClick} sx={{ p: 0 }}>
+                    <Avatar
+                        sx={{
+                            width: 36,
+                            height: 36,
+                            background: 'linear-gradient(45deg, #10b981, #06b6d4)'
+                        }}
+                    >
+                        J
                     </Avatar>
                 </IconButton>
 
+                {/* Profile Menu */}
                 <Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                    onClick={handleMenuClose}
-                    PaperProps={{
-                        elevation: 3,
-                        sx: {
-                            mt: 1.5,
-                            minWidth: 200,
-                        },
-                    }}
+                    onClose={handleClose}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                    <Box sx={{ px: 2, py: 1 }}>
-                        <Typography variant="subtitle1" fontWeight="bold">
-                            {user?.first_name} {user?.last_name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {user?.email}
-                        </Typography>
-                        <Typography variant="caption" color="primary">
-                            {user?.role}
-                        </Typography>
-                    </Box>
-                    <Divider />
-                    <MenuItem onClick={handleMenuClose}>
-                        <AccountCircle sx={{ mr: 2 }} />
+                    <MenuItem onClick={handleClose}>
+                        <ListItemIcon><Person fontSize="small" /></ListItemIcon>
                         Profile
                     </MenuItem>
-                    <MenuItem onClick={handleMenuClose}>
-                        <Settings sx={{ mr: 2 }} />
+                    <MenuItem onClick={handleClose}>
+                        <ListItemIcon><Settings fontSize="small" /></ListItemIcon>
                         Settings
                     </MenuItem>
                     <Divider />
-                    <MenuItem onClick={handleLogout}>
-                        <Logout sx={{ mr: 2 }} />
+                    <MenuItem onClick={handleClose}>
+                        <ListItemIcon><Logout fontSize="small" /></ListItemIcon>
                         Logout
+                    </MenuItem>
+                </Menu>
+
+                {/* Notifications Menu */}
+                <Menu
+                    anchorEl={notificationAnchor}
+                    open={Boolean(notificationAnchor)}
+                    onClose={handleClose}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
+                    <MenuItem onClick={handleClose}>
+                        <Typography variant="body2">New order received</Typography>
+                    </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                        <Typography variant="body2">Product out of stock</Typography>
+                    </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                        <Typography variant="body2">Customer review pending</Typography>
                     </MenuItem>
                 </Menu>
             </Box>

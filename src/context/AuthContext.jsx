@@ -78,18 +78,8 @@ export const AuthProvider = ({ children }) => {
                 // Check if user is logged in and has valid session
                 if (authService.isAuthenticated()) {
                     const user = authService.getCurrentUser();
-
-                    // Validate user role
                     if (user?.role === 'Administrator') {
-                        // Optionally validate session with server
-                        try {
-                            await authService.validateSession();
-                            dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-                        } catch (error) {
-                            console.error('Session validation failed:', error);
-                            dispatch({ type: 'SESSION_EXPIRED' });
-                            authService.clearUserData();
-                        }
+                        dispatch({ type: 'LOGIN_SUCCESS', payload: user });
                     } else {
                         dispatch({ type: 'LOGIN_FAILURE', payload: 'Invalid user role' });
                         authService.clearUserData();
