@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import {
@@ -7,133 +7,49 @@ import {
     Drawer,
     AppBar,
     Toolbar,
-    Typography,
     Container,
     useTheme,
     useMediaQuery,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Collapse,
-    Avatar,
-    Paper,
     ThemeProvider,
-    createTheme,
-    CssBaseline,
-    Chip
+    CssBaseline
 } from '@mui/material';
-import {
-    Dashboard,
-    Inventory,
-    People,
-    ShoppingCart,
-    Analytics,
-    Settings,
-    Add,
-    Category,
-    Business,
-    ExpandLess,
-    ExpandMore,
-    Store
-} from '@mui/icons-material';
+import { themes } from '../../../context/ThemeContext';
 
 const DRAWER_WIDTH = 300;
 
-// Create modern dark theme
-const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-        primary: {
-            main: '#6366f1',
-            light: '#818cf8',
-            dark: '#4f46e5',
-        },
-        secondary: {
-            main: '#f59e0b',
-            light: '#fbbf24',
-            dark: '#d97706',
-        },
-        background: {
-            default: '#0f172a',
-            paper: '#1e293b',
-        },
-        text: {
-            primary: '#f8fafc',
-            secondary: '#cbd5e1',
-        },
-    },
-    components: {
-        MuiDrawer: {
-            styleOverrides: {
-                paper: {
-                    background: 'linear-gradient(180deg, #1e293b 0%, #334155 100%)',
-                    borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-                },
-            },
-        },
-        MuiAppBar: {
-            styleOverrides: {
-                root: {
-                    background: 'linear-gradient(90deg, #1e293b 0%, #334155 100%)',
-                    backdropFilter: 'blur(10px)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                },
-            },
-        },
-        MuiListItemButton: {
-            styleOverrides: {
-                root: {
-                    borderRadius: 12,
-                    margin: '4px 12px',
-                    '&:hover': {
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        transform: 'translateX(4px)',
-                        transition: 'all 0.3s ease',
-                    },
-                    '&.Mui-selected': {
-                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                        borderLeft: '4px solid #6366f1',
-                        '&:hover': {
-                            backgroundColor: 'rgba(99, 102, 241, 0.3)',
-                        },
-                    },
-                },
-            },
-        },
-    },
-});
-
-
-
-
 
 const AdminLayout = () => {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
+    const [mode, setMode] = useState('light');
+
+    const toggleTheme = () => {
+        setMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    };
+
+    const theme = useMemo(() => themes[mode], [mode]);
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
     return (
-        <ThemeProvider theme={darkTheme}>
+        <ThemeProvider theme={theme}>
             <CssBaseline />
             <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-                {/* App Bar */}
                 <AppBar
                     position="fixed"
                     elevation={0}
-                    sx={{
+                    sx={(theme) => ({
                         width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
                         ml: { md: `${DRAWER_WIDTH}px` },
                         zIndex: theme.zIndex.drawer + 1,
-                    }}
+                    })}
                 >
-                    <Header onMenuClick={handleDrawerToggle} />
+                    <Header onMenuClick={handleDrawerToggle} toggleTheme={toggleTheme} mode={mode} /> 
                 </AppBar>
+
 
                 {/* Sidebar */}
                 <Box

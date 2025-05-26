@@ -185,16 +185,18 @@ const Login = () => {
                                     autoFocus
                                     error={!!errors.email}
                                     helperText={errors.email?.message}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Email color="action" />
-                                            </InputAdornment>
-                                        ),
-                                    }}
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             borderRadius: 2,
+                                        }
+                                    }}
+                                    slotProps={{
+                                        input: {
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Email color="action" />
+                                                </InputAdornment>
+                                            ),
                                         }
                                     }}
                                 />
@@ -209,27 +211,29 @@ const Login = () => {
                                     autoComplete="current-password"
                                     error={!!errors.password}
                                     helperText={errors.password?.message}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Lock color="action" />
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    onClick={handleTogglePassword}
-                                                    edge="end"
-                                                    aria-label="toggle password visibility"
-                                                >
-                                                    {!showPassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    }}
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             borderRadius: 2,
+                                        }
+                                    }}
+                                    slotProps={{
+                                        input: {
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Lock color="action" />
+                                                </InputAdornment>
+                                            ),
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        onClick={handleTogglePassword}
+                                                        edge="end"
+                                                        aria-label="toggle password visibility"
+                                                    >
+                                                        {!showPassword ? <VisibilityOff /> : <Visibility />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
                                         }
                                     }}
                                 />

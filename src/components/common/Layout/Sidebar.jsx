@@ -14,6 +14,15 @@ import {
     Chip
 } from '@mui/material';
 import {
+    Dashboard,
+    Inventory,
+    People,
+    ShoppingCart,
+    Analytics,
+    Settings,
+    Add,
+    Category,
+    Business,
     ExpandLess,
     ExpandMore,
     Store
@@ -23,7 +32,7 @@ const navigationItems = [
     {
         title: 'Dashboard',
         icon: Dashboard,
-        path: '/admin/dashboard',
+        path: '/dashboard',
         color: '#6366f1'
     },
     {
@@ -131,10 +140,12 @@ const Sidebar = ({ onItemClick }) => {
                         </ListItemIcon>
                         <ListItemText 
                             primary={item.title}
-                            primaryTypographyProps={{
-                                fontSize: depth > 0 ? '0.875rem' : '0.95rem',
-                                fontWeight: isSelected ? 600 : 500,
-                                color: isSelected ? '#6366f1' : 'inherit'
+                            slotProps={{
+                                primary: {
+                                    fontSize: depth > 0 ? '0.875rem' : '0.95rem',
+                                    fontWeight: isSelected ? 600 : 500,
+                                    color: isSelected ? '#6366f1' : 'inherit'
+                                }
                             }}
                         />
                         {item.badge && (

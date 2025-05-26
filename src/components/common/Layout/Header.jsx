@@ -22,7 +22,7 @@ import {
 } from '@mui/icons-material';
 
 
-const Header = ({ onMenuClick }) => {
+const Header = ({ onMenuClick, toggleTheme, mode }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [notificationAnchor, setNotificationAnchor] = useState(null);
 
@@ -59,15 +59,15 @@ const Header = ({ onMenuClick }) => {
                 <IconButton color="inherit">
                     <Search />
                 </IconButton>
-                
+
                 <IconButton color="inherit" onClick={handleNotificationClick}>
                     <Badge badgeContent={4} color="error">
                         <Notifications />
                     </Badge>
                 </IconButton>
 
-                <IconButton color="inherit">
-                    <DarkMode />
+                <IconButton color="inherit" onClick={toggleTheme}>
+                    {mode === 'dark' ? <DarkMode /> : <DarkMode sx={{ opacity: 0.5 }} />}
                 </IconButton>
 
                 <IconButton onClick={handleProfileClick} sx={{ p: 0 }}>

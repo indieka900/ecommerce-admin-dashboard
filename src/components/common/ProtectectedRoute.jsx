@@ -51,7 +51,9 @@ const ProtectedRoute = ({ children, requiredRole = 'Administrator' }) => {
           <Typography variant="h6" gutterBottom>
             Authentication Error
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" sx={{
+            marginBottom: "16px"
+          }}>
             {error}
           </Typography>
           <Button 
@@ -88,10 +90,14 @@ const ProtectedRoute = ({ children, requiredRole = 'Administrator' }) => {
           <Typography variant="h6" gutterBottom>
             Access Denied
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" sx={{
+            marginBottom: "16px"
+          }}>
             You don't have the required Administrator privileges to access this area.
           </Typography>
-          <Typography variant="body2" color="text.secondary" paragraph>
+          <Typography variant="body2" color="text.secondary" sx={{
+            marginBottom: "16px"
+          }}>
             Current role: {user?.role || 'Unknown'}
             <br />
             Required role: {requiredRole}
