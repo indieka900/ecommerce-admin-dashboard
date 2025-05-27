@@ -54,7 +54,8 @@ const Login = () => {
     // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated && user?.role === 'Administrator') {
-            const from = location.state?.from?.pathname || '/';
+            const from = location.state?.from?.pathname || '/dashboard';
+            console.log('Already authenticated, redirecting to:', from);
             navigate(from, { replace: true });
         }
     }, [isAuthenticated, user, navigate, location]);
@@ -77,30 +78,30 @@ const Login = () => {
         setLoginError('');
 
         try {
+            
             // Attempt login
             const response = await login(data);
 
-            // Check if user role is Administrator
+            // Double-check user role (should already be validated in authService)
             if (response.user?.role !== 'Administrator') {
                 setLoginError('Access denied. Administrator privileges required.');
                 toast.error('Access denied. Administrator privileges required.');
-
-                // Clear tokens if role is not Administrator
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                localStorage.removeItem('user');
-
                 return;
             }
 
-            // Success - redirect to dashboard
+            // Success toast
             toast.success(`Welcome back, ${response.user.first_name || response.user.email}!`);
 
-            // Get the intended destination or default to dashboard
-            const from = location.state?.from?.pathname || '/dashboard';
-            navigate(from, { replace: true });
+            // Get the intended destination or default to homepage/dashboard
+            const from = location.state?.from?.pathname || '/dashboard'; 
+            
+            // Use setTimeout to ensure state updates have propagated
+            setTimeout(() => {
+                navigate(from, { replace: true });
+            }, 100);
 
         } catch (error) {
+            console.error('Login error:', error);
             const errorMessage = error.message || 'Login failed. Please try again.';
             setLoginError(errorMessage);
             toast.error(errorMessage);

@@ -24,16 +24,6 @@ export const authService = {
             localStorage.setItem('refresh_token', refresh);
             localStorage.setItem('user', JSON.stringify(user));
 
-            console.log('User data:', user, 'access:', access, 'refresh:', refresh);
-
-
-            // Log successful login
-            console.log('Login successful:', {
-                userId: user.id,
-                email: user.email,
-                role: user.role,
-                loginTime: new Date().toISOString()
-            });
 
             return { success: true, user };
         } catch (error) {
@@ -116,11 +106,9 @@ export const authService = {
     // Enhanced authentication check
     isAuthenticated: () => {
         const token = localStorage.getItem('access_token');
-        console.log('Token:', token);
 
         const user = authService.getCurrentUser();
 
-        // Check if token exists and user is Administrator
         return !!(token && user && user.role === 'Administrator');
     },
 
