@@ -3,8 +3,10 @@ export const API_ENDPOINTS = {
     LOGIN: '/accounts/user/login/',
     LOGOUT: '/auth/logout/',
     REFRESH_TOKEN: '/token/refresh/',
-    PROFILE: '/auth/profile/',
-    CHANGE_PASSWORD: '/auth/change-password/',
+    PROFILE: '/accounts/user/profile/',
+    CHANGE_PASSWORD: '/accounts/user/change-password/',
+    RESET_PASSWORD: '/accounts/user/password-reset/',
+    CONFIRM_RESET_PASSWORD: '/accounts/user/password-reset-confirm/',
 
     // Product endpoints
     PRODUCTS: '/products/',

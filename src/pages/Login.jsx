@@ -117,7 +117,7 @@ const Login = () => {
     };
 
     const handleForgotPassword = () => {
-        // Handle forgot password functionality
+        navigate('/forgot-password');
         toast.info('Forgot password functionality will be implemented');
     };
 

@@ -1,6 +1,5 @@
 import { createTheme } from '@mui/material';
 
-// Custom color palette extensions
 const customColors = {
     success: {
         main: '#10b981',
@@ -74,7 +73,6 @@ const customColors = {
     },
 };
 
-// Enhanced typography settings
 const typography = {
     fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
     h1: {
@@ -136,7 +134,6 @@ const typography = {
     },
 };
 
-// Enhanced component overrides for dark theme
 const darkComponentOverrides = {
     MuiCssBaseline: {
         styleOverrides: {
@@ -346,7 +343,6 @@ const darkComponentOverrides = {
     },
 };
 
-// Enhanced component overrides for light theme
 const lightComponentOverrides = {
     MuiCssBaseline: {
         styleOverrides: {
@@ -478,7 +474,6 @@ const lightComponentOverrides = {
     },
 };
 
-// Create enhanced dark theme
 const darkTheme = createTheme({
     palette: {
         mode: 'dark',
@@ -525,7 +520,6 @@ const darkTheme = createTheme({
     components: darkComponentOverrides,
 });
 
-// Create enhanced light theme
 const lightTheme = createTheme({
     palette: {
         mode: 'light',
@@ -572,7 +566,6 @@ const lightTheme = createTheme({
     components: lightComponentOverrides,
 });
 
-// Utility functions for theme customization
 export const getGradientBackground = (theme, colors) => {
     return `linear-gradient(135deg, ${colors.map(color => 
         theme.palette[color]?.main || color
@@ -596,7 +589,6 @@ export const getHoverTransition = (translateY = -2) => ({
     },
 });
 
-// Export themes and utilities
 export const themes = {
     dark: darkTheme,
     light: lightTheme,

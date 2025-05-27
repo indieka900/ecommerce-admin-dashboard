@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useAuth } from '../../../context/AuthContext';
 import {
     Box,
     Toolbar,
@@ -99,7 +100,7 @@ const Header = ({ onMenuClick, toggleTheme, mode }) => {
                         Settings
                     </MenuItem>
                     <Divider />
-                    <MenuItem onClick={handleClose}>
+                    <MenuItem onClick={useAuth().logout}>
                         <ListItemIcon><Logout fontSize="small" /></ListItemIcon>
                         Logout
                     </MenuItem>

@@ -6,6 +6,7 @@ import AdminLayout from './components/common/Layout/AdminLayout';
 // Pages
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import ForgotPassword from './pages/ForgotPassword';
 // import Products from './pages/Products';
 // import Categories from './pages/Categories';
 // import Orders from './pages/Orders';
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
     {
         path: '/login',
         element: <Login />
+    },
+    {
+        path: '/forgot-password',
+        element: <ForgotPassword />
     },
     {
         path: '/',

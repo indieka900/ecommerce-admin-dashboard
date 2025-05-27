@@ -195,10 +195,21 @@ export const authService = {
     // Change password
     changePassword: async (passwordData) => {
         try {
-            await api.post('/auth/change-password/', passwordData);
+            await api.post(API_ENDPOINTS.CHANGE_PASSWORD, passwordData);
             return { success: true };
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Password change failed';
+            throw new Error(errorMessage);
+        }
+    },
+
+    // Reset password
+    resetPassword: async (email) => {
+        try {
+            await api.post(API_ENDPOINTS.RESET_PASSWORD, { email });
+            return { success: true };
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Password reset failed';
             throw new Error(errorMessage);
         }
     }
