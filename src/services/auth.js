@@ -25,7 +25,7 @@ export const authService = {
             localStorage.setItem('user', JSON.stringify(user));
 
             console.log('User data:', user, 'access:', access, 'refresh:', refresh);
-            
+
 
             // Log successful login
             console.log('Login successful:', {
@@ -117,7 +117,7 @@ export const authService = {
     isAuthenticated: () => {
         const token = localStorage.getItem('access_token');
         console.log('Token:', token);
-        
+
         const user = authService.getCurrentUser();
 
         // Check if token exists and user is Administrator
@@ -204,13 +204,14 @@ export const authService = {
     },
 
     // Reset password
-    resetPassword: async (email) => {
+    forgotPassword: async (email) => {
         try {
-            await api.post(API_ENDPOINTS.RESET_PASSWORD, { email });
-            return { success: true };
+            const res = await api.post(API_ENDPOINTS.RESET_PASSWORD, { email });
+            return res;
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Password reset failed';
-            throw new Error(errorMessage);
+            console.error('Password reset error:', error.response?.detail || error.message);
+            throw error;
         }
     }
+
 };

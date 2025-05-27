@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { 
-    Button, 
-    TextField, 
-    Typography, 
-    Paper, 
-    Box, 
+import {
+    Button,
+    TextField,
+    Typography,
+    Paper,
+    Box,
     useTheme,
     Alert,
     CircularProgress,
@@ -15,7 +15,7 @@ import {
     Fade,
     Slide
 } from "@mui/material";
-import { 
+import {
     Email as EmailIcon,
     ArrowBack as ArrowBackIcon,
     Security as SecurityIcon,
@@ -46,7 +46,7 @@ const ForgotPassword = () => {
         setEmail(value);
         setError("");
         setValidationErrors({});
-        
+
         // Real-time validation
         if (value && !validateEmail(value)) {
             setValidationErrors({ email: "Please enter a valid email address" });
@@ -72,26 +72,24 @@ const ForgotPassword = () => {
         setLoading(true);
 
         try {
-            
-            const response = await authService.resetPassword(email);
+            const response = await authService.forgotPassword(email);
 
-            if (response.success) {
+            if (response.status === 200) {
                 setSubmitted(true);
                 startResendTimer();
-            } else {
-                const errorData = await response.json();
-                setError(errorData.message || "Failed to send reset link. Please try again.");
             }
         } catch (err) {
-            console.error('Forgot password error:', err);
-            setError("Network error. Please check your connection and try again.");
+            const status = error.response?.status;
+            const message = error.response?.data?.detail || "Something went wrong";
+            console.error(`Reset password failed (${status}):`, message);
+            setError(message);
         } finally {
             setLoading(false);
         }
     };
 
     const startResendTimer = () => {
-        setResendTimer(60);
+        setResendTimer(10);
         const timer = setInterval(() => {
             setResendTimer((prev) => {
                 if (prev <= 1) {
@@ -105,7 +103,7 @@ const ForgotPassword = () => {
 
     const handleResend = () => {
         if (resendTimer === 0) {
-            handleSubmit({ preventDefault: () => {} });
+            handleSubmit({ preventDefault: () => { } });
         }
     };
 
@@ -146,13 +144,13 @@ const ForgotPassword = () => {
                     opacity: 0.3
                 }}
             />
-            
+
             <Slide direction="up" in={true} timeout={600}>
-                <Paper 
-                    elevation={8} 
-                    sx={{ 
-                        p: 5, 
-                        borderRadius: 3, 
+                <Paper
+                    elevation={8}
+                    sx={{
+                        p: 5,
+                        borderRadius: 3,
                         bgcolor: theme.palette.background.paper,
                         maxWidth: 450,
                         width: '100%',
@@ -162,29 +160,29 @@ const ForgotPassword = () => {
                 >
                     {/* Header */}
                     <Box sx={{ textAlign: 'center', mb: 4 }}>
-                        <SecurityIcon 
-                            sx={{ 
-                                fontSize: 48, 
-                                color: theme.palette.primary.main, 
-                                mb: 2 
-                            }} 
+                        <SecurityIcon
+                            sx={{
+                                fontSize: 48,
+                                color: theme.palette.primary.main,
+                                mb: 2
+                            }}
                         />
-                        <Typography 
-                            variant="h4" 
-                            gutterBottom 
-                            sx={{ 
+                        <Typography
+                            variant="h4"
+                            gutterBottom
+                            sx={{
                                 fontWeight: 600,
-                                color: theme.palette.text.primary 
+                                color: theme.palette.text.primary
                             }}
                         >
                             Admin Password Reset
                         </Typography>
-                        <Typography 
-                            variant="body2" 
+                        <Typography
+                            variant="body2"
                             color="text.secondary"
                             sx={{ maxWidth: 300, mx: 'auto' }}
                         >
-                            {submitted 
+                            {submitted
                                 ? "Check your email for reset instructions"
                                 : "Enter your admin email to receive a password reset link"
                             }
@@ -195,23 +193,23 @@ const ForgotPassword = () => {
                     {submitted ? (
                         <Fade in={submitted} timeout={800}>
                             <Box sx={{ textAlign: 'center' }}>
-                                <CheckCircleIcon 
-                                    sx={{ 
-                                        fontSize: 64, 
-                                        color: 'success.main', 
-                                        mb: 2 
-                                    }} 
+                                <CheckCircleIcon
+                                    sx={{
+                                        fontSize: 64,
+                                        color: 'success.main',
+                                        mb: 2
+                                    }}
                                 />
-                                
-                                <Alert 
-                                    severity="success" 
+
+                                <Alert
+                                    severity="success"
                                     sx={{ mb: 3, textAlign: 'left' }}
                                 >
                                     <Typography variant="body2" sx={{ mb: 1 }}>
                                         <strong>Reset link sent successfully!</strong>
                                     </Typography>
                                     <Typography variant="body2">
-                                        If an admin account exists with <strong>{email}</strong>, 
+                                        If an admin account exists with <strong>{email}</strong>,
                                         you'll receive a password reset link within 5 minutes.
                                     </Typography>
                                 </Alert>
@@ -220,7 +218,7 @@ const ForgotPassword = () => {
                                     <Typography variant="body2" color="text.secondary" gutterBottom>
                                         Didn't receive the email? Check your spam folder or:
                                     </Typography>
-                                    
+
                                     <Button
                                         variant="outlined"
                                         startIcon={<RefreshIcon />}
@@ -228,12 +226,12 @@ const ForgotPassword = () => {
                                         disabled={resendTimer > 0}
                                         sx={{ mt: 1, mb: resendTimer > 0 ? 1 : 0 }}
                                     >
-                                        {resendTimer > 0 
-                                            ? `Resend in ${resendTimer}s` 
+                                        {resendTimer > 0
+                                            ? `Resend in ${resendTimer}s`
                                             : "Resend Email"
                                         }
                                     </Button>
-                                    
+
                                     {resendTimer > 0 && (
                                         <Typography variant="caption" display="block" color="text.secondary">
                                             Please wait before requesting another email
@@ -252,7 +250,7 @@ const ForgotPassword = () => {
                                     >
                                         Back to Login
                                     </Button>
-                                    
+
                                     <Button
                                         variant="text"
                                         onClick={resetForm}
@@ -292,8 +290,8 @@ const ForgotPassword = () => {
 
                                     {/* Error Display */}
                                     {error && (
-                                        <Alert 
-                                            severity="error" 
+                                        <Alert
+                                            severity="error"
                                             sx={{ mb: 2 }}
                                             icon={<ErrorIcon />}
                                         >
@@ -309,8 +307,8 @@ const ForgotPassword = () => {
                                         size="large"
                                         disabled={loading || !!validationErrors.email}
                                         startIcon={loading ? <CircularProgress size={20} /> : <EmailIcon />}
-                                        sx={{ 
-                                            py: 1.5, 
+                                        sx={{
+                                            py: 1.5,
                                             mt: 1,
                                             fontWeight: 600,
                                             textTransform: 'none'
@@ -327,12 +325,12 @@ const ForgotPassword = () => {
                                     <Typography variant="body2" color="text.secondary" gutterBottom>
                                         Remember your password?
                                     </Typography>
-                                    
+
                                     <Link
                                         component="button"
                                         variant="body2"
                                         onClick={handleBackToLogin}
-                                        sx={{ 
+                                        sx={{
                                             textDecoration: 'none',
                                             fontWeight: 500,
                                             '&:hover': {
