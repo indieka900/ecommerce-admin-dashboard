@@ -5,8 +5,8 @@ export const API_ENDPOINTS = {
     REFRESH_TOKEN: '/token/refresh/',
     PROFILE: '/accounts/user/profile/',
     CHANGE_PASSWORD: '/accounts/user/change-password/',
-    RESET_PASSWORD: '/accounts/user/password-reset/',
-    CONFIRM_RESET_PASSWORD: '/accounts/user/password-reset-confirm/',
+    FORGOT_PASSWORD: '/accounts/user/password-reset/',
+    RESET_PASSWORD: '/accounts/user/password-reset-confirm/',
 
     // Product endpoints
     PRODUCTS: '/products/',

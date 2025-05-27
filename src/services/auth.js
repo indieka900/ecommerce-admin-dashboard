@@ -203,10 +203,21 @@ export const authService = {
         }
     },
 
-    // Reset password
+    // Forgot password
     forgotPassword: async (email) => {
         try {
-            const res = await api.post(API_ENDPOINTS.RESET_PASSWORD, { email });
+            const res = await api.post(API_ENDPOINTS.FORGOT_PASSWORD, { email });
+            return res;
+        } catch (error) {
+            console.error('Password reset error:', error.response?.detail || error.message);
+            throw error;
+        }
+    },
+
+    // Reset password
+    resetPassword: async (resetData) => {
+        try {
+            const res = await api.post(API_ENDPOINTS.RESET_PASSWORD, resetData);
             return res;
         } catch (error) {
             console.error('Password reset error:', error.response?.detail || error.message);

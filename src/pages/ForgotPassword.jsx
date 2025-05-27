@@ -144,7 +144,6 @@ const ForgotPassword = () => {
                     opacity: 0.3
                 }}
             />
-
             <Slide direction="up" in={true} timeout={600}>
                 <Paper
                     elevation={8}
@@ -263,7 +262,7 @@ const ForgotPassword = () => {
                         </Fade>
                     ) : (
                         /* Form State */
-                        <Fade in={!submitted} timeout={400}>
+                        (<Fade in={!submitted} timeout={400}>
                             <Box>
                                 <form onSubmit={handleSubmit}>
                                     <TextField
@@ -278,14 +277,16 @@ const ForgotPassword = () => {
                                         autoComplete="email"
                                         error={!!validationErrors.email}
                                         helperText={validationErrors.email}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <EmailIcon color="action" />
-                                                </InputAdornment>
-                                            ),
-                                        }}
                                         sx={{ mb: 2 }}
+                                        slotProps={{
+                                            input: {
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <EmailIcon color="action" />
+                                                    </InputAdornment>
+                                                ),
+                                            }
+                                        }}
                                     />
 
                                     {/* Error Display */}
@@ -353,7 +354,7 @@ const ForgotPassword = () => {
                                     </Typography>
                                 </Box>
                             </Box>
-                        </Fade>
+                        </Fade>)
                     )}
                 </Paper>
             </Slide>
