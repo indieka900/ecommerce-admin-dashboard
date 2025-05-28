@@ -101,7 +101,6 @@ const ResetPassword = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`
         }}>
             <Slide direction="up" in={true} timeout={600}>
                 <Paper elevation={8} sx={{ p: 5, width: '100%', maxWidth: 520 }}>

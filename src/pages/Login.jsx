@@ -129,7 +129,6 @@ const Login = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 padding: 2
             }}
         >
@@ -140,7 +139,6 @@ const Login = () => {
                         borderRadius: 3,
                         overflow: 'hidden',
                         backdropFilter: 'blur(10px)',
-                        background: 'rgba(255, 255, 255, 0.95)'
                     }}
                 >
                     <CardContent sx={{ p: 4 }}>
@@ -266,10 +264,6 @@ const Login = () => {
                                     borderRadius: 2,
                                     fontSize: '1.1rem',
                                     fontWeight: 600,
-                                    background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
-                                    '&:hover': {
-                                        background: 'linear-gradient(45deg, #1565c0 30%, #1976d2 90%)',
-                                    }
                                 }}
                             >
                                 {isLoading ? 'Signing In...' : 'Sign In'}
