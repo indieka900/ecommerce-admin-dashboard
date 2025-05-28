@@ -167,8 +167,15 @@ export const authService = {
     // Update user profile
     updateProfile: async (userData) => {
         try {
-            const response = await api.put('/auth/profile/', userData);
+            const response = await api.put(API_ENDPOINTS.PROFILE, userData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
             const updatedUser = response.data;
+            console.log('Profile updated successfully:', updatedUser);
 
             // Update stored user data
             localStorage.setItem('user', JSON.stringify(updatedUser));

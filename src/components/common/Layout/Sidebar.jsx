@@ -188,7 +188,7 @@ const Sidebar = ({ onItemClick }) => {
     };
 
     return (
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 'none'}}>
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {/* Logo Section */}
             <Box sx={{ p: 3, textAlign: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 <Box
