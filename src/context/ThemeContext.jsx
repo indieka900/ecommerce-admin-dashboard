@@ -147,7 +147,7 @@ const darkComponentOverrides = {
                 },
                 '&::-webkit-scrollbar-thumb': {
                     backgroundColor: '#475569',
-                    borderRadius: '4px',
+                    // borderRadius: '4px',
                     '&:hover': {
                         backgroundColor: '#64748b',
                     },

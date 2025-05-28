@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import {
     Box,
@@ -25,7 +26,13 @@ import {
 
 const Header = ({ onMenuClick, toggleTheme, mode }) => {
     const [anchorEl, setAnchorEl] = useState(null);
+    const navigate = useNavigate();
     const [notificationAnchor, setNotificationAnchor] = useState(null);
+
+    const handleGoToProfile = () => {
+        navigate('/profile');
+        handleClose();
+    };
 
     const handleProfileClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -91,7 +98,7 @@ const Header = ({ onMenuClick, toggleTheme, mode }) => {
                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                    <MenuItem onClick={handleClose}>
+                    <MenuItem onClick={handleGoToProfile}>
                         <ListItemIcon><Person fontSize="small" /></ListItemIcon>
                         Profile
                     </MenuItem>
