@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import {
     Box,
     Typography,
@@ -94,9 +95,16 @@ const navigationItems = [
 ];
 
 const Sidebar = ({ onItemClick }) => {
+    const { user } = useAuth()
     const location = useLocation();
     const navigate = useNavigate();
     const [expandedItems, setExpandedItems] = useState(['Products']);
+
+    const getDisplayName = () => {
+        const first = user?.first_name || '';
+        const last = user?.last_name || '';
+        return `${first} ${last}`.trim() || 'User';
+    };
 
     const handleToggle = (title) => {
         setExpandedItems(prev => 
@@ -117,6 +125,8 @@ const Sidebar = ({ onItemClick }) => {
         const isSelected = location.pathname === item.path;
         const hasChildren = item.children && item.children.length > 0;
         const isExpanded = expandedItems.includes(item.title);
+
+        
 
         return (
             <React.Fragment key={item.title}>
@@ -240,10 +250,10 @@ const Sidebar = ({ onItemClick }) => {
                         </Avatar>
                         <Box>
                             <Typography variant="body2" fontWeight="bold" color="white">
-                                John Doe
+                                {getDisplayName()}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
-                                Administrator
+                                {user?.role}
                             </Typography>
                         </Box>
                     </Box>
