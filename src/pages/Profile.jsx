@@ -52,7 +52,7 @@ const Profile = () => {
     const fileInputRef = useRef(null);
     // const { updateProfile } = authService();
 
-    const { user } = useAuth();
+    const { user, updateUserProfile } = useAuth();
     const navigate = useNavigate();
 
     const {
@@ -133,7 +133,7 @@ const Profile = () => {
             }
 
             // Call the API using FormData
-            const response = await authService.updateProfile(formData);
+            await updateUserProfile(formData);
             // await new Promise((resolve) => setTimeout(resolve, 1000));
 
             // const updatedUser = { ...user, ...updatedData };

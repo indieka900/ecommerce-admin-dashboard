@@ -30,10 +30,51 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    // Update user data immediately
+    const updateUser = (updatedData) => {
+        if (!user) return;
+        
+        const updatedUser = { ...user, ...updatedData };
+        setUser(updatedUser);
+        
+        // Also update in localStorage/storage if your authService stores it there
+        if (authService.updateStoredUser) {
+            authService.updateStoredUser(updatedUser);
+        }
+    };
+
+    // Update user profile with API call and immediate UI update
+    const updateUserProfile = async (profileData) => {
+        if (!user) throw new Error('No user logged in');
+        
+        try {
+            // Optimistically update UI first for immediate feedback
+            const optimisticUpdate = { ...user, ...profileData };
+            setUser(optimisticUpdate);
+            
+            // Make API call
+            const response = await authService.updateProfile(profileData);
+            
+            // Update with actual response data
+            if (response.user) {
+                setUser(response.user);
+            }
+            
+            return response;
+        } catch (error) {
+            // Revert optimistic update on error
+            const currentUser = authService.getCurrentUser();
+            setUser(currentUser);
+            throw error;
+        }
+    };
+
     const value = {
         user,
         login,
         logout,
+        updateUser,
+        updateUserProfile,
         isAuthenticated: !!user,
         isLoading
     };

@@ -187,6 +187,10 @@ export const authService = {
         }
     },
 
+    updateStoredUser: (user) => {
+        localStorage.setItem('user', JSON.stringify(user));
+    },
+
     // Change password
     changePassword: async (passwordData) => {
         try {
