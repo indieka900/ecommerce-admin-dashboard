@@ -177,7 +177,7 @@ const darkComponentOverrides = {
     MuiCard: {
         styleOverrides: {
             root: {
-                borderRadius: 16,
+                // borderRadius: 16,
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 background: 'rgba(30, 41, 59, 0.8)',
@@ -506,7 +506,7 @@ const darkTheme = createTheme({
     },
     typography,
     shape: {
-        borderRadius: 12,
+        // borderRadius: 12,
     },
     shadows: [
         'none',
@@ -593,6 +593,7 @@ export const themes = {
     dark: darkTheme,
     light: lightTheme,
 };
+
 
 export const customPalette = customColors;
 

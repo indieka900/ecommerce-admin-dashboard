@@ -8,7 +8,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import router from './routes';
 import themes from './context/ThemeContext';
-import theme from './styles/theme';
+
+
 
 function App() {
   const [mode, setMode] = useState('dark');

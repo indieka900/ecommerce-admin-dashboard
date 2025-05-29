@@ -26,6 +26,7 @@ import {
 
 const Header = ({ onMenuClick, toggleTheme, mode }) => {
     const [anchorEl, setAnchorEl] = useState(null);
+    const { user } = useAuth()
     const navigate = useNavigate();
     const [notificationAnchor, setNotificationAnchor] = useState(null);
 
@@ -40,6 +41,12 @@ const Header = ({ onMenuClick, toggleTheme, mode }) => {
 
     const handleNotificationClick = (event) => {
         setNotificationAnchor(event.currentTarget);
+    };
+
+    const getDisplayName = () => {
+        const first = user?.first_name || '';
+        const last = user?.last_name || '';
+        return `${first} ${last}`.trim() || 'User';
     };
 
     const handleClose = () => {
@@ -79,15 +86,21 @@ const Header = ({ onMenuClick, toggleTheme, mode }) => {
                 </IconButton>
 
                 <IconButton onClick={handleProfileClick} sx={{ p: 0 }}>
-                    <Avatar
-                        sx={{
-                            width: 36,
-                            height: 36,
-                            background: 'linear-gradient(45deg, #10b981, #06b6d4)'
-                        }}
-                    >
-                        J
-                    </Avatar>
+                    {user?.profile_picture ? (
+                        <Avatar
+                            src={user.profile_picture}
+                            alt={getDisplayName()}
+                            sx={{
+                                width: 40,
+                                height: 40,
+                                background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                                mr: 2
+                            }}
+                        />
+                    ) : (
+                        getDisplayName().charAt(0)
+                    )}
+
                 </IconButton>
 
                 {/* Profile Menu */}

@@ -238,16 +238,21 @@ const Sidebar = ({ onItemClick }) => {
                     }}
                 >
                     <Box display="flex" alignItems="center">
-                        <Avatar
-                            sx={{
-                                width: 40,
-                                height: 40,
-                                background: 'linear-gradient(45deg, #10b981, #06b6d4)',
-                                mr: 2
-                            }}
-                        >
-                            J
-                        </Avatar>
+                        
+                            {user?.profile_picture ? (
+                                <Avatar
+                                    src={user.profile_picture}
+                                    alt={getDisplayName()}
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                                        mr: 2
+                                    }}
+                                />
+                            ) : (
+                                getDisplayName().charAt(0)
+                            )}
                         <Box>
                             <Typography variant="body2" fontWeight="bold" color="white">
                                 {getDisplayName()}

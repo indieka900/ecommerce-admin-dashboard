@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useTheme } from '@mui/material/styles';
 import {
     Box,
     Card,
@@ -46,7 +47,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [loginError, setLoginError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
+    const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const { login, isAuthenticated, user } = useAuth();
@@ -129,6 +130,7 @@ const Login = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                
                 padding: 2
             }}
         >
@@ -174,7 +176,7 @@ const Login = () => {
 
                         {/* Login Form */}
                         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-                            <Box mb={3}>
+                            <Box mb={3} >
                                 <TextField
                                     {...register('email')}
                                     fullWidth

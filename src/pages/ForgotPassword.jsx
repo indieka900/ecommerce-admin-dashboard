@@ -343,7 +343,7 @@ const ForgotPassword = () => {
                                 </Box>
 
                                 {/* Support Contact */}
-                                <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                                <Box sx={{ mt: 3, p: 2, borderRadius: 2 }}>
                                     <Typography variant="caption" color="text.secondary" align="center" display="block">
                                         Need help? Contact IT Support at{' '}
                                         <Link href="mailto:indiekaj@gmail.com" underline="hover">
