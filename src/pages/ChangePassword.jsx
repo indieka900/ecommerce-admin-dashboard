@@ -1,6 +1,6 @@
-// ChangePassword.jsx
 import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
+import { useGlobalLoading } from '../context/LoadingContext';
 import { validationSchema } from '../validators/ValidationSchema';
 import {
     Box,
@@ -17,6 +17,7 @@ import PasswordFormFields from '../components/PasswordFormFields';
 
 const ChangePassword = () => {
     const navigate = useNavigate();
+    const { setLoading: setGlobalLoading } = useGlobalLoading();
 
     const formik = useFormik({
         initialValues: {
@@ -26,9 +27,10 @@ const ChangePassword = () => {
         validationSchema,
         onSubmit: async (values) => {
             try {
+                setGlobalLoading('change-password', true, 'Changing Your Password...');
                 const response = await authService.changePassword({
                     new_password: values.newPassword,
-                    confirm_password: values.confirmPassword
+                    // confirm_password: values.confirmPassword
                 });
 
                 if (response.success) {
@@ -39,7 +41,9 @@ const ChangePassword = () => {
                 const message = err.response?.data?.detail ||
                     err.response?.data?.error ||
                     'Change Password failed. Please try again.';
-                formik.setFieldError('newPassword', message);
+                toast.error(message);
+            } finally {
+                setGlobalLoading('change-password', false);
             }
         }
     });
@@ -55,9 +59,9 @@ const ChangePassword = () => {
                     <Box sx={{ textAlign: 'center', mb: 3 }}>
                         <LockIcon color="primary" sx={{ fontSize: 40 }} />
                         <Typography variant="h4" gutterBottom>Change Password</Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        {/* <Typography variant="body2" color="text.secondary">
                             Your new password must be different from previously used passwords
-                        </Typography>
+                        </Typography> */}
                     </Box>
 
                     <form onSubmit={formik.handleSubmit}>
