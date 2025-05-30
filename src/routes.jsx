@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
+import ChangePassword from './pages/ChangePassword';
 // import Products from './pages/Products';
 // import Categories from './pages/Categories';
 // import Orders from './pages/Orders';
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
             {
                 path: 'profile',
                 element: <Profile />
+            },
+            {
+                path: 'change-password',
+                element: <ChangePassword />
             },
             // {
             //     path: 'products',
