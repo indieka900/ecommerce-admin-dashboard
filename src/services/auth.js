@@ -104,13 +104,13 @@ export const authService = {
     },
 
     // Enhanced authentication check
-    isAuthenticated: () => {
-        const token = localStorage.getItem('access_token');
+    // isAuthenticated: () => {
+    //     const token = localStorage.getItem('access_token');
 
-        const user = authService.getCurrentUser();
+    //     const user = authService.getCurrentUser();
 
-        return !!(token && user && user.role === 'Administrator');
-    },
+    //     return !!(token && user && user.role === 'Administrator');
+    // },
 
     // Check if user has specific role
     hasRole: (requiredRole) => {

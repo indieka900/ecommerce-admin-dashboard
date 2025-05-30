@@ -26,13 +26,6 @@ const CustomTextField = ({
             disabled={disabled}
             error={error}
             helperText={helperText}
-            InputProps={{
-                startAdornment: Icon && (
-                    <InputAdornment position="start">
-                        <Icon sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-                    </InputAdornment>
-                ),
-            }}
             sx={{
                 '& .MuiInputLabel-root': {
                     color: 'rgba(255, 255, 255, 0.7)'
@@ -54,7 +47,15 @@ const CustomTextField = ({
                 }
             }}
             {...otherProps}
-        />
+            slotProps={{
+                input: {
+                    startAdornment: Icon && (
+                        <InputAdornment position="start">
+                            <Icon sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                        </InputAdornment>
+                    ),
+                }
+            }} />
     );
 };
 

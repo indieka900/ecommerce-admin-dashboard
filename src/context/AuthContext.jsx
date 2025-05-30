@@ -52,10 +52,8 @@ export const AuthProvider = ({ children }) => {
             const optimisticUpdate = { ...user, ...profileData };
             setUser(optimisticUpdate);
             
-            // Make API call
             const response = await authService.updateProfile(profileData);
             
-            // Update with actual response data
             if (response.user) {
                 setUser(response.user);
             }
