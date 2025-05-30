@@ -4,7 +4,7 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Toaster } from 'react-hot-toast';
-
+import { LoadingProvider } from './context/LoadingContext';
 import { AuthProvider } from './context/AuthContext';
 import router from './routes';
 import themes from './context/ThemeContext';
@@ -24,27 +24,29 @@ function App() {
       <CssBaseline />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <AuthProvider>
-          <RouterProvider router={router} />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-              success: {
+          <LoadingProvider>
+            <RouterProvider router={router} />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
                 style: {
-                  background: '#4caf50',
+                  background: '#363636',
+                  color: '#fff',
                 },
-              },
-              error: {
-                style: {
-                  background: '#f44336',
+                success: {
+                  style: {
+                    background: '#4caf50',
+                  },
                 },
-              },
-            }}
-          />
+                error: {
+                  style: {
+                    background: '#f44336',
+                  },
+                },
+              }}
+            />
+          </LoadingProvider>
         </AuthProvider>
       </LocalizationProvider>
     </ThemeProvider>

@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useTheme } from '@mui/material/styles';
+import { useGlobalLoading} from '../context/LoadingContext';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import {
     Box,
     Card,
@@ -44,10 +45,10 @@ const loginSchema = yup.object({
 });
 
 const Login = () => {
+    const { setLoading: setGlobalLoading } = useGlobalLoading();
     const [showPassword, setShowPassword] = useState(false);
     const [loginError, setLoginError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const { login, isAuthenticated, user } = useAuth();
@@ -75,12 +76,12 @@ const Login = () => {
     });
 
     const onSubmit = async (data) => {
-        setIsLoading(true);
         setLoginError('');
+            try {
 
-        try {
-            
             // Attempt login
+            setIsLoading(true);
+            setGlobalLoading('Loging In', true, 'Veryfying Credetials please wait...');
             const response = await login(data);
 
             // Double-check user role (should already be validated in authService)
@@ -94,8 +95,8 @@ const Login = () => {
             toast.success(`Welcome back, ${response.user.first_name || response.user.email}!`);
 
             // Get the intended destination or default to homepage/dashboard
-            const from = location.state?.from?.pathname || '/dashboard'; 
-            
+            const from = location.state?.from?.pathname || '/dashboard';
+
             // Use setTimeout to ensure state updates have propagated
             setTimeout(() => {
                 navigate(from, { replace: true });
@@ -111,7 +112,11 @@ const Login = () => {
             reset({ email: data.email, password: '' });
         } finally {
             setIsLoading(false);
+            setGlobalLoading('Loging In', false);
         }
+        
+
+        
     };
 
     const handleTogglePassword = () => {
@@ -130,7 +135,7 @@ const Login = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                
+
                 padding: 2
             }}
         >

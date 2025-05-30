@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import toast from 'react-hot-toast';
-import { authService } from '../services/auth';
 import {
     Box,
     Card,
@@ -17,6 +16,7 @@ import {
     Divider,
     IconButton,
     Badge,
+    CircularProgress,
 } from '@mui/material';
 import {
     Person as PersonIcon,
@@ -30,7 +30,10 @@ import {
     LocationCity as CityIcon,
     CameraAlt as CameraIcon,
 } from '@mui/icons-material';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+import LoadingButton from '../components/ui/LoadingButton';
 import { useAuth } from '../context/AuthContext';
+import { useGlobalLoading } from '../context/LoadingContext';
 import CustomTextField from '../components/CustomTextField';
 
 // Yup validation schema
@@ -45,12 +48,13 @@ const profileSchema = yup.object().shape({
 });
 
 const Profile = () => {
+    const { setLoading: setGlobalLoading } = useGlobalLoading();
     const [isEditing, setIsEditing] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
     const [profileImagePreview, setProfileImagePreview] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoadingProfile, setIsLoadingProfile] = useState(true);
     const fileInputRef = useRef(null);
-    // const { updateProfile } = authService();
 
     const { user, updateUserProfile } = useAuth();
     const navigate = useNavigate();
@@ -89,6 +93,7 @@ const Profile = () => {
             if (user.profile_picture) {
                 setProfileImagePreview(user.profile_picture);
             }
+            setIsLoadingProfile(false);
         }
     }, [user, reset]);
 
@@ -116,37 +121,32 @@ const Profile = () => {
     };
 
     const onSubmit = async (data) => {
-        setIsLoading(true);
-        try {
-            let profilePictureUrl = user.profile_picture;
+        setIsSubmitting(true);
+        setGlobalLoading('profile-update', true, 'Updating your profile...');
 
+        try {
             const formData = new FormData();
 
-            // Append all other form fields
-            for (const key in data) {
+            Object.keys(data).forEach(key => {
                 formData.append(key, data[key]);
-            }
+            });
 
-            // Append the image file if available
             if (profileImage) {
                 formData.append('profile_picture', profileImage);
             }
 
-            // Call the API using FormData
             await updateUserProfile(formData);
-            // await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            // const updatedUser = { ...user, ...updatedData };
-            // localStorage.setItem('user', JSON.stringify(updatedUser));
 
             toast.success('Profile updated successfully!');
             setIsEditing(false);
             setProfileImage(null);
+            setProfileImagePreview(null);
         } catch (error) {
             toast.error('Failed to update profile');
             console.error(error);
         } finally {
-            setIsLoading(false);
+            setIsSubmitting(false);
+            setGlobalLoading('profile-update', false);
         }
     };
 
@@ -169,14 +169,23 @@ const Profile = () => {
         return `${first} ${last}`.trim() || 'User';
     };
 
+    // Show loading spinner while profile is loading
+    if (isLoadingProfile) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+                <LoadingSpinner />
+            </Box>
+        );
+    }
+
     return (
         <Box>
             <Typography variant="h4" sx={{ color: 'white', mb: 4 }}>
                 Profile Settings
             </Typography>
 
-            <Grid container spacing={4} size="grow" >
-                <Grid spacing={4} size={{ xs: 12, md: 4 }}>
+            <Grid container spacing={4} size="grow">
+                <Grid spacing={2} size={{ xs: 12, md: 4 }}>
                     <Card sx={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(10px)' }}>
                         <CardContent sx={{ textAlign: 'center', py: 4 }}>
                             <Badge
@@ -187,6 +196,7 @@ const Profile = () => {
                                         <IconButton
                                             size="small"
                                             onClick={handleImageClick}
+                                            disabled={isSubmitting}
                                             sx={{ bgcolor: 'primary.main', color: 'white' }}
                                         >
                                             <CameraIcon fontSize="small" />
@@ -204,7 +214,8 @@ const Profile = () => {
                                         mb: 2,
                                         bgcolor: 'primary.main',
                                         fontSize: '2.5rem',
-                                        cursor: isEditing ? 'pointer' : 'default',
+                                        cursor: isEditing && !isSubmitting ? 'pointer' : 'default',
+                                        opacity: isSubmitting ? 0.7 : 1,
                                     }}
                                 >
                                     {!profileImagePreview && getInitials()}
@@ -216,6 +227,7 @@ const Profile = () => {
                                 onChange={handleImageChange}
                                 accept="image/*"
                                 style={{ display: 'none' }}
+                                disabled={isSubmitting}
                             />
                             <Typography variant="h5" sx={{ color: 'white', mb: 1 }}>
                                 {getDisplayName()}
@@ -227,12 +239,21 @@ const Profile = () => {
                                 variant="outlined"
                                 startIcon={<EditIcon />}
                                 onClick={() => setIsEditing(!isEditing)}
-                                sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}
+                                disabled={isSubmitting}
+                                sx={{
+                                    color: 'white',
+                                    borderColor: 'rgba(255,255,255,0.3)',
+                                    '&:disabled': {
+                                        color: 'rgba(255,255,255,0.5)',
+                                        borderColor: 'rgba(255,255,255,0.2)'
+                                    }
+                                }}
                             >
                                 {isEditing ? 'Cancel Edit' : 'Edit Profile'}
                             </Button>
                         </CardContent>
                     </Card>
+
                     <Paper sx={{ mt: 3, p: 2, backgroundColor: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)' }}>
                         <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
                             Quick Actions
@@ -240,42 +261,77 @@ const Profile = () => {
                         <Button
                             fullWidth
                             variant="outlined"
-                            sx={{ mb: 1, color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}
+                            sx={{
+                                mb: 1,
+                                color: 'white',
+                                borderColor: 'rgba(255,255,255,0.3)',
+                                '&:disabled': {
+                                    color: 'rgba(255,255,255,0.5)',
+                                    borderColor: 'rgba(255,255,255,0.2)'
+                                }
+                            }}
                             onClick={() => navigate('/change-password')}
+                            disabled={isSubmitting}
                         >
                             Change Password
                         </Button>
                         <Button
                             fullWidth
                             variant="outlined"
-                            sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}
+                            sx={{
+                                color: 'white',
+                                borderColor: 'rgba(255,255,255,0.3)',
+                                '&:disabled': {
+                                    color: 'rgba(255,255,255,0.5)',
+                                    borderColor: 'rgba(255,255,255,0.2)'
+                                }
+                            }}
                             onClick={() => navigate('/dashboard')}
+                            disabled={isSubmitting}
                         >
                             Back to Dashboard
                         </Button>
                     </Paper>
-
                 </Grid>
 
                 <Grid size="grow" >
                     <Card sx={{ backgroundColor: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)' }}>
                         <CardContent>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                                 <Typography variant="h6" sx={{ color: 'white' }}>
                                     Personal Information
                                 </Typography>
                                 {isEditing && (
-                                    <Box>
-                                        <IconButton
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {/* {isSubmitting && (
+                                            <CircularProgress size={20} sx={{ color: 'white', mr: 1 }} />
+                                        )} */}
+                                        <LoadingButton
                                             onClick={handleSubmit(onSubmit)}
-                                            disabled={isLoading}
-                                            sx={{ color: 'green', mr: 1 }}
+                                            loading={isSubmitting}
+                                            variant="contained"
+                                            startIcon={<SaveIcon />}
+                                            sx={{ mr: 1 }}
+                                            disabled={isSubmitting}
                                         >
-                                            <SaveIcon />
-                                        </IconButton>
-                                        <IconButton onClick={handleCancel} sx={{ color: 'red' }}>
-                                            <CancelIcon />
-                                        </IconButton>
+                                            Save
+                                        </LoadingButton>
+                                        <Button
+                                            onClick={handleCancel}
+                                            variant="outlined"
+                                            startIcon={<CancelIcon />}
+                                            disabled={isSubmitting}
+                                            sx={{
+                                                color: 'white',
+                                                borderColor: 'rgba(255,255,255,0.3)',
+                                                '&:disabled': {
+                                                    color: 'rgba(255,255,255,0.5)',
+                                                    borderColor: 'rgba(255,255,255,0.2)'
+                                                }
+                                            }}
+                                        >
+                                            Cancel
+                                        </Button>
                                     </Box>
                                 )}
                             </Box>
