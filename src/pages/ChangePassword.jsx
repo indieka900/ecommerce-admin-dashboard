@@ -1,4 +1,4 @@
-import { useState } from 'react';
+// ChangePassword.jsx
 import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { validationSchema } from '../validators/ValidationSchema';
@@ -6,33 +6,17 @@ import {
     Box,
     Paper,
     Typography,
-    TextField,
-    Button,
-    Alert,
-    CircularProgress,
-    InputAdornment,
-    IconButton,
-    LinearProgress,
     Slide,
-    Chip
 } from '@mui/material';
 import {
-    Visibility,
-    VisibilityOff,
     Lock as LockIcon,
-    Security as SecurityIcon
 } from '@mui/icons-material';
 import { authService } from "../services/auth";
-import { calculatePasswordStrength, getPasswordStrengthColor, getPasswordStrengthText } from '../utils/passwordUtils';
 import toast from 'react-hot-toast';
+import PasswordFormFields from '../components/PasswordFormFields';
 
 const ChangePassword = () => {
     const navigate = useNavigate();
-
-    const [showPasswords, setShowPasswords] = useState({
-        newPassword: false,
-        confirmPassword: false
-    });
 
     const formik = useFormik({
         initialValues: {
@@ -44,16 +28,12 @@ const ChangePassword = () => {
             try {
                 const response = await authService.changePassword({
                     new_password: values.newPassword,
-                    confirm_password : values.confirmPassword
+                    confirm_password: values.confirmPassword
                 });
-                
 
                 if (response.success) {
-
-                    // setSuccess(true);
                     toast.success('Password changed successfully! Redirecting to profile...');
                     navigate('/profile');
-
                 }
             } catch (err) {
                 const message = err.response?.data?.detail ||
@@ -63,13 +43,6 @@ const ChangePassword = () => {
             }
         }
     });
-
-    const passwordStrength = calculatePasswordStrength(formik.values.newPassword);
-
-    const togglePasswordVisibility = (field) => {
-        setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
-    };
-
 
     return (
         <Box sx={{
@@ -88,123 +61,12 @@ const ChangePassword = () => {
                     </Box>
 
                     <form onSubmit={formik.handleSubmit}>
-                        <TextField
-                            label="New Password"
-                            name="newPassword"
-                            type={showPasswords.newPassword ? 'text' : 'password'}
-                            value={formik.values.newPassword}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            fullWidth
-                            margin="normal"
-                            required
-                            autoFocus
-                            error={formik.touched.newPassword && !!formik.errors.newPassword}
-                            helperText={formik.touched.newPassword && formik.errors.newPassword}
-                            slotProps={{
-                                input: {
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <LockIcon color="action" />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton onClick={() => togglePasswordVisibility('newPassword')} edge="end">
-                                                {showPasswords.newPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }
-                            }}
+                        <PasswordFormFields
+                            formik={formik}
+                            isSubmitting={formik.isSubmitting}
+                            submitButtonText="Update Password"
+                            submittingText="Updating Password..."
                         />
-
-                        {formik.values.newPassword && (
-                            <Box sx={{ mt: 2 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                    <Typography variant="body2" sx={{ mr: 2 }}>Password Strength:</Typography>
-                                    <Chip
-                                        label={getPasswordStrengthText(passwordStrength)}
-                                        size="small"
-                                        color={getPasswordStrengthColor(passwordStrength)}
-                                        variant="outlined"
-                                    />
-                                </Box>
-                                <LinearProgress
-                                    variant="determinate"
-                                    value={(passwordStrength.score / 5) * 100}
-                                    color={getPasswordStrengthColor(passwordStrength)}
-                                    sx={{ mb: 2 }}
-                                />
-                                <Box sx={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    gap: 1
-                                }}>
-                                    {/* {Object.entries(passwordStrength.checks).map(([key, passed]) => (
-                                        <Box key={key} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            {passed ? <CheckIcon sx={{ color: theme.palette.success.main }} /> : <CloseIcon sx={{ color: theme.palette.error.main }} />}
-                                            <Typography variant="caption" color={passed ? 'success.main' : 'error.main'}>
-                                                {{
-                                                    length: '6+ characters',
-                                                    uppercase: 'Uppercase',
-                                                    lowercase: 'Lowercase',
-                                                    number: 'Number',
-                                                    special: 'Special char'
-                                                }[key]}
-                                            </Typography>
-                                        </Box>
-                                    ))} */}
-                                </Box>
-                            </Box>
-                        )}
-
-                        <TextField
-                            label="Confirm New Password"
-                            name="confirmPassword"
-                            type={showPasswords.confirmPassword ? 'text' : 'password'}
-                            value={formik.values.confirmPassword}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            fullWidth
-                            margin="normal"
-                            required
-                            error={formik.touched.confirmPassword && !!formik.errors.confirmPassword}
-                            helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                            slotProps={{
-                                input: {
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <LockIcon color="action" />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton onClick={() => togglePasswordVisibility('confirmPassword')} edge="end">
-                                                {showPasswords.confirmPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }
-                            }}
-                        />
-
-                        <Alert severity="info" sx={{ mt: 2, mb: 3 }} icon={<SecurityIcon />}>
-                            <strong>Security Tips:</strong> Use a strong password with a mix of letters,
-                            numbers, and special characters.
-                        </Alert>
-
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            fullWidth
-                            size="large"
-                            disabled={formik.isSubmitting || !formik.isValid || passwordStrength.score < 3}
-                            startIcon={formik.isSubmitting ? <CircularProgress size={20} /> : <LockIcon />}
-                        >
-                            {formik.isSubmitting ? 'Updating Password...' : 'Update Password'}
-                        </Button>
                     </form>
                 </Paper>
             </Slide>
