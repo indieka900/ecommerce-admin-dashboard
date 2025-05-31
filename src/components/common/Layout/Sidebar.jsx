@@ -107,8 +107,8 @@ const Sidebar = ({ onItemClick }) => {
     };
 
     const handleToggle = (title) => {
-        setExpandedItems(prev => 
-            prev.includes(title) 
+        setExpandedItems(prev =>
+            prev.includes(title)
                 ? prev.filter(item => item !== title)
                 : [...prev, title]
         );
@@ -126,7 +126,7 @@ const Sidebar = ({ onItemClick }) => {
         const hasChildren = item.children && item.children.length > 0;
         const isExpanded = expandedItems.includes(item.title);
 
-        
+
 
         return (
             <React.Fragment key={item.title}>
@@ -148,7 +148,7 @@ const Sidebar = ({ onItemClick }) => {
                         <ListItemIcon sx={{ minWidth: 40 }}>
                             <item.icon sx={{ color: item.color, fontSize: 22 }} />
                         </ListItemIcon>
-                        <ListItemText 
+                        <ListItemText
                             primary={item.title}
                             slotProps={{
                                 primary: {
@@ -159,16 +159,16 @@ const Sidebar = ({ onItemClick }) => {
                             }}
                         />
                         {item.badge && (
-                            <Chip 
-                                label={item.badge} 
-                                size="small" 
-                                sx={{ 
+                            <Chip
+                                label={item.badge}
+                                size="small"
+                                sx={{
                                     backgroundColor: '#ef4444',
                                     color: 'white',
                                     fontSize: '0.75rem',
                                     height: 20,
                                     minWidth: 20
-                                }} 
+                                }}
                             />
                         )}
                         {hasChildren && (
@@ -188,7 +188,14 @@ const Sidebar = ({ onItemClick }) => {
     };
 
     return (
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{
+            height: '100%',
+            display: 'flex', flexDirection: 'column',
+            borderRadius: 0, // ← Explicitly remove border radius
+            '& > *': {
+                borderRadius: 0 // ← Remove from direct children if needed
+            }
+        }}>
             {/* Logo Section */}
             <Box sx={{ p: 3, textAlign: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 <Box
@@ -238,21 +245,21 @@ const Sidebar = ({ onItemClick }) => {
                     }}
                 >
                     <Box display="flex" alignItems="center">
-                        
-                            {user?.profile_picture ? (
-                                <Avatar
-                                    src={user.profile_picture}
-                                    alt={getDisplayName()}
-                                    sx={{
-                                        width: 40,
-                                        height: 40,
-                                        background: 'linear-gradient(45deg, #10b981, #06b6d4)',
-                                        mr: 2
-                                    }}
-                                />
-                            ) : (
-                                getDisplayName().charAt(0)
-                            )}
+
+                        {user?.profile_picture ? (
+                            <Avatar
+                                src={user.profile_picture}
+                                alt={getDisplayName()}
+                                sx={{
+                                    width: 40,
+                                    height: 40,
+                                    background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                                    mr: 2
+                                }}
+                            />
+                        ) : (
+                            getDisplayName().charAt(0)
+                        )}
                         <Box>
                             <Typography variant="body2" fontWeight="bold" color="white">
                                 {getDisplayName()}

@@ -30,7 +30,7 @@ const ChangePassword = () => {
                 setGlobalLoading('change-password', true, 'Changing Your Password...');
                 const response = await authService.changePassword({
                     new_password: values.newPassword,
-                    // confirm_password: values.confirmPassword
+                    confirm_password: values.confirmPassword
                 });
 
                 if (response.success) {
