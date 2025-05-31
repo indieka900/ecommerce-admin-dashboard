@@ -10,6 +10,8 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import ChangePassword from './pages/ChangePassword';
+import NotFound from './pages/NotFound';
+import ErrorPage from './pages/ErrorPage';
 // import Products from './pages/Products';
 // import Categories from './pages/Categories';
 // import Orders from './pages/Orders';
@@ -43,6 +45,7 @@ const router = createBrowserRouter([
                 <AdminLayout />
             </ProtectedRoute>
         ),
+        errorElement: <ErrorPage />,
         children: [
             {
                 index: true,
@@ -102,10 +105,10 @@ const router = createBrowserRouter([
     //     path: '/unauthorized',
     //     element: <Unauthorized />
     // },
-    // {
-    //     path: '*',
-    //     element: <NotFound />
-    // }
+    {
+        path: '*',
+        element: <NotFound />
+    }
 ]);
 
 export default router;
