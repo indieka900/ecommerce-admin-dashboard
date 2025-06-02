@@ -185,17 +185,26 @@ const Dashboard = () => {
                     Welcome back! Here's what's happening with your business today.
                 </Typography>
             </Box>
-
             <Grid container spacing={4}>
                 {/* Stats Cards */}
                 {statsData.map((stat, index) => (
-                    <Grid item xs={12} sm={6} lg={3} key={index}>
+                    <Grid
+                        key={index}
+                        size={{
+                            xs: 12,
+                            sm: 6,
+                            lg: 3
+                        }}>
                         <StatCard {...stat} />
                     </Grid>
                 ))}
 
                 {/* Sales Chart */}
-                <Grid item xs={12} lg={8}>
+                <Grid
+                    size={{
+                        xs: 12,
+                        lg: 8
+                    }}>
                     <ChartCard title="Sales Analytics" height={450}>
                         <Box
                             display="flex"
@@ -219,7 +228,11 @@ const Dashboard = () => {
                 </Grid>
 
                 {/* Quick Stats */}
-                <Grid item xs={12} lg={4}>
+                <Grid
+                    size={{
+                        xs: 12,
+                        lg: 4
+                    }}>
                     <ChartCard title="Quick Stats" height={450}>
                         <Box sx={{ height: '80%' }}>
                             {[
@@ -261,7 +274,7 @@ const Dashboard = () => {
                 </Grid>
 
                 {/* Recent Activity */}
-                <Grid item xs={12}>
+                <Grid size={12}>
                     <ChartCard title="Recent Activity" height={300}>
                         <Box
                             display="flex"
