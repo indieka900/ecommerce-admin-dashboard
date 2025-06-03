@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     Card,
     CardMedia,
@@ -7,6 +8,8 @@ import {
     Box,
     Avatar,
     Chip,
+    useTheme,
+    useMediaQuery,
     Tooltip,
     IconButton
 } from '@mui/material';
@@ -18,7 +21,9 @@ import {
     Comment as CommentIcon
 } from '@mui/icons-material';
 
-const BlogCard = ({ blog, onView, onEdit, onDelete, commentsCount }) => {
+const BlogCard = React.memo(({ blog, onView, onEdit, onDelete, commentsCount }) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -30,7 +35,20 @@ const BlogCard = ({ blog, onView, onEdit, onDelete, commentsCount }) => {
     };
 
     return (
-        <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Card
+            sx={{
+                // height: '100%',
+                // display: 'flex',
+                // flexDirection: 'column',
+                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: theme.shadows[4],
+                },
+                // minHeight: { xs: 200, sm: 250 },
+                // maxHeight: { xs: 300, sm: 350 },
+
+            }}>
             <CardMedia
                 component="img"
                 height="200"
@@ -38,8 +56,22 @@ const BlogCard = ({ blog, onView, onEdit, onDelete, commentsCount }) => {
                 alt={blog.title}
                 sx={{ objectFit: 'cover' }}
             />
-            <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" gutterBottom noWrap>
+            <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+                <Typography
+                    gutterBottom
+                    variant={isMobile ? "h6" : "h5"}
+                    component="h2"
+                    sx={{
+                        fontWeight: 600,
+                        lineHeight: 1.3,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                    }}
+                >
                     {blog.title}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -96,6 +128,6 @@ const BlogCard = ({ blog, onView, onEdit, onDelete, commentsCount }) => {
             </CardActions>
         </Card>
     );
-};
+});
 
 export default BlogCard;
