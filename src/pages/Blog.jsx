@@ -194,10 +194,21 @@ const Blog = () => {
     };
 
     // Comment Operations
-    const handleDeleteComment = (commentId) => {
+    const handleDeleteComment = async (commentId) => {
         if (window.confirm('Are you sure you want to delete this comment?')) {
-            setComments(comments.filter(comment => comment.id !== commentId));
-            showSnackbar('Comment deleted successfully');
+            try {
+                setGlobalLoading('Delete-Comment', true, 'Deleting comment...');
+                await blogService.deleteComment(commentId);
+                setComments(comments.filter(comment => comment.id !== commentId));
+                toast.success('Comment deleted successfully');
+                
+            } catch (error) {
+                toast.error('Failed to delete comment. Please try again later.');
+                console.error('Error deleting comment:', error);
+            } finally {
+                setGlobalLoading('Delete-Comment', false);
+            }
+            
         }
     };
 
@@ -311,7 +322,7 @@ const Blog = () => {
 
                         <Collapse in={isExpanded}>
                             <Divider />
-                            <CommentSection comments={blogComments}/>
+                            <CommentSection comments={blogComments} onDelete={handleDeleteComment} />
                         </Collapse>
                     </Paper>
                 );

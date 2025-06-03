@@ -21,7 +21,7 @@ export const blogService = {
     // Create a new blog post
     createBlog: async (blogData) => {
         try {
-            const response = await api.post(API_ENDPOINTS.BLOGS, blogData);
+            const response = await api.post(`${API_ENDPOINTS.BLOGS}/`, blogData);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to create blog post. Please try again later.';
@@ -37,7 +37,7 @@ export const blogService = {
     // Update an existing blog post
     updateBlog: async (id, blogData) => {
         try {
-            const response = await api.put(`${API_ENDPOINTS.BLOGS}/${id}`, blogData);
+            const response = await api.put(`${API_ENDPOINTS.BLOGS}/${id}/`, blogData);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to update blog post. Please try again later.';
@@ -53,7 +53,7 @@ export const blogService = {
     // Delete a blog post
     deleteBlog: async (id) => {
         try {
-            const response = await api.delete(`${API_ENDPOINTS.BLOGS}/${id}`);
+            const response = await api.delete(`${API_ENDPOINTS.BLOGS}/${id}/`);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to delete blog post. Please try again later.';
@@ -83,10 +83,24 @@ export const blogService = {
     //fetch all comments
     getComments: async () => {
         try {
-            const response = await api.get(`${API_ENDPOINTS.COMMENTS}`);
+            const response = await api.get(`${API_ENDPOINTS.COMMENTS}/`);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to fetch comments. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+    deleteComment: async (id) => {
+        try {
+            const response = await api.delete(`${API_ENDPOINTS.COMMENTS}/${id}/`);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to delete comment. Please try again later.';
             if (error.response?.data?.message) {
                 errorMessage = error.response.data.message;
             } else if (error.message) {
