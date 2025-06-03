@@ -26,7 +26,7 @@ import {
     Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { blogService } from '../services/blogService';
-import CommentItem from '../components/blog/CommentSection';
+import CommentSection from '../components/blog/CommentSection';
 import BlogCard from '../components/blog/BlogCard';
 import BlogFilters from '../components/blog/BlogFilters';
 import BlogViewDialog from '../components/blog/BlogViewDialog';
@@ -306,21 +306,7 @@ const Blog = () => {
 
                         <Collapse in={isExpanded}>
                             <Divider />
-                            {blogComments.length > 0 ? (
-                                <List>
-                                    {blogComments.map((comment) => (
-                                        <CommentItem
-                                            key={comment.id}
-                                            comment={comment}
-                                            onDelete={handleDeleteComment}
-                                        />
-                                    ))}
-                                </List>
-                            ) : (
-                                <Box sx={{ p: 3, textAlign: 'center' }}>
-                                    <Typography color="text.secondary">No comments yet</Typography>
-                                </Box>
-                            )}
+                            <CommentSection comments={blogComments}/>
                         </Collapse>
                     </Paper>
                 );

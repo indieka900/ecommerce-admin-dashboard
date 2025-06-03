@@ -1,142 +1,164 @@
+import React, { useState, useMemo, useCallback } from 'react';
 import { 
-    ListItem, 
-    ListItemText, 
-    IconButton, 
-    Tooltip, 
+    List,
     Box, 
     Typography,
-    Avatar,
-    Chip
+    Paper,
+    Button,
+    useMediaQuery,
+    useTheme,
+    Divider,
+    Container,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import LanguageIcon from '@mui/icons-material/Language';
+import CommentItem from './CommentItem';
+import { Comment as CommentIcon,
+    ExpandMore as ExpandMoreIcon
+ } from '@mui/icons-material';
 
-const CommentItem = ({ comment, onDelete, showDeleteButton = true }) => {
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
 
-    // Generate initials for avatar
-    const getInitials = (name) => {
-        return name
-            .split(' ')
-            .map(word => word[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2);
-    };
+// Simple Load More Comment Section
+const CommentSection = ({ 
+    comments = [], 
+    onDelete, 
+    loading = false,
+    title = "Comments",
+    showDeleteButton = true 
+}) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
+    // Load more state
+    const [visibleCount, setVisibleCount] = useState(isMobile ? 3 : 5);
+    const incrementSize = isMobile ? 3 : 5; // Increment size based on device type
+    
+    // Memoized visible comments
+    const visibleComments = useMemo(() => {
+        return comments.slice(0, visibleCount);
+    }, [comments, visibleCount]);
+    
+    const hasMore = visibleCount < comments.length;
+    const remainingCount = comments.length - visibleCount;
+    
+    // Load more handler
+    const handleLoadMore = useCallback(() => {
+        setVisibleCount(prev => Math.min(prev + incrementSize, comments.length));
+    }, [incrementSize, comments.length]);
+    
+    // Reset when comments change
+    React.useEffect(() => {
+        setVisibleCount(isMobile ? 3 : 5);
+    }, [comments.length, isMobile]);
+    
+    // Memoized delete handler
+    const handleDelete = useCallback((commentId) => {
+        onDelete?.(commentId);
+    }, [onDelete]);
+
+    if (loading) {
+        return (
+            <Container maxWidth="md" sx={{ py: 2 }}>
+                <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+                    <Typography variant="h6" gutterBottom>
+                        Loading comments...
+                    </Typography>
+                </Paper>
+            </Container>
+        );
+    }
+
+    if (!comments.length) {
+        return (
+            <Container maxWidth="md" sx={{ py: 2 }}>
+                <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CommentIcon />
+                        {title}
+                    </Typography>
+                    <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <CommentIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                        <Typography variant="h6" color="text.secondary" gutterBottom>
+                            No comments yet
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Be the first to leave a comment!
+                        </Typography>
+                    </Box>
+                </Paper>
+            </Container>
+        );
+    }
 
     return (
-        <ListItem
-            alignItems="flex-start"
-            sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-                mb: 1,
+        <Container maxWidth="md" sx={{ py: 2 }}>
+            <Paper sx={{ 
+                p: { xs: 2, sm: 3 },
                 bgcolor: 'background.paper',
-                '&:hover': {
-                    bgcolor: 'action.hover',
-                },
-            }}
-            secondaryAction={
-                showDeleteButton && (
-                    <Tooltip title="Delete comment" arrow>
-                        <IconButton
-                            edge="end"
-                            aria-label="delete comment"
-                            onClick={() => onDelete(comment.id)}
-                            color="error"
-                            size="small"
-                        >
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
-                )
-            }
-        >
-            <Avatar
-                sx={{ 
-                    mr: 2, 
-                    bgcolor: 'primary.main',
-                    width: 40,
-                    height: 40
-                }}
-            >
-                {getInitials(comment.full_name)}
-            </Avatar>
-            
-            <ListItemText
-                primary={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                        <Typography 
-                            variant="subtitle2" 
-                            component="span"
-                            sx={{ fontWeight: 600 }}
-                        >
-                            {comment.full_name}
-                        </Typography>
-                        
-                        {comment.website && (
-                            <Tooltip title={`Visit ${comment.website}`} arrow>
-                                <IconButton
-                                    size="small"
-                                    href={comment.website}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    sx={{ p: 0.5 }}
-                                >
-                                    <LanguageIcon fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
-                        )}
-                        
-                        <Chip
-                            label={formatDate(comment.added_at)}
-                            size="small"
-                            variant="outlined"
-                            sx={{ 
-                                height: 20,
-                                fontSize: '0.75rem',
-                                ml: 'auto'
-                            }}
+                borderRadius: 2
+            }}>
+                {/* Header */}
+                <Typography 
+                    variant="h6" 
+                    gutterBottom
+                    sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 1,
+                        fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                    }}
+                >
+                    <CommentIcon />
+                    {title} ({comments.length})
+                </Typography>
+
+                <Divider sx={{ mb: 2 }} />
+
+                {/* Comments List */}
+                <List sx={{ p: 0 }}>
+                    {visibleComments.map((comment) => (
+                        <CommentItem
+                            key={comment.id}
+                            comment={comment}
+                            onDelete={handleDelete}
+                            showDeleteButton={showDeleteButton}
                         />
-                    </Box>
-                }
-                secondary={
-                    <Box>
-                        <Typography 
-                            variant="body2" 
-                            color="text.primary"
-                            sx={{ 
-                                mt: 1,
-                                lineHeight: 1.5,
-                                wordBreak: 'break-word'
+                    ))}
+                </List>
+
+                {/* Load More Button */}
+                {hasMore && (
+                    <Box sx={{ textAlign: 'center', mt: 3, pt: 2 }}>
+                        <Button
+                            variant="outlined"
+                            onClick={handleLoadMore}
+                            startIcon={<ExpandMoreIcon />}
+                            sx={{
+                                borderRadius: 2,
+                                px: 3,
+                                py: 1,
+                                textTransform: 'none',
+                                fontSize: '0.9rem'
                             }}
                         >
-                            {comment.text}
-                        </Typography>
-                        
-                        
-                        
-                        <Typography 
-                            variant="caption" 
-                            color="text.secondary"
-                            sx={{ mt: 0.5, display: 'block' }}
-                        >
-                            {comment.email}
-                        </Typography>
+                            Load More Comments ({remainingCount} remaining)
+                        </Button>
                     </Box>
-                }
-            />
-        </ListItem>
+                )}
+
+                {/* Status */}
+                <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{
+                        display: 'block',
+                        textAlign: 'center',
+                        mt: 2
+                    }}
+                >
+                    Showing {visibleComments.length} of {comments.length} comments
+                </Typography>
+            </Paper>
+        </Container>
     );
 };
 
-export default CommentItem;
+export default CommentSection;
