@@ -14,6 +14,7 @@ import {
     Paper,
     Chip
 } from '@mui/material';
+// import BookIcon from '@mui/icons-material/Book';
 import {
     Dashboard,
     Inventory,
@@ -26,7 +27,7 @@ import {
     Business,
     ExpandLess,
     ExpandMore,
-    Store
+    Store,
 } from '@mui/icons-material';
 
 const navigationItems = [
@@ -84,6 +85,12 @@ const navigationItems = [
         title: 'Analytics',
         icon: Analytics,
         path: '/admin/analytics',
+        color: '#84cc16'
+    },
+    {
+        title: 'Blogs',
+        icon: Analytics,
+        path: '/blog',
         color: '#84cc16'
     },
     {

@@ -17,7 +17,7 @@ import ErrorPage from './pages/ErrorPage';
 // import Orders from './pages/Orders';
 // import Customers from './pages/Customers';
 // import Transactions from './pages/Transactions';
-// import Blog from './pages/Blog';
+import Blog from './pages/Blog';
 // // import Reviews from './pages/Reviews';
 // import Settings from './pages/Settings';
 
@@ -83,10 +83,10 @@ const router = createBrowserRouter([
             //     path: 'transactions',
             //     element: <Transactions />
             // },
-            // {
-            //     path: 'blog',
-            //     element: <Blog />
-            // },
+            {
+                path: 'blog',
+                element: <Blog />
+            },
             // {
             //     path: 'reviews',
             //     element: <Reviews />
