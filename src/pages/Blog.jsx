@@ -32,6 +32,7 @@ import BlogFilters from '../components/blog/BlogFilters';
 import BlogViewDialog from '../components/blog/BlogViewDialog';
 import BlogForm from '../components/blog/BlogForm';
 import toast from 'react-hot-toast';
+import { useGlobalLoading } from '../context/LoadingContext';
 
 
 const Blog = () => {
@@ -41,6 +42,7 @@ const Blog = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [editingBlog, setEditingBlog] = useState(null);
     const [viewingBlog, setViewingBlog] = useState(null);
+    const { setLoading: setGlobalLoading } = useGlobalLoading();
     const [expandedComments, setExpandedComments] = useState({});
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
@@ -63,6 +65,7 @@ const Blog = () => {
     const categories = [...new Set(blogs.map(blog => blog.category))];
     useEffect(() => {
         const fetchData = async () => {
+            setGlobalLoading('Blogs-Comments' ,true, 'Loading blogs and comments...');
             try {
                 const [fetchedBlogs, fetchedComments] = await Promise.all([
                     blogService.getBlogs(),
@@ -72,6 +75,8 @@ const Blog = () => {
                 setComments(fetchedComments);
             } catch (error) {
                 toast.error('Failed to fetch blogs or comments. Please try again later.');
+            } finally {
+                setGlobalLoading('Blogs-Comments', false);
             }
         };
 

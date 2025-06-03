@@ -16,7 +16,6 @@ import {
     Divider,
     IconButton,
     Badge,
-    CircularProgress,
 } from '@mui/material';
 import {
     Person as PersonIcon,
