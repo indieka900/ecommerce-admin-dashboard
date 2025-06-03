@@ -12,7 +12,7 @@ import {
     useMediaQuery
 } from '@mui/material';
 
-const DRAWER_WIDTH = 300;
+const DRAWER_WIDTH = 260; // Width of the sidebar
 
 const AdminLayout = () => {
     const [mobileOpen, setMobileOpen] = useState(false);

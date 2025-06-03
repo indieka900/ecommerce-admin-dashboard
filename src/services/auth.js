@@ -1,6 +1,5 @@
 import api from './api';
 import { API_ENDPOINTS } from '../utils/constants';
-import toast from 'react-hot-toast';
 
 export const authService = {
     // Enhanced login with role checking

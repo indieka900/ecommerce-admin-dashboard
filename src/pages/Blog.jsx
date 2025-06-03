@@ -25,11 +25,13 @@ import {
     Article as ArticleIcon,
     Dashboard as DashboardIcon,
 } from '@mui/icons-material';
+import { blogService } from '../services/blogService';
 import CommentItem from '../components/blog/CommentSection';
 import BlogCard from '../components/blog/BlogCard';
 import BlogFilters from '../components/blog/BlogFilters';
 import BlogViewDialog from '../components/blog/BlogViewDialog';
 import BlogForm from '../components/blog/BlogForm';
+import toast from 'react-hot-toast';
 
 
 const Blog = () => {
@@ -58,15 +60,24 @@ const Blog = () => {
         slug: ''
     });
 
-    const categories = ['Technology', 'Business', 'Corporate', 'Lifestyle', 'Health', 'Education', 'Travel'];
-
-    // Sample initial data
+    const categories = [...new Set(blogs.map(blog => blog.category))];
     useEffect(() => {
-        
+        const fetchData = async () => {
+            try {
+                const [fetchedBlogs, fetchedComments] = await Promise.all([
+                    blogService.getBlogs(),
+                    blogService.getComments()
+                ]);
+                setBlogs(fetchedBlogs);
+                setComments(fetchedComments);
+            } catch (error) {
+                toast.error('Failed to fetch blogs or comments. Please try again later.');
+            }
+        };
 
-        setBlogs(sampleBlogs);
-        setComments(sampleComments);
+        fetchData();
     }, []);
+
 
     // Filter and pagination logic
     const filteredBlogs = blogs.filter(blog => {
@@ -140,7 +151,7 @@ const Blog = () => {
         if (window.confirm('Are you sure you want to delete this blog?')) {
             setBlogs(blogs.filter(blog => blog.id !== blogId));
             setComments(comments.filter(comment => comment.blogId !== blogId));
-            showSnackbar('Blog deleted successfully');
+            toast.success('Blog deleted successfully');
         }
     };
 
@@ -192,15 +203,15 @@ const Blog = () => {
         }));
     };
 
-    const getBlogComments = (blogId) => {
-        return comments.filter(comment => comment.blogId === blogId);
+    const getBlogComments = (blogTitle) => {
+        return comments.filter(comment => comment.blog === blogTitle);
     };
 
     const BlogsTab = () => (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ArticleIcon /> Blog Management
+                    <ArticleIcon /> Blogs
                 </Typography>
                 <Button
                     variant="contained"
@@ -230,10 +241,13 @@ const Blog = () => {
                 </Typography>
             </Box>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
                 {paginatedBlogs.map((blog) => (
                     <Grid
                         key={blog.id}
+                        sx={{
+                            pl: 0,
+                        }}
                         size={{
                             xs: 12,
                             md: 6,
@@ -244,7 +258,7 @@ const Blog = () => {
                             onView={handleViewBlog}
                             onEdit={handleEditBlog}
                             onDelete={handleDeleteBlog}
-                            commentsCount={getBlogComments(blog.id).length}
+                            commentsCount={getBlogComments(blog.title).length}
                         />
                     </Grid>
                 ))}
@@ -271,7 +285,7 @@ const Blog = () => {
             </Typography>
 
             {blogs.map((blog) => {
-                const blogComments = getBlogComments(blog.id);
+                const blogComments = getBlogComments(blog.title);
                 const isExpanded = expandedComments[blog.id];
 
                 return (
@@ -315,9 +329,12 @@ const Blog = () => {
     );
 
     return (
-        <Container maxWidth="xl" sx={{ py: 2 }}>
+        <Box sx={{
+            minHeight: '100vh',
+            my: 0,
+        }} >
             <Paper sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h4" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                <Typography variant="h4" sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <DashboardIcon /> Blog Admin Dashboard
                 </Typography>
 
@@ -358,7 +375,7 @@ const Blog = () => {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
-        </Container>
+        </Box>
     );
 };
 
