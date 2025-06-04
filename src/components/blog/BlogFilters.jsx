@@ -45,12 +45,14 @@ const BlogFilters = ({
                         placeholder="Search blogs..."
                         value={searchTerm}
                         onChange={(e) => onSearchChange(e.target.value)}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon />
+                                    </InputAdornment>
+                                ),
+                            }
                         }}
                     />
                 </Grid>
@@ -68,8 +70,8 @@ const BlogFilters = ({
                         >
                             <MenuItem value="">All Categories</MenuItem>
                             {categories.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
+                                <MenuItem key={category.id} value={category.category}>
+                                    {category.category}
                                 </MenuItem>
                             ))}
                         </Select>

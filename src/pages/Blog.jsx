@@ -39,6 +39,7 @@ const Blog = () => {
     const [activeTab, setActiveTab] = useState(0);
     const [blogs, setBlogs] = useState([]);
     const [comments, setComments] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [editingBlog, setEditingBlog] = useState(null);
     const [viewingBlog, setViewingBlog] = useState(null);
@@ -62,17 +63,19 @@ const Blog = () => {
         slug: ''
     });
 
-    const categories = [...new Set(blogs.map(blog => blog.category))];
     useEffect(() => {
         const fetchData = async () => {
-            setGlobalLoading('Blogs-Comments' ,true, 'Loading blogs and comments...');
+            setGlobalLoading('Blogs-Comments', true, 'Loading blogs and comments...');
             try {
-                const [fetchedBlogs, fetchedComments] = await Promise.all([
+                const [fetchedBlogs, fetchedComments, fetchedCategories] = await Promise.all([
                     blogService.getBlogs(),
-                    blogService.getComments()
+                    blogService.getComments(),
+                    blogService.getBlogCategories()
                 ]);
                 setBlogs(fetchedBlogs);
                 setComments(fetchedComments);
+                setCategories(fetchedCategories);
+
             } catch (error) {
                 toast.error('Failed to fetch blogs or comments. Please try again later.');
             } finally {
@@ -134,7 +137,7 @@ const Blog = () => {
             category: '',
             image: '',
             content: '',
-            slug: ''
+            // slug: ''
         });
         setOpenDialog(true);
     };
@@ -160,33 +163,52 @@ const Blog = () => {
         }
     };
 
-    const handleSaveBlog = () => {
+    const handleSaveBlog = async () => {
         if (!blogForm.title || !blogForm.author || !blogForm.content) {
             showSnackbar('Please fill in all required fields', 'error');
             return;
         }
 
-        const slug = blogForm.slug || blogForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        try {
+            if (editingBlog) {
+                const slug = blogForm.slug || blogForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                // Optionally, update on the server here too:
+                await blogService.updateBlog(editingBlog.id, {
+                    ...blogForm,
+                    slug,
+                });
 
-        if (editingBlog) {
-            setBlogs(blogs.map(blog =>
-                blog.id === editingBlog.id
-                    ? { ...blog, ...blogForm, slug }
-                    : blog
-            ));
-            showSnackbar('Blog updated successfully');
-        } else {
-            const newBlog = {
-                id: Math.max(...blogs.map(b => b.id), 0) + 1,
-                ...blogForm,
-                slug,
-                date_posted: new Date().toISOString()
-            };
-            setBlogs([...blogs, newBlog]);
-            showSnackbar('Blog created successfully');
+                setBlogs(blogs.map(blog =>
+                    blog.id === editingBlog.id
+                        ? { ...blog, ...blogForm, slug }
+                        : blog
+                ));
+                toast.success('Blog updated successfully');
+            } else {
+                await setGlobalLoading('Create-Blog', true, 'Creating blog...');
+                const slug = blogForm.slug || blogForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+                const formData = new FormData();
+                formData.append('title', blogForm.title);
+                formData.append('author', blogForm.author);
+                formData.append('category_id', blogForm.category);
+                formData.append('slug', slug);
+                formData.append('content', blogForm.content);
+                if (blogForm.image instanceof File) {
+                    formData.append('image', blogForm.image);
+                }
+
+                await blogService.createBlog(formData);
+                toast.success('Blog created successfully');
+            }
+
+            setOpenDialog(false);
+        } catch (error) {
+            console.error('Error saving blog:', error);
+            toast.error(error?.response?.data?.message || 'Something went wrong. Please try again.');
+        } finally {
+            await setGlobalLoading('Create-Blog', false);
         }
-
-        setOpenDialog(false);
     };
 
     const handleViewBlog = (blog) => {
@@ -201,14 +223,14 @@ const Blog = () => {
                 await blogService.deleteComment(commentId);
                 setComments(comments.filter(comment => comment.id !== commentId));
                 toast.success('Comment deleted successfully');
-                
+
             } catch (error) {
                 toast.error('Failed to delete comment. Please try again later.');
                 console.error('Error deleting comment:', error);
             } finally {
                 setGlobalLoading('Delete-Comment', false);
             }
-            
+
         }
     };
 

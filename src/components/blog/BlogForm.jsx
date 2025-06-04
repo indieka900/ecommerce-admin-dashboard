@@ -65,20 +65,39 @@ const BlogForm = ({
                                 onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
                             >
                                 {categories.map((category) => (
-                                    <MenuItem key={category} value={category}>
-                                        {category}
+                                    <MenuItem key={category.id} value={category.id}>
+                                        {category.category}
                                     </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid size={12}>
-                        <TextField
+                    <Grid item xs={12}>
+                        <Button
+                            variant="outlined"
+                            component="label"
                             fullWidth
-                            label="Image URL"
-                            value={blogForm.image}
-                            onChange={(e) => setBlogForm({ ...blogForm, image: e.target.value })}
-                        />
+                        >
+                            {blogForm.image ? 'Change Image' : 'Upload Image'}
+                            <input
+                                type="file"
+                                hidden
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        setBlogForm({ ...blogForm, image: file });
+                                    }
+                                }}
+                            />
+                        </Button>
+                        {blogForm.image && typeof blogForm.image === 'object' && (
+                            <img
+                                src={URL.createObjectURL(blogForm.image)}
+                                alt="Preview"
+                                style={{ marginTop: 10, maxHeight: 200, borderRadius: 8 }}
+                            />
+                        )}
                     </Grid>
                     <Grid size={12}>
                         <TextField

@@ -21,7 +21,11 @@ export const blogService = {
     // Create a new blog post
     createBlog: async (blogData) => {
         try {
-            const response = await api.post(`${API_ENDPOINTS.BLOGS}/`, blogData);
+            const response = await api.post(`${API_ENDPOINTS.BLOGS}/`, blogData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            },);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to create blog post. Please try again later.';

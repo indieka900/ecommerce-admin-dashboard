@@ -15,7 +15,7 @@ export const API_ENDPOINTS = {
     // Blog endpoints
     BLOGS: '/blogs/blogs',
     COMMENTS: '/blogs/comments',
-    BLOG_CATEGORIES: '/blogs/categories/',
+    BLOG_CATEGORIES: '/blogs/blogs/categories',
 
     // Order endpoints
     ORDERS: '/orders/',
@@ -28,9 +28,6 @@ export const API_ENDPOINTS = {
     // Transaction endpoints
     TRANSACTIONS: '/transactions/',
 
-    // Blog endpoints
-    BLOG_POSTS: '/blog/posts/',
-    BLOG_CATEGORIES: '/blog/categories/',
 
     // Review endpoints
     REVIEWS: '/reviews/',
