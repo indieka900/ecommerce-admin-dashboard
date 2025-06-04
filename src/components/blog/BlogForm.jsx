@@ -1,3 +1,5 @@
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { debounce } from 'lodash';
 import {
     Dialog,
     DialogTitle,
@@ -12,7 +14,7 @@ import {
     Button
 } from '@mui/material';
 
-const BlogForm = ({
+const BlogForm = React.memo(({
     open,
     onClose,
     editingBlog,
@@ -21,99 +23,155 @@ const BlogForm = ({
     onSave,
     categories
 }) => {
+    const [localForm, setLocalForm] = useState(blogForm);
+
+    // Sync local form with props when blogForm changes
+    useEffect(() => {
+        setLocalForm(blogForm);
+    }, [blogForm]);
+
+    // Debounced update to parent state
+    const updateParentForm = useCallback(
+        debounce((form) => {
+            setBlogForm(form);
+        }, 300),
+        [setBlogForm]
+    );
+
+    const handleFieldChange = useCallback((field) => (e) => {
+        const newForm = {
+            ...localForm,
+            [field]: e.target.value
+        };
+        setLocalForm(newForm);
+        updateParentForm(newForm);
+    }, [localForm, updateParentForm]);
+
+    // Fixed category change handler
+    const handleCategoryChange = useCallback((e) => {
+        const newForm = {
+            ...localForm,
+            category_id: e.target.value
+        };
+        setLocalForm(newForm);
+        updateParentForm(newForm);
+    }, [localForm, updateParentForm]);
+
+    const handleImageChange = useCallback((e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const newForm = {
+                ...localForm,
+                image: file
+            };
+            setLocalForm(newForm);
+            setBlogForm(newForm); // Immediate update for file uploads
+        }
+    }, [localForm, setBlogForm]);
+
+    const imagePreviewUrl = useMemo(() => {
+        if (!localForm.image) return null;
+        return typeof localForm.image === 'string'
+            ? localForm.image
+            : URL.createObjectURL(localForm.image);
+    }, [localForm.image]);
+
+    const categoryOptions = useMemo(() =>
+        categories.map((category) => (
+            <MenuItem key={category.id} value={category.id}>
+                {category.category }
+            </MenuItem>
+        )), [categories]
+    );
+
+    // Clean up object URLs on unmount
+    useEffect(() => {
+        return () => {
+            if (localForm.image && typeof localForm.image === 'object') {
+                URL.revokeObjectURL(URL.createObjectURL(localForm.image));
+            }
+        };
+    }, [localForm.image]);
+
     return (
         <Dialog
             open={open}
             onClose={onClose}
             maxWidth="md"
             fullWidth
-            PaperProps={{ sx: { borderRadius: 2 } }}
+            slotProps={{
+                paper: { sx: { borderRadius: 2 } }
+            }}
         >
             <DialogTitle>{editingBlog ? 'Edit Blog' : 'Create New Blog'}</DialogTitle>
             <DialogContent>
                 <Grid container spacing={2} sx={{ mt: 1 }}>
-                    <Grid size={12}>
+                    <Grid size={{ xs: 12 }}>
                         <TextField
                             fullWidth
                             label="Title *"
-                            value={blogForm.title}
-                            onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })}
+                            value={localForm.title}
+                            onChange={handleFieldChange('title')}
                         />
                     </Grid>
-                    <Grid
-                        size={{
-                            xs: 12,
-                            sm: 6
-                        }}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
                             fullWidth
                             label="Author *"
-                            value={blogForm.author}
-                            onChange={(e) => setBlogForm({ ...blogForm, author: e.target.value })}
+                            value={localForm.author}
+                            onChange={handleFieldChange('author')}
                         />
                     </Grid>
-                    <Grid
-                        size={{
-                            xs: 12,
-                            sm: 6
-                        }}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <FormControl fullWidth>
                             <InputLabel>Category</InputLabel>
                             <Select
-                                value={blogForm.category}
+                                value={localForm.category_id || ''} // Use category_id and provide fallback
                                 label="Category"
-                                onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
+                                onChange={handleCategoryChange} // Use the fixed handler
                             >
-                                {categories.map((category) => (
-                                    <MenuItem key={category.id} value={category.id}>
-                                        {category.category}
-                                    </MenuItem>
-                                ))}
+                                
+                                {categoryOptions}
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <Button
                             variant="outlined"
                             component="label"
                             fullWidth
                         >
-                            {blogForm.image ? 'Change Image' : 'Upload Image'}
+                            {localForm.image ? 'Change Image' : 'Upload Image'}
                             <input
                                 type="file"
                                 hidden
                                 accept="image/*"
-                                onChange={(e) => {
-                                    const file = e.target.files[0];
-                                    if (file) {
-                                        setBlogForm({ ...blogForm, image: file });
-                                    }
-                                }}
+                                onChange={handleImageChange}
                             />
                         </Button>
-                        {blogForm.image && typeof blogForm.image === 'object' && (
+                        {imagePreviewUrl && (
                             <img
-                                src={URL.createObjectURL(blogForm.image)}
+                                src={imagePreviewUrl}
                                 alt="Preview"
                                 style={{ marginTop: 10, maxHeight: 200, borderRadius: 8 }}
                             />
                         )}
                     </Grid>
-                    <Grid size={12}>
+                    <Grid size={{ xs: 12 }}>
                         <TextField
                             fullWidth
                             label="Slug"
-                            value={blogForm.slug}
-                            onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })}
+                            value={localForm.slug}
+                            onChange={handleFieldChange('slug')}
                             helperText="Leave empty to auto-generate from title"
                         />
                     </Grid>
-                    <Grid size={12}>
+                    <Grid size={{ xs: 12 }}>
                         <TextField
                             fullWidth
                             label="Content *"
-                            value={blogForm.content}
-                            onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
+                            value={localForm.content}
+                            onChange={handleFieldChange('content')}
                             multiline
                             rows={6}
                         />
@@ -128,6 +186,6 @@ const BlogForm = ({
             </DialogActions>
         </Dialog>
     );
-};
+});
 
 export default BlogForm;

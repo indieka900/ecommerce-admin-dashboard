@@ -41,7 +41,9 @@ export const blogService = {
     // Update an existing blog post
     updateBlog: async (id, blogData) => {
         try {
-            const response = await api.put(`${API_ENDPOINTS.BLOGS}/${id}/`, blogData);
+            const response = await api.patch(`${API_ENDPOINTS.BLOGS}/${id}/`, blogData, {
+                headers : {'Content-Type': 'multipart/form-data'}
+            });
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to update blog post. Please try again later.';

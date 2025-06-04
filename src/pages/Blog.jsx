@@ -63,26 +63,26 @@ const Blog = () => {
         slug: ''
     });
 
+    const fetchData = async () => {
+        setGlobalLoading('Blogs-Comments', true, 'Loading blogs and comments...');
+        try {
+            const [fetchedBlogs, fetchedComments, fetchedCategories] = await Promise.all([
+                blogService.getBlogs(),
+                blogService.getComments(),
+                blogService.getBlogCategories()
+            ]);
+            setBlogs(fetchedBlogs);
+            setComments(fetchedComments);
+            setCategories(fetchedCategories);
+
+        } catch (error) {
+            toast.error('Failed to fetch blogs or comments. Please try again later.');
+        } finally {
+            setGlobalLoading('Blogs-Comments', false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            setGlobalLoading('Blogs-Comments', true, 'Loading blogs and comments...');
-            try {
-                const [fetchedBlogs, fetchedComments, fetchedCategories] = await Promise.all([
-                    blogService.getBlogs(),
-                    blogService.getComments(),
-                    blogService.getBlogCategories()
-                ]);
-                setBlogs(fetchedBlogs);
-                setComments(fetchedComments);
-                setCategories(fetchedCategories);
-
-            } catch (error) {
-                toast.error('Failed to fetch blogs or comments. Please try again later.');
-            } finally {
-                setGlobalLoading('Blogs-Comments', false);
-            }
-        };
-
         fetchData();
     }, []);
 
@@ -147,13 +147,15 @@ const Blog = () => {
         setBlogForm({
             title: blog.title,
             author: blog.author,
-            category: blog.category,
+            category: blog.category || '',
+            category_id: blog.category?.id || blog.category_id || '',
             image: blog.image,
             content: blog.content,
             slug: blog.slug
         });
         setOpenDialog(true);
     };
+
 
     const handleDeleteBlog = (blogId) => {
         if (window.confirm('Are you sure you want to delete this blog?')) {
@@ -164,53 +166,68 @@ const Blog = () => {
     };
 
     const handleSaveBlog = async () => {
-        if (!blogForm.title || !blogForm.author || !blogForm.content) {
-            showSnackbar('Please fill in all required fields', 'error');
+        // Validation - include category_id check
+        if (!blogForm.title || !blogForm.author || !blogForm.content || !blogForm.category_id) {
+            showSnackbar('Please fill in all required fields including category', 'error');
             return;
         }
 
         try {
-            if (editingBlog) {
-                const slug = blogForm.slug || blogForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                // Optionally, update on the server here too:
-                await blogService.updateBlog(editingBlog.id, {
-                    ...blogForm,
-                    slug,
-                });
+            // Generate slug once
+            const slug = blogForm.slug || blogForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-                setBlogs(blogs.map(blog =>
-                    blog.id === editingBlog.id
-                        ? { ...blog, ...blogForm, slug }
-                        : blog
-                ));
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('title', blogForm.title);
+            formData.append('author', blogForm.author);
+            formData.append('category_id', blogForm.category_id); // Fixed: use category_id
+            formData.append('slug', slug);
+            formData.append('content', blogForm.content);
+
+            // Only append image if it's a File object
+            if (blogForm.image instanceof File) {
+                formData.append('image', blogForm.image);
+            }
+
+            if (editingBlog) {
+                await setGlobalLoading('Update-Blog', true, 'Updating blog...');
+
+                // Update blog on server
+                await blogService.updateBlog(editingBlog.id, formData);
+
+                // Refetch data to ensure consistency (recommended approach)
+                await fetchData();
+
                 toast.success('Blog updated successfully');
             } else {
                 await setGlobalLoading('Create-Blog', true, 'Creating blog...');
-                const slug = blogForm.slug || blogForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-                const formData = new FormData();
-                formData.append('title', blogForm.title);
-                formData.append('author', blogForm.author);
-                formData.append('category_id', blogForm.category);
-                formData.append('slug', slug);
-                formData.append('content', blogForm.content);
-                if (blogForm.image instanceof File) {
-                    formData.append('image', blogForm.image);
-                }
-
+                // Create new blog
                 await blogService.createBlog(formData);
+                await fetchData();
+
                 toast.success('Blog created successfully');
             }
 
+            // Close dialog on success
             setOpenDialog(false);
+
         } catch (error) {
             console.error('Error saving blog:', error);
-            toast.error(error?.response?.data?.message || 'Something went wrong. Please try again.');
+
+            // Extract error message
+            const errorMessage = error?.response?.data?.message
+                || error?.response?.data?.error
+                || 'Something went wrong. Please try again.';
+
+            toast.error(errorMessage);
+
         } finally {
+            // Clean up loading states
             await setGlobalLoading('Create-Blog', false);
+            await setGlobalLoading('Update-Blog', false);
         }
     };
-
     const handleViewBlog = (blog) => {
         setViewingBlog(blog);
     };
