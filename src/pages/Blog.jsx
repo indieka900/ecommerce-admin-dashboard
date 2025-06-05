@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
     Box,
-    Container,
     Typography,
     Paper,
     Button,
@@ -13,7 +12,6 @@ import {
     Snackbar,
     Alert,
     Collapse,
-    List,
     Divider,
     Pagination,
 } from '@mui/material';
@@ -31,6 +29,7 @@ import BlogCard from '../components/blog/BlogCard';
 import BlogFilters from '../components/blog/BlogFilters';
 import BlogViewDialog from '../components/blog/BlogViewDialog';
 import BlogForm from '../components/blog/BlogForm';
+import ConfirmDialog from '../components/blog/DeleteDialog';
 import toast from 'react-hot-toast';
 import { useGlobalLoading } from '../context/LoadingContext';
 
@@ -62,6 +61,11 @@ const Blog = () => {
         content: '',
         slug: ''
     });
+
+    const [open_Delete_Dialog, setOpen_Delete_Dialog] = useState(false);
+    const [selectedBlogId, setSelectedBlogId] = useState(null);
+    const [loadingDelete, setLoadingDelete] = useState(false);
+
 
     const fetchData = async () => {
         setGlobalLoading('Blogs-Comments', true, 'Loading blogs and comments...');
@@ -157,13 +161,28 @@ const Blog = () => {
     };
 
 
-    const handleDeleteBlog = (blogId) => {
-        if (window.confirm('Are you sure you want to delete this blog?')) {
-            setBlogs(blogs.filter(blog => blog.id !== blogId));
-            setComments(comments.filter(comment => comment.blogId !== blogId));
+    const handleDeleteConfirmed = async () => {
+        setLoadingDelete(true);
+        try {
+            await blogService.deleteBlog(selectedBlogId);
+            setBlogs(prev => prev.filter(blog => blog.id !== selectedBlogId));
+            setComments(prev => prev.filter(comment => comment.blogId !== selectedBlogId));
             toast.success('Blog deleted successfully');
+        } catch (err) {
+            toast.error('Failed to delete blog. Please try again.');
+        } finally {
+            setLoadingDelete(false);
+            setOpen_Delete_Dialog(false);
+            setSelectedBlogId(null);
         }
     };
+
+    const confirmDeleteBlog = (blogId) => {
+        setSelectedBlogId(blogId);
+        setOpen_Delete_Dialog(true);
+    };
+
+
 
     const handleSaveBlog = async () => {
         // Validation - include category_id check
@@ -263,74 +282,83 @@ const Blog = () => {
     };
 
     const BlogsTab = () => (
-        <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ArticleIcon /> Blogs
-                </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleCreateBlog}
-                    sx={{ borderRadius: 2 }}
-                >
-                    Create New Blog
-                </Button>
-            </Box>
-
-            <BlogFilters
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-                selectedAuthor={selectedAuthor}
-                onAuthorChange={setSelectedAuthor}
-                categories={categories}
-                authors={authors}
-                onClearFilters={handleClearFilters}
-            />
-
-            <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body2" color="text.secondary">
-                    Showing {paginatedBlogs.length} of {filteredBlogs.length} blogs
-                </Typography>
-            </Box>
-
-            <Grid container spacing={2}>
-                {paginatedBlogs.map((blog) => (
-                    <Grid
-                        key={blog.id}
-                        sx={{
-                            pl: 0,
-                        }}
-                        size={{
-                            xs: 12,
-                            md: 6,
-                            lg: 4
-                        }}>
-                        <BlogCard
-                            blog={blog}
-                            onView={handleViewBlog}
-                            onEdit={handleEditBlog}
-                            onDelete={handleDeleteBlog}
-                            commentsCount={getBlogComments(blog.title).length}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
-
-            {totalPages > 1 && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                    <Pagination
-                        count={totalPages}
-                        page={currentPage}
-                        onChange={handlePageChange}
-                        color="primary"
-                        size="large"
-                    />
+        <>
+            <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <ArticleIcon /> Blogs
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={handleCreateBlog}
+                        sx={{ borderRadius: 2 }}
+                    >
+                        Create New Blog
+                    </Button>
                 </Box>
-            )}
-        </Box>
+
+                <BlogFilters
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    selectedCategory={selectedCategory}
+                    onCategoryChange={setSelectedCategory}
+                    selectedAuthor={selectedAuthor}
+                    onAuthorChange={setSelectedAuthor}
+                    categories={categories}
+                    authors={authors}
+                    onClearFilters={handleClearFilters}
+                />
+
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                        Showing {paginatedBlogs.length} of {filteredBlogs.length} blogs
+                    </Typography>
+                </Box>
+
+                <Grid container spacing={2}>
+                    {paginatedBlogs.map((blog) => (
+                        <Grid
+                            key={blog.id}
+                            sx={{
+                                pl: 0,
+                            }}
+                            size={{
+                                xs: 12,
+                                md: 6,
+                                lg: 4
+                            }}>
+                            <BlogCard
+                                blog={blog}
+                                onView={handleViewBlog}
+                                onEdit={handleEditBlog}
+                                onDelete={confirmDeleteBlog}
+                                commentsCount={getBlogComments(blog.title).length}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
+
+                {totalPages > 1 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                        <Pagination
+                            count={totalPages}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                            color="primary"
+                            size="large"
+                        />
+                    </Box>
+                )}
+            </Box>
+            <ConfirmDialog
+                open={open_Delete_Dialog}
+                title="Delete Blog"
+                content="Are you sure you want to delete this blog? This action cannot be undone."
+                onClose={() => setOpen_Delete_Dialog(false)}
+                onConfirm={handleDeleteConfirmed}
+                loading={loadingDelete}
+            /></>
     );
 
     const CommentsTab = () => (
