@@ -90,8 +90,21 @@ const navigationItems = [
     {
         title: 'Blogs',
         icon: Analytics,
-        path: '/blog',
-        color: '#84cc16'
+        color: '#84cc16',
+        children: [
+            {
+                title: 'Blog List',
+                icon: Analytics,
+                path: '/blog',
+                color: '#84cc16'
+            },
+            {
+                title: 'Blog Categories',
+                icon: Category,
+                path: '/blog/categories',
+                color: '#3b82f6'
+            }
+        ]
     },
     {
         title: 'Settings',
