@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     Box,
     Typography,
@@ -92,22 +92,33 @@ const Blog = () => {
 
 
     // Filter and pagination logic
-    const filteredBlogs = blogs.filter(blog => {
-        const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            blog.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            blog.author.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = !selectedCategory || blog.category === selectedCategory;
-        const matchesAuthor = !selectedAuthor || blog.author === selectedAuthor;
+    const filteredBlogs = useMemo(() => {
+        return blogs.filter(blog => {
+            const matchesSearch =
+                blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                blog.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                blog.author.toLowerCase().includes(searchTerm.toLowerCase());
 
-        return matchesSearch && matchesCategory && matchesAuthor;
-    });
+            const matchesCategory = !selectedCategory || blog.category === selectedCategory;
+            const matchesAuthor = !selectedAuthor || blog.author === selectedAuthor;
+
+            return matchesSearch && matchesCategory && matchesAuthor;
+        });
+    }, [blogs, searchTerm, selectedCategory, selectedAuthor]);
+
 
     const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedBlogs = filteredBlogs.slice(startIndex, startIndex + itemsPerPage);
+    const paginatedBlogs = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredBlogs.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredBlogs, currentPage, itemsPerPage]);
 
-    // Get unique authors
-    const authors = [...new Set(blogs.map(blog => blog.author))];
+
+    const authors = useMemo(() => {
+        return [...new Set(blogs.map(blog => blog.author))];
+    }, [blogs]);
+
 
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
@@ -211,19 +222,20 @@ const Blog = () => {
             if (editingBlog) {
                 await setGlobalLoading('Update-Blog', true, 'Updating blog...');
 
-                // Update blog on server
-                await blogService.updateBlog(editingBlog.id, formData);
+                const response = await blogService.updateBlog(editingBlog.id, formData);
+                console.log('Blog updated response:', response);
 
-                // Refetch data to ensure consistency (recommended approach)
-                await fetchData();
+                setBlogs(prev =>
+                    prev.map(b => b.id === editingBlog.id ? { ...b, ...response } : b)
+                );
+
 
                 toast.success('Blog updated successfully');
             } else {
                 await setGlobalLoading('Create-Blog', true, 'Creating blog...');
 
-                // Create new blog
-                await blogService.createBlog(formData);
-                await fetchData();
+                const response = await blogService.createBlog(formData);
+                setBlogs(prev => [...prev, response]);
 
                 toast.success('Blog created successfully');
             }
@@ -242,7 +254,6 @@ const Blog = () => {
             toast.error(errorMessage);
 
         } finally {
-            // Clean up loading states
             await setGlobalLoading('Create-Blog', false);
             await setGlobalLoading('Update-Blog', false);
         }
