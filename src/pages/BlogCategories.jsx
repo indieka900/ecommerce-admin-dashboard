@@ -47,7 +47,7 @@ const BlogCategories = () => {
     const handleDeleteConfirmed = async () => {
         setLoadingDelete(true);
         try {
-            await blogService.deleteCategory(selectedCategoryId);
+            await blogService.deleteBlogCategory(selectedCategoryId);
             setCategories(prev => prev.filter(cat => cat.id !== selectedCategoryId));
             toast.success('Category deleted');
         } catch {
@@ -60,13 +60,15 @@ const BlogCategories = () => {
     };
 
     const handleSaveCategory = async (data, isEdit) => {
+        
         try {
             if (isEdit) {
-                const updated = await blogService.updateCategory(editingCategory.id, data);
+                const updated = await blogService.updateBlogCategory(editingCategory.id, data);
+                console.log('Updated category:', updated);
                 setCategories(prev => prev.map(cat => cat.id === updated.id ? updated : cat));
                 toast.success('Category updated');
             } else {
-                const created = await blogService.createCategory(data);
+                const created = await blogService.createBlogCategory(data);
                 setCategories(prev => [...prev, created]);
                 toast.success('Category created');
             }
@@ -112,7 +114,7 @@ const BlogCategories = () => {
                                 <TableRow key={category.id}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>{category.category}</TableCell>
-                                    <TableCell>{category.category}</TableCell>
+                                    <TableCell>{category.blog_count}</TableCell>
                                     <TableCell align="right">
                                         <IconButton onClick={() => handleEditCategory(category)}>
                                             <EditIcon />

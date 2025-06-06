@@ -8,13 +8,13 @@ const BlogCategoryForm = ({ open, onClose, category, onSave }) => {
     const [name, setName] = useState('');
 
     useEffect(() => {
-        if (category) setName(category.name);
+        if (category) setName(category.category);
         else setName('');
     }, [category]);
 
     const handleSubmit = () => {
         if (!name.trim()) return;
-        onSave({ name }, !!category);
+        onSave({ category: name }, !!category);
     };
 
     return (
