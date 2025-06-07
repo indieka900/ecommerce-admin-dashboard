@@ -1,4 +1,3 @@
-import React from 'react';
 import { TextField, InputAdornment } from '@mui/material';
 
 const CustomTextField = ({
@@ -33,7 +32,7 @@ const CustomTextField = ({
                 '& .MuiOutlinedInput-root': {
                     color: 'white',
                     '& fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.3)'
+                        borderColor: 'rgba(255, 255, 255, 0.09)'
                     },
                     '&:hover fieldset': {
                         borderColor: 'rgba(255, 255, 255, 0.5)'

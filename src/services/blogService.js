@@ -86,6 +86,51 @@ export const blogService = {
             throw new Error(errorMessage);
         }
     },
+    // Create a new blog category
+    createBlogCategory: async (categoryData) => {
+        try {
+            const response = await api.post(`${API_ENDPOINTS.BLOG_CATEGORIES}/`, categoryData);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to create blog category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+    // Update an existing blog category
+    updateBlogCategory: async (id, categoryData) => {
+        try {
+            const response = await api.patch(`${API_ENDPOINTS.BLOG_CATEGORIES}/${id}/`, categoryData);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to update blog category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+    // Delete a blog category
+    deleteBlogCategory: async (id) => {
+        try {
+            const response = await api.delete(`${API_ENDPOINTS.BLOG_CATEGORIES}/${id}/`);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to delete blog category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
     //fetch all comments
     getComments: async () => {
         try {

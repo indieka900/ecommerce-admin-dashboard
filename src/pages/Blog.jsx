@@ -49,6 +49,7 @@ const Blog = () => {
     // Filter and pagination states
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedComment, setSelectedComment] = useState('');
     const [selectedAuthor, setSelectedAuthor] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(6);
@@ -63,6 +64,7 @@ const Blog = () => {
     });
 
     const [open_Delete_Dialog, setOpen_Delete_Dialog] = useState(false);
+    const [open_Delete_Comment, setOpen_Delete_Comment] = useState(false);
     const [selectedBlogId, setSelectedBlogId] = useState(null);
     const [loadingDelete, setLoadingDelete] = useState(false);
 
@@ -188,12 +190,11 @@ const Blog = () => {
         }
     };
 
+
     const confirmDeleteBlog = (blogId) => {
         setSelectedBlogId(blogId);
         setOpen_Delete_Dialog(true);
     };
-
-
 
     const handleSaveBlog = async () => {
         // Validation - include category_id check
@@ -263,22 +264,26 @@ const Blog = () => {
     };
 
     // Comment Operations
-    const handleDeleteComment = async (commentId) => {
-        if (window.confirm('Are you sure you want to delete this comment?')) {
-            try {
-                setGlobalLoading('Delete-Comment', true, 'Deleting comment...');
-                await blogService.deleteComment(commentId);
-                setComments(comments.filter(comment => comment.id !== commentId));
-                toast.success('Comment deleted successfully');
+    const handleCommentDeleteConfirmed = async () => {
+        setLoadingDelete(true);
+        try {
+            await blogService.deleteComment(selectedComment);
+            setComments(comments.filter(comment => comment.id !== selectedComment));
+            toast.success('Comment deleted successfully');
 
-            } catch (error) {
-                toast.error('Failed to delete comment. Please try again later.');
-                console.error('Error deleting comment:', error);
-            } finally {
-                setGlobalLoading('Delete-Comment', false);
-            }
-
+        } catch (error) {
+            toast.error('Failed to delete comment. Please try again later.');
+            console.error('Error deleting comment:', error);
+        } finally {
+            setLoadingDelete(false);
+            setSelectedComment(null)
+            setOpen_Delete_Comment(false);
         }
+    };
+
+    const confirmDeleteComment = (commentId) => {
+        setSelectedComment(commentId);
+        setOpen_Delete_Comment(true);
     };
 
     const toggleComments = (blogId) => {
@@ -369,54 +374,68 @@ const Blog = () => {
                 onClose={() => setOpen_Delete_Dialog(false)}
                 onConfirm={handleDeleteConfirmed}
                 loading={loadingDelete}
-            /></>
+            />
+        </>
     );
 
     const CommentsTab = () => (
-        <Box>
-            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                <CommentIcon /> Comments Management
-            </Typography>
+        <>
+            <Box>
+                <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                    <CommentIcon /> Comments Management
+                </Typography>
 
-            {blogs.map((blog) => {
-                const blogComments = getBlogComments(blog.title);
-                const isExpanded = expandedComments[blog.id];
+                {blogs.map((blog) => {
+                    const blogComments = getBlogComments(blog.title);
+                    const isExpanded = expandedComments[blog.id];
 
-                return (
-                    <Paper key={blog.id} sx={{ mb: 2 }}>
-                        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Typography variant="h6">{blog.title}</Typography>
-                                <Chip
-                                    label={`${blogComments.length} comments`}
-                                    size="small"
-                                    color={blogComments.length > 0 ? "primary" : "default"}
-                                />
+                    return (
+                        <Paper key={blog.id} sx={{ mb: 2 }}>
+                            <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Typography variant="h6">{blog.title}</Typography>
+                                    <Chip
+                                        label={`${blogComments.length} comments`}
+                                        size="small"
+                                        color={blogComments.length > 0 ? "primary" : "default"}
+                                    />
+                                </Box>
+                                <IconButton onClick={() => toggleComments(blog.id)}>
+                                    {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </IconButton>
                             </Box>
-                            <IconButton onClick={() => toggleComments(blog.id)}>
-                                {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                            </IconButton>
-                        </Box>
 
-                        <Collapse in={isExpanded}>
-                            <Divider />
-                            <CommentSection comments={blogComments} onDelete={handleDeleteComment} />
-                        </Collapse>
-                    </Paper>
-                );
-            })}
-        </Box>
+                            <Collapse in={isExpanded}>
+                                <Divider />
+                                <CommentSection comments={blogComments} onDelete={confirmDeleteComment} />
+                            </Collapse>
+                        </Paper>
+                    );
+                })}
+            </Box>
+            <ConfirmDialog
+                open={open_Delete_Comment}
+                title="Delete Comment"
+                content="Are you sure you want to delete this comment?"
+                onClose={() => setOpen_Delete_Comment(false)}
+                onConfirm={handleCommentDeleteConfirmed}
+                loading={loadingDelete}
+            />
+        </>
+
     );
 
     return (
-        <Box sx={{
+        <Box container sx={{
             minHeight: '100vh',
-            my: 0,
+            m: 0,
+            padding: 0,
+            margin: 0
         }} >
+            <Typography variant="h4" sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <DashboardIcon /> Blog Admin Dashboard
+            </Typography>
             <Paper sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h4" sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                    <DashboardIcon /> Blog Admin Dashboard
-                </Typography>
 
                 <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
                     <Tab label="Blogs" />
@@ -443,6 +462,8 @@ const Blog = () => {
                 onClose={() => setViewingBlog(null)}
                 onEdit={handleEditBlog}
             />
+
+
 
             {/* Snackbar for notifications */}
             <Snackbar
