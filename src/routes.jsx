@@ -10,6 +10,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import ChangePassword from './pages/ChangePassword';
+import AddAdmin from './pages/AddAdmin';
 import NotFound from './pages/NotFound';
 import ErrorPage from './pages/ErrorPage';
 // import Products from './pages/Products';
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
             {
                 path: 'change-password',
                 element: <ChangePassword />
+            },
+            {
+                path: 'add-admin',
+                element: (
+                    <ProtectedRoute is_super_admin={true}> 
+                        <AddAdmin />
+                    </ProtectedRoute>
+                )
             },
             // {
             //     path: 'products',

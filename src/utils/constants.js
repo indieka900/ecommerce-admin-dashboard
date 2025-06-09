@@ -1,3 +1,5 @@
+import { Add } from "@mui/icons-material";
+
 export const API_ENDPOINTS = {
     // Auth endpoints
     LOGIN: '/accounts/user/login/',
@@ -7,6 +9,7 @@ export const API_ENDPOINTS = {
     CHANGE_PASSWORD: '/accounts/user/change-password/',
     FORGOT_PASSWORD: '/accounts/user/password-reset/',
     RESET_PASSWORD: '/accounts/user/password-reset-confirm/',
+    ADD_ADMIN: '/accounts/user/add-admin/',
 
     // Product endpoints
     PRODUCTS: '/products/',

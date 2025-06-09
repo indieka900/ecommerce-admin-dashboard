@@ -290,6 +290,24 @@ const Profile = () => {
                         >
                             Back to Dashboard
                         </Button>
+                        { user.is_superuser && 
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{
+                                mt: 1,
+                                color: 'white',
+                                borderColor: 'rgba(255,255,255,0.3)',
+                                '&:disabled': {
+                                    color: 'rgba(255,255,255,0.5)',
+                                    borderColor: 'rgba(255,255,255,0.2)'
+                                }
+                            }}
+                            onClick={() => navigate('/add-admin')}
+                            disabled={isSubmitting}
+                        >
+                            Add Admin
+                        </Button>}
                     </Paper>
                 </Grid>
 

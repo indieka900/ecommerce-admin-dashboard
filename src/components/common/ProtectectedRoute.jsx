@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { AdminPanelSettings, Warning } from '@mui/icons-material';
 
-const ProtectedRoute = ({ children, requiredRole = 'Administrator' }) => {
+const ProtectedRoute = ({ children, requiredRole = 'Administrator', is_super_admin=false }) => {
   const { isAuthenticated, user, loading, error, logout } = useAuth();
   const location = useLocation();
 
@@ -100,6 +100,39 @@ const ProtectedRoute = ({ children, requiredRole = 'Administrator' }) => {
             Current role: {user?.role || 'Unknown'}
             <br />
             Required role: {requiredRole}
+          </Typography>
+          <Button 
+            variant="contained" 
+            onClick={logout}
+            size="small"
+          >
+            Sign Out
+          </Button>
+        </Alert>
+      </Box>
+    );
+  }
+
+  if (is_super_admin && !user?.is_superuser) {
+    return (
+      <Box 
+        display="flex" 
+        flexDirection="column"
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="100vh"
+        gap={2}
+        px={2}
+      >
+        <Warning sx={{ fontSize: 48, color: 'warning.main' }} />
+        <Alert severity="warning" sx={{ maxWidth: 400 }}>
+          <Typography variant="h6" gutterBottom>
+            Access Denied
+          </Typography>
+          <Typography variant="body2" sx={{
+            marginBottom: "16px"
+          }}>
+            You don't have the required super admin privileges to access this area.
           </Typography>
           <Button 
             variant="contained" 

@@ -221,6 +221,17 @@ export const authService = {
             console.error('Password reset error:', error.response?.detail || error.message);
             throw error;
         }
+    },
+
+    //add admin
+    addAdmin: async (adminData) => {
+        try {
+            const response = await api.post(API_ENDPOINTS.ADD_ADMIN, adminData);
+            return response.data;
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Failed to add administrator';
+            throw new Error(errorMessage);
+        }
     }
 
 };
