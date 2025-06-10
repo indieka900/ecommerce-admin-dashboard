@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import {
     Box,
@@ -27,7 +27,7 @@ import {
 
 const Header = ({ onMenuClick, toggleTheme, mode }) => {
     const [anchorEl, setAnchorEl] = useState(null);
-    const { user } = useAuth()
+    const { user, logout } = useAuth()
     const navigate = useNavigate();
     const [notificationAnchor, setNotificationAnchor] = useState(null);
 
@@ -122,7 +122,7 @@ const Header = ({ onMenuClick, toggleTheme, mode }) => {
                             Settings
                         </MenuItem>
                         <Divider />
-                        <MenuItem onClick={useAuth().logout}>
+                        <MenuItem onClick={logout}>
                             <ListItemIcon><Logout fontSize="small" /></ListItemIcon>
                             Logout
                         </MenuItem>
