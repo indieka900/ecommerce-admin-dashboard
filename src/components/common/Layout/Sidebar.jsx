@@ -14,7 +14,6 @@ import {
     Paper,
     Chip
 } from '@mui/material';
-// import BookIcon from '@mui/icons-material/Book';
 import {
     Dashboard,
     Inventory,
@@ -146,8 +145,6 @@ const Sidebar = ({ onItemClick }) => {
         const hasChildren = item.children && item.children.length > 0;
         const isExpanded = expandedItems.includes(item.title);
 
-
-
         return (
             <React.Fragment key={item.title}>
                 <ListItem disablePadding sx={{ pl: depth * 2 }}>
@@ -210,14 +207,21 @@ const Sidebar = ({ onItemClick }) => {
     return (
         <Box sx={{
             height: '100%',
-            display: 'flex', flexDirection: 'column',
-            borderRadius: 0, // ← Explicitly remove border radius
+            display: 'flex', 
+            flexDirection: 'column',
+            borderRadius: 0,
+            overflow: 'hidden', 
             '& > *': {
-                borderRadius: 0 // ← Remove from direct children if needed
+                borderRadius: 0
             }
         }}>
             {/* Logo Section */}
-            <Box sx={{ p: 3, textAlign: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <Box sx={{ 
+                p: 3, 
+                textAlign: 'center', 
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                flexShrink: 0 
+            }}>
                 <Box
                     sx={{
                         display: 'flex',
@@ -248,14 +252,29 @@ const Sidebar = ({ onItemClick }) => {
             </Box>
 
             {/* Navigation */}
-            <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 2 }}>
-                <List>
+            <Box sx={{ 
+                flexGrow: 1, 
+                overflowY: 'auto', 
+                overflowX: 'hidden', 
+                py: 2,
+                
+                '&::-webkit-scrollbar': {
+                    display: 'none', 
+                },
+                scrollbarWidth: 'none', 
+                msOverflowStyle: 'none', 
+            }}>
+                <List sx={{ width: '100%' }}>
                     {navigationItems.map(item => renderNavItem(item))}
                 </List>
             </Box>
 
             {/* User Profile Section */}
-            <Box sx={{ p: 3, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <Box sx={{ 
+                p: 3, 
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                flexShrink: 0
+            }}>
                 <Paper
                     sx={{
                         p: 2,
@@ -265,7 +284,6 @@ const Sidebar = ({ onItemClick }) => {
                     }}
                 >
                     <Box display="flex" alignItems="center">
-
                         {user?.profile_picture ? (
                             <Avatar
                                 src={user.profile_picture}
@@ -278,13 +296,39 @@ const Sidebar = ({ onItemClick }) => {
                                 }}
                             />
                         ) : (
-                            getDisplayName().charAt(0)
+                            <Avatar
+                                sx={{
+                                    width: 40,
+                                    height: 40,
+                                    background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                                    mr: 2
+                                }}
+                            >
+                                {getDisplayName().charAt(0)}
+                            </Avatar>
                         )}
-                        <Box>
-                            <Typography variant="body2" fontWeight="bold" color="white">
+                        <Box sx={{ minWidth: 0 }}>
+                            <Typography 
+                                variant="body2" 
+                                fontWeight="bold" 
+                                color="white"
+                                sx={{ 
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
                                 {getDisplayName()}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography 
+                                variant="caption" 
+                                color="text.secondary"
+                                sx={{ 
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
                                 {user?.role}
                             </Typography>
                         </Box>

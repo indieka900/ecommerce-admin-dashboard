@@ -12,7 +12,7 @@ import {
     useMediaQuery
 } from '@mui/material';
 
-const DRAWER_WIDTH = 260; // Width of the sidebar
+const DRAWER_WIDTH = 300; // Width of the sidebar
 
 const AdminLayout = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -59,6 +59,7 @@ const AdminLayout = () => {
                             '& .MuiDrawer-paper': {
                                 boxSizing: 'border-box',
                                 width: DRAWER_WIDTH,
+                                
                             },
                         }}
                     >
@@ -74,6 +75,7 @@ const AdminLayout = () => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: DRAWER_WIDTH,
+                            borderRadius: 0,
                         },
                     }}
                     open
