@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
     Grid,
     Card,
@@ -14,21 +15,27 @@ import {
     TrendingUp,
     ShoppingCart,
     People,
-    AttachMoney,
+    AttachMoney
+} from '@mui/icons-material';
+import {
     ArrowUpward,
     ArrowDownward
 } from '@mui/icons-material';
-import { getGradientBackground, getGlassmorphismStyles, getHoverTransition } from '../context/ThemeContext';
+import {
+    getGradientBackground,
+    getGlassmorphismStyles,
+    getHoverTransition
+} from '../context/ThemeContext';
 
+import { LineChart, BarChart } from '../components/charts';
 
 const StatCard = ({ title, value, icon: Icon, color, trend, trendValue, gradient }) => {
     const theme = useTheme();
-    
     return (
-        <Card 
-            elevation={0} 
-            sx={{ 
-                p: 3, 
+        <Card
+            elevation={0}
+            sx={{
+                p: 3,
                 height: '100%',
                 background: gradient,
                 position: 'relative',
@@ -37,7 +44,7 @@ const StatCard = ({ title, value, icon: Icon, color, trend, trendValue, gradient
                 ...getHoverTransition(-4),
                 '&:hover': {
                     boxShadow: theme.shadows[6],
-                }
+                },
             }}
         >
             <CardContent sx={{ position: 'relative', zIndex: 1, p: 0, '&:last-child': { pb: 0 } }}>
@@ -58,22 +65,23 @@ const StatCard = ({ title, value, icon: Icon, color, trend, trendValue, gradient
                             label={trendValue}
                             size="small"
                             sx={{
-                                backgroundColor: trend === 'up' ? 
-                                    theme.palette.success[50] : 
-                                    theme.palette.error[50],
-                                color: trend === 'up' ? 
-                                    theme.palette.success.main : 
-                                    theme.palette.error.main,
-                                border: `1px solid ${trend === 'up' ? 
-                                    theme.palette.success[100] : 
-                                    theme.palette.error[100]}`,
+                                backgroundColor:
+                                    trend === 'up' ? theme.palette.success[50] : theme.palette.error[50],
+                                color:
+                                    trend === 'up' ? theme.palette.success.main : theme.palette.error.main,
+                                border: `1px solid ${trend === 'up' ? theme.palette.success[100] : theme.palette.error[100]
+                                    }`,
                             }}
                         />
                     )}
                 </Box>
-                <Typography 
-                    color={theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.6)'} 
-                    variant="body2" 
+                <Typography
+                    color={
+                        theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.8)'
+                            : 'rgba(0, 0, 0, 0.6)'
+                    }
+                    variant="body2"
                     sx={{ mb: 1 }}
                 >
                     {title}
@@ -101,12 +109,11 @@ const StatCard = ({ title, value, icon: Icon, color, trend, trendValue, gradient
 
 const ChartCard = ({ title, children, height = 400 }) => {
     const theme = useTheme();
-    
     return (
-        <Paper 
+        <Paper
             elevation={0}
-            sx={{ 
-                p: 4, 
+            sx={{
+                p: 4,
                 height,
                 background: getGradientBackground(theme, ['primary', 'secondary']),
                 position: 'relative',
@@ -126,52 +133,92 @@ const ChartCard = ({ title, children, height = 400 }) => {
 
 const Dashboard = () => {
     const theme = useTheme();
+
     const statsData = [
         {
-            title: "Total Revenue",
-            value: "$124,563",
+            title: 'Total Revenue',
+            value: '$124,563',
             icon: AttachMoney,
             gradient: getGradientBackground(theme, ['purple', 'pink']),
-            trend: "up",
-            trendValue: "+12.5%"
+            trend: 'up',
+            trendValue: '+12.5%',
         },
         {
-            title: "Orders",
-            value: "2,847",
+            title: 'Orders',
+            value: '2,847',
             icon: ShoppingCart,
             gradient: getGradientBackground(theme, ['pink', 'error']),
-            trend: "up",
-            trendValue: "+8.2%"
+            trend: 'up',
+            trendValue: '+8.2%',
         },
         {
-            title: "Customers",
-            value: "1,429",
+            title: 'Customers',
+            value: '1,429',
             icon: People,
             gradient: getGradientBackground(theme, ['info', 'cyan']),
-            trend: "up",
-            trendValue: "+23.1%"
+            trend: 'up',
+            trendValue: '+23.1%',
         },
         {
-            title: "Growth Rate",
-            value: "+28.4%",
+            title: 'Growth Rate',
+            value: '+28.4%',
             icon: TrendingUp,
             gradient: getGradientBackground(theme, ['success', 'cyan']),
-            trend: "up",
-            trendValue: "+2.4%"
-        }
+            trend: 'up',
+            trendValue: '+2.4%',
+        },
     ];
 
+    const salesChartData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        datasets: [
+            {
+                label: 'Revenue',
+                data: [12000, 15000, 14000, 16000, 18000, 20000, 22000],
+                // borderColor: theme.palette.success.main,
+                // backgroundColor: theme.palette.success.light,
+                // tension: 0.4,
+                fill: true,
+            },
+            {
+                label: 'Expenses',
+                data: [8000, 10000, 9000, 11000, 13000, 14000, 16000],
+                // borderColor: theme.palette.error.main,
+                // backgroundColor: theme.palette.error.light,
+                // tension: 0.4,
+                fill: true,
+            },
+        ],
+    };
+
+    const ordersChartData = {
+        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+        datasets: [
+            {
+                label: 'New Orders',
+                data: [600, 800, 700, 900],
+                borderWidth: 2,
+            },
+        ],
+    };
+
     return (
-        <Box sx={{ 
-            minHeight: '100vh', 
-            background: getGradientBackground(theme, ['background.default', 'background.paper', 'secondary']),
-            p: 4
-        }}>
+        <Box
+            sx={{
+                minHeight: '100vh',
+                background: getGradientBackground(theme, [
+                    'background.default',
+                    'background.paper',
+                    'secondary',
+                ]),
+                p: 4,
+            }}
+        >
             <Box sx={{ mb: 4 }}>
-                <Typography 
-                    variant="h4" 
-                    fontWeight="bold" 
-                    sx={{ 
+                <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    sx={{
                         mb: 1,
                         background: getGradientBackground(theme, ['primary', 'purple']),
                         backgroundClip: 'text',
@@ -186,10 +233,9 @@ const Dashboard = () => {
                 </Typography>
             </Box>
             <Grid container spacing={4}>
-                {/* Stats Cards */}
-                {statsData.map((stat, index) => (
+                {statsData.map((stat, idx) => (
                     <Grid
-                        key={index}
+                        key={idx}
                         size={{
                             xs: 12,
                             sm: 6,
@@ -199,40 +245,31 @@ const Dashboard = () => {
                     </Grid>
                 ))}
 
-                {/* Sales Chart */}
                 <Grid
                     size={{
                         xs: 12,
                         lg: 8
                     }}>
                     <ChartCard title="Sales Analytics" height={450}>
-                        <Box
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            height="80%"
-                            sx={{
-                                background: `linear-gradient(45deg, ${theme.palette.primary[50]}, ${theme.palette.secondary[50]})`,
-                                borderRadius: theme.shape.borderRadius,
-                                border: `1px dashed ${theme.palette.primary[200]}`,
-                            }}
-                        >
-                            <Typography variant="h6" color="text.secondary" textAlign="center">
-                                📈 Interactive Sales Chart<br />
-                                <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
-                                    Connect your analytics data here
-                                </Typography>
-                            </Typography>
+                        <Box sx={{ height: '90%' }}>
+                            <LineChart data={salesChartData} title="" />
                         </Box>
                     </ChartCard>
                 </Grid>
 
-                {/* Quick Stats */}
                 <Grid
                     size={{
                         xs: 12,
                         lg: 4
                     }}>
+                    <ChartCard title="Quarterly Orders" height={450}>
+                        <Box sx={{ height: '90%' }}>
+                            <BarChart data={ordersChartData} title="" />
+                        </Box>
+                    </ChartCard>
+                </Grid>
+
+                <Grid size={12}>
                     <ChartCard title="Quick Stats" height={450}>
                         <Box sx={{ height: '80%' }}>
                             {[
@@ -240,19 +277,20 @@ const Dashboard = () => {
                                 { label: 'Avg. Order Value', value: '$87.50', color: 'warning.main' },
                                 { label: 'Customer Satisfaction', value: '94%', color: 'info.main' },
                                 { label: 'Return Rate', value: '2.1%', color: 'error.main' },
-                            ].map((item, index) => (
-                                <Box 
-                                    key={index}
-                                    sx={{ 
-                                        display: 'flex', 
-                                        justifyContent: 'space-between', 
+                            ].map((item, i) => (
+                                <Box
+                                    key={i}
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
                                         alignItems: 'center',
                                         py: 2,
                                         px: 3,
                                         mb: 2,
-                                        backgroundColor: theme.palette.mode === 'dark' ? 
-                                            'rgba(255, 255, 255, 0.05)' : 
-                                            'rgba(0, 0, 0, 0.02)',
+                                        backgroundColor:
+                                            theme.palette.mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.05)'
+                                                : 'rgba(0, 0, 0, 0.02)',
                                         borderRadius: theme.shape.borderRadius,
                                         border: `1px solid ${theme.palette.divider}`,
                                     }}
@@ -260,10 +298,12 @@ const Dashboard = () => {
                                     <Typography variant="body2" color="text.secondary">
                                         {item.label}
                                     </Typography>
-                                    <Typography 
-                                        variant="h6" 
-                                        fontWeight="bold" 
-                                        sx={{ color: theme.palette[item.color.split('.')[0]][item.color.split('.')[1]] }}
+                                    <Typography
+                                        variant="h6"
+                                        fontWeight="bold"
+                                        sx={{
+                                            color: theme.palette[item.color.split('.')[0]][item.color.split('.')[1]],
+                                        }}
                                     >
                                         {item.value}
                                     </Typography>
@@ -273,7 +313,6 @@ const Dashboard = () => {
                     </ChartCard>
                 </Grid>
 
-                {/* Recent Activity */}
                 <Grid size={12}>
                     <ChartCard title="Recent Activity" height={300}>
                         <Box
@@ -288,7 +327,8 @@ const Dashboard = () => {
                             }}
                         >
                             <Typography variant="h6" color="text.secondary" textAlign="center">
-                                📋 Recent Orders & Activity Feed<br />
+                                📋 Recent Orders & Activity Feed
+                                <br />
                                 <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
                                     Real-time activity monitoring
                                 </Typography>

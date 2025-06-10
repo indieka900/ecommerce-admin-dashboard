@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import { LoadingProvider } from './context/LoadingContext';
 import { AuthProvider } from './context/AuthContext';
 import router from './routes';
+import './utils/chartConfig';
 import themes from './context/ThemeContext';
 
 
