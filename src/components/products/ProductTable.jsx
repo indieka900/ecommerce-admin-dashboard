@@ -73,8 +73,8 @@ export const ProductTable = ({
                                     </Box>
                                 </Box>
                             </TableCell>
-                            <TableCell>{product.brand}</TableCell>
-                            <TableCell>{product.category}</TableCell>
+                            <TableCell>{product.brand_name}</TableCell>
+                            <TableCell>{product.category_name}</TableCell>
                             <TableCell>
                                 <Box>
                                     <Typography variant="body2" fontWeight="bold">

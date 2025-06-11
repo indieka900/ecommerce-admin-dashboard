@@ -9,7 +9,7 @@ export const useProductFilters = (products) => {
     useEffect(() => {
         let filtered = products.filter(product => {
             const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                product.brand.toLowerCase().includes(searchTerm.toLowerCase());
+                                product.brand_name.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
             const matchesBrand = selectedBrand === 'All' || product.brand === selectedBrand;
             

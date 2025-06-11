@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { productService } from '../services/productService';
 import {
     Box,
     Grid,
@@ -22,25 +23,49 @@ import { useNotification } from '../hooks/useNotification';
 
 
 
-const mockCategories = ["All", "Electronics for Audio", "Photography for Equipment", "Wearables for Health"];
-const mockBrands = ["All", "TechSound", "PhotoPro", "FitTech"];
-
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [viewMode, setViewMode] = useState('table');
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    const { 
-        filteredProducts, 
-        searchTerm, 
-        setSearchTerm, 
-        selectedCategory, 
-        setSelectedCategory, 
-        selectedBrand, 
-        setSelectedBrand 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [fetchedProducts, fetchedCategories, fetchedBrands] = await Promise.all([
+                    productService.getProducts(),
+                    productService.getProductCategories(),
+                    productService.getProductBrands()
+                ]);
+                setProducts(fetchedProducts);
+                setCategories(["All", ...fetchedCategories]);
+                setBrands(["All", ...fetchedBrands]);
+            } catch (err) {
+                console.error(err);
+                setError(err.message || "An error occurred");
+                showNotification(err.message || "Failed to load product data", "error");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    });
+
+    const {
+        filteredProducts,
+        searchTerm,
+        setSearchTerm,
+        selectedCategory,
+        setSelectedCategory,
+        selectedBrand,
+        setSelectedBrand
     } = useProductFilters(products);
     const { snackbar, showNotification, hideNotification } = useNotification();
 
@@ -55,8 +80,8 @@ const ProductsPage = () => {
     };
 
     const handleToggleFeatured = (productId) => {
-        setProducts(prev => prev.map(product => 
-            product.id === productId 
+        setProducts(prev => prev.map(product =>
+            product.id === productId
                 ? { ...product, featured: !product.featured }
                 : product
         ));
@@ -85,10 +110,14 @@ const ProductsPage = () => {
         showNotification('Add product functionality not implemented yet', 'info');
     };
 
-    return (
+    return (loading ? (
+        <Box>Loading products...</Box>
+    ) : error ? (
+        <Alert severity="error">{error}</Alert>
+    ) : 
         <Box sx={{ p: 3 }}>
             {/* Header */}
-            <PageHeader 
+            <PageHeader
                 title="Products"
                 subtitle="Manage your product inventory"
                 onAddClick={handleAddProduct}
@@ -96,9 +125,9 @@ const ProductsPage = () => {
             />
 
             {/* Stats Cards */}
-            <ProductStatsCards 
-                products={products} 
-                categories={mockCategories}
+            <ProductStatsCards
+                products={products}
+                categories={categories}
             />
 
             {/* Filters */}
@@ -107,10 +136,10 @@ const ProductsPage = () => {
                 onSearchChange={setSearchTerm}
                 selectedCategory={selectedCategory}
                 onCategoryChange={setSelectedCategory}
-                categories={mockCategories}
+                categories={categories}
                 selectedBrand={selectedBrand}
                 onBrandChange={setSelectedBrand}
-                brands={mockBrands}
+                brands={brands}
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
             />
@@ -136,25 +165,25 @@ const ProductsPage = () => {
                     {filteredProducts
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((product) => (
-                        <Grid
-                            key={product.id}
-                            size={{
-                                xs: 12,
-                                sm: 6,
-                                md: 4,
-                                lg: 3
-                            }}>
-                            <ProductCard 
-                                product={product}
-                                onView={handleViewProduct}
-                                onEdit={handleEditProduct}
-                                onToggleFeatured={handleToggleFeatured}
-                                renderStockStatus={renderStockStatus}
-                                renderRating={renderRating}
-                                getDisplayPrice={getDisplayPrice}
-                            />
-                        </Grid>
-                    ))}
+                            <Grid
+                                key={product.id}
+                                size={{
+                                    xs: 12,
+                                    sm: 6,
+                                    md: 4,
+                                    lg: 3
+                                }}>
+                                <ProductCard
+                                    product={product}
+                                    onView={handleViewProduct}
+                                    onEdit={handleEditProduct}
+                                    onToggleFeatured={handleToggleFeatured}
+                                    renderStockStatus={renderStockStatus}
+                                    renderRating={renderRating}
+                                    getDisplayPrice={getDisplayPrice}
+                                />
+                            </Grid>
+                        ))}
                 </Grid>
             )}
 
@@ -179,7 +208,7 @@ const ProductsPage = () => {
                 </Alert>
             </Snackbar>
         </Box>
-    );
-};
+    )
+}
 
 export default ProductsPage;

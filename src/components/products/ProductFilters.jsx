@@ -49,9 +49,10 @@ export const ProductFilters = ({
                         onChange={(e) => onCategoryChange(e.target.value)}
                         label="Category"
                     >
+                        <MenuItem value="All">All</MenuItem>
                         {categories.map(category => (
-                            <MenuItem key={category} value={category}>
-                                {category}
+                            <MenuItem key={category.id} value={category.id}>
+                                {category.category_name}
                             </MenuItem>
                         ))}
                     </Select>
@@ -65,9 +66,10 @@ export const ProductFilters = ({
                         onChange={(e) => onBrandChange(e.target.value)}
                         label="Brand"
                     >
+                        <MenuItem value="All">All</MenuItem>
                         {brands.map(brand => (
-                            <MenuItem key={brand} value={brand}>
-                                {brand}
+                            <MenuItem key={brand.id} value={brand.id}>
+                                {brand.brand_title}
                             </MenuItem>
                         ))}
                     </Select>

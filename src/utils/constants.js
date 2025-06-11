@@ -12,8 +12,10 @@ export const API_ENDPOINTS = {
     ADD_ADMIN: '/accounts/user/add-admin/',
 
     // Product endpoints
-    PRODUCTS: '/products/',
-    PRODUCT_CATEGORIES: '/categories/',
+    PRODUCTS: '/ecommerce/products/',
+    PRODUCT_CATEGORIES: '/ecommerce/categories/',
+    PRODUCT_BRANDS: '/ecommerce/brands/',
+    PRODUCT_STATS: '/ecommerce/products/stats/',
 
     // Blog endpoints
     BLOGS: '/blogs/blogs',

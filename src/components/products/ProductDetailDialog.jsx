@@ -46,11 +46,11 @@ export const ProductDetailDialog = ({
                         </Typography>
                         <Box mb={2}>
                             <Typography variant="body2" color="text.secondary">Brand</Typography>
-                            <Typography variant="body1">{product.brand}</Typography>
+                            <Typography variant="body1">{product.brand_name}</Typography>
                         </Box>
                         <Box mb={2}>
                             <Typography variant="body2" color="text.secondary">Category</Typography>
-                            <Typography variant="body1">{product.category}</Typography>
+                            <Typography variant="body1">{product.category_name}</Typography>
                         </Box>
                         <Box mb={2}>
                             <Typography variant="body2" color="text.secondary">Price</Typography>
@@ -65,6 +65,10 @@ export const ProductDetailDialog = ({
                         <Box mb={2}>
                             <Typography variant="body2" color="text.secondary">Rating</Typography>
                             {renderRating(product.rating)}
+                        </Box>
+                        <Box mb={2}>
+                            <Typography variant="body2" color="text.secondary">Description</Typography>
+                            <Typography variant="body1">{product.description}</Typography>
                         </Box>
                         {product.has_variants && product.variants.length > 0 && (
                             <Box>
