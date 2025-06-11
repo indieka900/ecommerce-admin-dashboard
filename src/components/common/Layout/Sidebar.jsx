@@ -44,7 +44,7 @@ const navigationItems = [
             {
                 title: 'Product List',
                 icon: Inventory,
-                path: '/admin/products',
+                path: '/products',
                 color: '#f59e0b'
             },
             {

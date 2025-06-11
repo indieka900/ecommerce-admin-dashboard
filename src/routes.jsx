@@ -13,7 +13,7 @@ import ChangePassword from './pages/ChangePassword';
 import AddAdmin from './pages/AddAdmin';
 import NotFound from './pages/NotFound';
 import ErrorPage from './pages/ErrorPage';
-// import Products from './pages/Products';
+import Products from './pages/Products';
 // import Categories from './pages/Categories';
 // import Orders from './pages/Orders';
 // import Customers from './pages/Customers';
@@ -73,10 +73,10 @@ const router = createBrowserRouter([
                     </ProtectedRoute>
                 )
             },
-            // {
-            //     path: 'products',
-            //     element: <Products />
-            // },
+            {
+                path: 'products',
+                element: <Products />
+            },
             // {
             //     path: 'categories',
             //     element: <Categories />

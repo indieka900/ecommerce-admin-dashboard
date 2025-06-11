@@ -90,7 +90,7 @@ const CommentItem = React.memo(({ comment, onDelete, showDeleteButton = true }) 
             >
                 {isMobile ? (
                     // Mobile Layout - Stacked
-                    <Box sx={{ width: '100%' }}>
+                    (<Box sx={{ width: '100%' }}>
                         <Box sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -126,7 +126,6 @@ const CommentItem = React.memo(({ comment, onDelete, showDeleteButton = true }) 
                                 </IconButton>
                             )}
                         </Box>
-
                         <Typography
                             variant="body2"
                             sx={{
@@ -137,7 +136,6 @@ const CommentItem = React.memo(({ comment, onDelete, showDeleteButton = true }) 
                         >
                             {comment.text}
                         </Typography>
-
                         <Box sx={{
                             display: 'flex',
                             justifyContent: 'space-between',
@@ -178,10 +176,10 @@ const CommentItem = React.memo(({ comment, onDelete, showDeleteButton = true }) 
                                 />
                             </Box>
                         </Box>
-                    </Box>
+                    </Box>)
                 ) : (
                     // Desktop Layout - Side by side
-                    <>
+                    (<>
                         <Avatar
                             sx={{
                                 mr: 2,
@@ -192,7 +190,6 @@ const CommentItem = React.memo(({ comment, onDelete, showDeleteButton = true }) 
                         >
                             {getInitials(comment.full_name)}
                         </Avatar>
-
                         <ListItemText
                             primary={
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
@@ -254,7 +251,7 @@ const CommentItem = React.memo(({ comment, onDelete, showDeleteButton = true }) 
                                 </Box>
                             }
                         />
-                    </>
+                    </>)
                 )}
             </ListItem>
         </Fade>

@@ -1,0 +1,185 @@
+import { useState } from 'react';
+import {
+    Box,
+    Grid,
+    Snackbar,
+    Alert
+} from '@mui/material';
+
+import { ProductFilters } from '../components/products/ProductFilters';
+import { ProductCard } from '../components/products/ProductCard';
+import { ProductTable } from '../components/products/ProductTable';
+import { ProductStatsCards } from '../components/products/ProductStatsCards';
+import { ProductDetailDialog } from '../components/products/ProductDetailDialog';
+import { PageHeader } from '../components/products/PageHeader';
+
+import { getDisplayPrice } from '../hooks/useProductUtils';
+import { renderStockStatus, renderRating } from '../utils/productDisplayUtils';
+
+
+import { useProductFilters } from '../hooks/useProductFilters';
+import { useNotification } from '../hooks/useNotification';
+
+
+
+const mockCategories = ["All", "Electronics for Audio", "Photography for Equipment", "Wearables for Health"];
+const mockBrands = ["All", "TechSound", "PhotoPro", "FitTech"];
+
+const ProductsPage = () => {
+    const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [viewMode, setViewMode] = useState('table');
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const { 
+        filteredProducts, 
+        searchTerm, 
+        setSearchTerm, 
+        selectedCategory, 
+        setSelectedCategory, 
+        selectedBrand, 
+        setSelectedBrand 
+    } = useProductFilters(products);
+    const { snackbar, showNotification, hideNotification } = useNotification();
+
+    // Event handlers
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const handleToggleFeatured = (productId) => {
+        setProducts(prev => prev.map(product => 
+            product.id === productId 
+                ? { ...product, featured: !product.featured }
+                : product
+        ));
+        showNotification('Product featured status updated');
+    };
+
+    const handleViewProduct = (product) => {
+        setSelectedProduct(product);
+        setDialogOpen(true);
+    };
+
+    const handleEditProduct = (product) => {
+        // Navigate to edit page or open edit modal
+        console.log('Edit product:', product.id);
+        showNotification('Edit functionality not implemented yet', 'info');
+    };
+
+    const handleDeleteProduct = (productId) => {
+        setProducts(prev => prev.filter(product => product.id !== productId));
+        showNotification('Product deleted successfully');
+    };
+
+    const handleAddProduct = () => {
+        // Navigate to add product page or open add modal
+        console.log('Add new product');
+        showNotification('Add product functionality not implemented yet', 'info');
+    };
+
+    return (
+        <Box sx={{ p: 3 }}>
+            {/* Header */}
+            <PageHeader 
+                title="Products"
+                subtitle="Manage your product inventory"
+                onAddClick={handleAddProduct}
+                addButtonText="Add Product"
+            />
+
+            {/* Stats Cards */}
+            <ProductStatsCards 
+                products={products} 
+                categories={mockCategories}
+            />
+
+            {/* Filters */}
+            <ProductFilters
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                categories={mockCategories}
+                selectedBrand={selectedBrand}
+                onBrandChange={setSelectedBrand}
+                brands={mockBrands}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+            />
+
+            {/* Products Display */}
+            {viewMode === 'table' ? (
+                <ProductTable
+                    products={filteredProducts}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    onChangePage={handleChangePage}
+                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                    onView={handleViewProduct}
+                    onEdit={handleEditProduct}
+                    onDelete={handleDeleteProduct}
+                    onToggleFeatured={handleToggleFeatured}
+                    renderStockStatus={renderStockStatus}
+                    renderRating={renderRating}
+                    getDisplayPrice={getDisplayPrice}
+                />
+            ) : (
+                <Grid container spacing={3}>
+                    {filteredProducts
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((product) => (
+                        <Grid
+                            key={product.id}
+                            size={{
+                                xs: 12,
+                                sm: 6,
+                                md: 4,
+                                lg: 3
+                            }}>
+                            <ProductCard 
+                                product={product}
+                                onView={handleViewProduct}
+                                onEdit={handleEditProduct}
+                                onToggleFeatured={handleToggleFeatured}
+                                renderStockStatus={renderStockStatus}
+                                renderRating={renderRating}
+                                getDisplayPrice={getDisplayPrice}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
+            )}
+
+            {/* Product Detail Dialog */}
+            <ProductDetailDialog
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+                product={selectedProduct}
+                renderStockStatus={renderStockStatus}
+                renderRating={renderRating}
+                getDisplayPrice={getDisplayPrice}
+            />
+
+            {/* Snackbar for notifications */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={3000}
+                onClose={hideNotification}
+            >
+                <Alert severity={snackbar.severity} onClose={hideNotification}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+        </Box>
+    );
+};
+
+export default ProductsPage;
