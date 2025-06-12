@@ -4,13 +4,12 @@ import {
     TextField,
     InputAdornment,
     FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     FormControlLabel,
     Switch
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
+import CategoryDropdown from './CategoryDropdown';
+import BrandDropdown from './BrandDropdown';
 
 export const ProductFilters = ({
     searchTerm,
@@ -43,36 +42,23 @@ export const ProductFilters = ({
             </Grid>
             <Grid size={{ xs: 12, md: 3 }}>
                 <FormControl fullWidth>
-                    <InputLabel>Category</InputLabel>
-                    <Select
+                    <CategoryDropdown
+                        categories={categories}
                         value={selectedCategory}
                         onChange={(e) => onCategoryChange(e.target.value)}
-                        label="Category"
-                    >
-                        <MenuItem value="All">All</MenuItem>
-                        {categories.map(category => (
-                            <MenuItem key={category.id} value={category.id}>
-                                {category.category_name}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                    />
+
                 </FormControl>
             </Grid>
             <Grid size={{ xs: 12, md: 3 }}>
                 <FormControl fullWidth>
-                    <InputLabel>Brand</InputLabel>
-                    <Select
+                    <BrandDropdown
+                        brands={brands}
                         value={selectedBrand}
                         onChange={(e) => onBrandChange(e.target.value)}
-                        label="Brand"
-                    >
-                        <MenuItem value="All">All</MenuItem>
-                        {brands.map(brand => (
-                            <MenuItem key={brand.id} value={brand.id}>
-                                {brand.brand_title}
-                            </MenuItem>
-                        ))}
-                    </Select>
+
+                    />
+
                 </FormControl>
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
