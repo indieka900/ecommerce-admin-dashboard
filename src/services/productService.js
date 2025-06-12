@@ -71,9 +71,9 @@ export const productService = {
     },
 
     // Update an existing product
-    updateBlog: async (id, productData) => {
+    updateProduct: async (id, productData) => {
         try {
-            const response = await api.patch(`${API_ENDPOINTS.PRODUCTS}/${id}/`, productData, {
+            const response = await api.patch(`${API_ENDPOINTS.PRODUCTS}${id}/`, productData, {
                 headers : {'Content-Type': 'multipart/form-data'}
             });
             return response.data;
@@ -91,7 +91,7 @@ export const productService = {
     // Delete a product
     deleteProduct: async (id) => {
         try {
-            const response = await api.delete(`${API_ENDPOINTS.PRODUCTS}/${id}/`);
+            const response = await api.delete(`${API_ENDPOINTS.PRODUCTS}${id}/`);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to delete product. Please try again later.';

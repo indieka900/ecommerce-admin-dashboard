@@ -12,7 +12,8 @@ import {
 import { Edit } from '@mui/icons-material';
 
 export const ProductDetailDialog = ({ 
-    open, 
+    open,
+    onEdit, 
     onClose, 
     product, 
     renderStockStatus, 
@@ -99,7 +100,7 @@ export const ProductDetailDialog = ({
                 <Button onClick={onClose}>
                     Close
                 </Button>
-                <Button variant="contained" startIcon={<Edit />}>
+                <Button variant="contained" startIcon={<Edit />} onClick={() => onEdit(product)}>
                     Edit Product
                 </Button>
             </DialogActions>

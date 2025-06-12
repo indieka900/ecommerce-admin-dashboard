@@ -139,7 +139,7 @@ export const ProductTable = ({
                                         <IconButton 
                                             size="small" 
                                             color="error"
-                                            onClick={() => onDelete(product.id)}
+                                            onClick={() => onDelete(product)}
                                         >
                                             <Delete />
                                         </IconButton>

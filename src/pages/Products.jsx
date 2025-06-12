@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { productService } from '../services/productService';
 import {
     Box,
@@ -7,7 +8,7 @@ import {
     Snackbar,
     Alert
 } from '@mui/material';
-
+import ConfirmDialog from '../components/blog/DeleteDialog';
 import { ProductFilters } from '../components/products/ProductFilters';
 import { ProductCard } from '../components/products/ProductCard';
 import { ProductTable } from '../components/products/ProductTable';
@@ -26,6 +27,7 @@ import { useNotification } from '../hooks/useNotification';
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
+    const [isEditting, setisEditting] = useState(false);
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -36,6 +38,7 @@ const ProductsPage = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [addProdDialogue, setaddProdDialogue] = useState(false)
+    const [open_Delete, setOpen_Delete] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -88,12 +91,16 @@ const ProductsPage = () => {
         console.log(data);
         try {
             if (selectedProduct) {
-                await productService.updateProduct(selectedProduct.id, data);
+                const res = await productService.updateProduct(selectedProduct.id, data);
+                setProducts(prev =>
+                    prev.map(p => p.id === selectedProduct.id ? { ...p, ...res } : p)
+                );
                 showNotification('Product updated successfully!', 'success');
             } else {
                 
                 
-                await productService.createProduct(data);
+                const res = await productService.createProduct(data);
+                setProducts(prev => [...prev, res]);
                 showNotification('Product added successfully!', 'success');
             }
 
@@ -126,16 +133,35 @@ const ProductsPage = () => {
 
     const handleEditProduct = (product) => {
         setSelectedProduct(product);
-        setDialogOpen(true);
+        setisEditting(true);
+        setaddProdDialogue(true);
     };
 
-    const handleDeleteProduct = (productId) => {
-        setProducts(prev => prev.filter(product => product.id !== productId));
-        showNotification('Product deleted successfully');
+    const handleDeleteProduct = (product) => {
+        setSelectedProduct(product)
+        setOpen_Delete(true)
     };
+
+    const handleProductDeleteConfirmed = async () => {
+            setLoading(true);
+            try {
+                await productService.deleteProduct(selectedProduct.id);
+                setProducts(products.filter(product => product.id !== selectedProduct.id))
+                toast.success('Product deleted successfully');
+    
+            } catch (error) {
+                toast.error('Failed to delete product. Please try again later.');
+                console.error('Error deleting product:', error);
+            } finally {
+                setLoading(false);
+                setSelectedProduct(null)
+                setOpen_Delete(false);
+            }
+        };
 
     const handleAddProduct = () => {
         setSelectedProduct(null);
+        setisEditting(false);
         setaddProdDialogue(true);
     };
 
@@ -219,6 +245,7 @@ const ProductsPage = () => {
             {/* Product Detail Dialog */}
             <ProductDetailDialog
                 open={dialogOpen}
+                onEdit={handleEditProduct}
                 onClose={() => setDialogOpen(false)}
                 product={selectedProduct}
                 renderStockStatus={renderStockStatus}
@@ -233,6 +260,16 @@ const ProductsPage = () => {
                 initialData={selectedProduct}
                 categories={categories}
                 brands={brands}
+                isEditing = {isEditting}
+            />
+
+            <ConfirmDialog
+                open={open_Delete}
+                title="Delete Product"
+                content="Are you sure you want to delete this product?"
+                onClose={() => setOpen_Delete(false)}
+                onConfirm={handleProductDeleteConfirmed}
+                loading={loading}
             />
 
             {/* Snackbar for notifications */}
