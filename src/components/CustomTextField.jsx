@@ -14,9 +14,17 @@ const CustomTextField = ({
     fullWidth = true,
     ...otherProps
 }) => {
+    const registrationProps = register ? register(name) : {};
+    
+    const fieldProps = {
+        ...registrationProps,
+        name: name,
+        id: name, 
+    };
+
     return (
         <TextField
-            {...(register ? register(name) : {})}
+            {...fieldProps}
             label={label}
             type={type}
             fullWidth={fullWidth}
@@ -54,7 +62,8 @@ const CustomTextField = ({
                         </InputAdornment>
                     ),
                 }
-            }} />
+            }}
+        />
     );
 };
 

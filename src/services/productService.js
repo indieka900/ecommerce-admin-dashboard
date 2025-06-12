@@ -53,7 +53,7 @@ export const productService = {
     // Create a new product
     createProduct: async (productData) => {
         try {
-            const response = await api.post(`${API_ENDPOINTS.PRODUCTS}/`, productData, {
+            const response = await api.post(API_ENDPOINTS.PRODUCTS, productData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }

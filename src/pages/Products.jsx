@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { productService } from '../services/productService';
 import {
@@ -13,7 +14,7 @@ import { ProductTable } from '../components/products/ProductTable';
 import { ProductStatsCards } from '../components/products/ProductStatsCards';
 import { ProductDetailDialog } from '../components/products/ProductDetailDialog';
 import { PageHeader } from '../components/products/PageHeader';
-
+import ProductFormDialog from '../components/products/ProductFormDialog';
 import { getDisplayPrice } from '../hooks/useProductUtils';
 import { renderStockStatus, renderRating } from '../utils/productDisplayUtils';
 
@@ -34,6 +35,7 @@ const ProductsPage = () => {
     const [viewMode, setViewMode] = useState('table');
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [addProdDialogue, setaddProdDialogue] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -43,6 +45,8 @@ const ProductsPage = () => {
                     productService.getProductCategories(),
                     productService.getProductBrands()
                 ]);
+                console.log("Fetching Products......");
+
                 setProducts(fetchedProducts);
                 setCategories(["All", ...fetchedCategories]);
                 setBrands(["All", ...fetchedBrands]);
@@ -56,7 +60,7 @@ const ProductsPage = () => {
         };
 
         fetchData();
-    });
+    }, []);
 
     const {
         filteredProducts,
@@ -72,6 +76,33 @@ const ProductsPage = () => {
     // Event handlers
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
+    };
+
+
+    const handleDialogClose = () => {
+        setaddProdDialogue(false);
+        setSelectedProduct(null);
+    };
+
+    const handleFormSubmit = async (data) => {
+        console.log(data);
+        try {
+            if (selectedProduct) {
+                await productService.updateProduct(selectedProduct.id, data);
+                showNotification('Product updated successfully!', 'success');
+            } else {
+                
+                
+                await productService.createProduct(data);
+                showNotification('Product added successfully!', 'success');
+            }
+
+            handleDialogClose();
+            // fetchData();
+        } catch (err) {
+            console.error(err);
+            showNotification(err.message || 'Failed to save product', 'error');
+        }
     };
 
     const handleChangeRowsPerPage = (event) => {
@@ -94,9 +125,8 @@ const ProductsPage = () => {
     };
 
     const handleEditProduct = (product) => {
-        // Navigate to edit page or open edit modal
-        console.log('Edit product:', product.id);
-        showNotification('Edit functionality not implemented yet', 'info');
+        setSelectedProduct(product);
+        setDialogOpen(true);
     };
 
     const handleDeleteProduct = (productId) => {
@@ -105,17 +135,16 @@ const ProductsPage = () => {
     };
 
     const handleAddProduct = () => {
-        // Navigate to add product page or open add modal
-        console.log('Add new product');
-        showNotification('Add product functionality not implemented yet', 'info');
+        setSelectedProduct(null);
+        setaddProdDialogue(true);
     };
 
     return (loading ? (
         <Box>Loading products...</Box>
     ) : error ? (
         <Alert severity="error">{error}</Alert>
-    ) : 
-        <Box sx={{ p: 3 }}>
+    ) :
+        <Box>
             {/* Header */}
             <PageHeader
                 title="Products"
@@ -195,6 +224,15 @@ const ProductsPage = () => {
                 renderStockStatus={renderStockStatus}
                 renderRating={renderRating}
                 getDisplayPrice={getDisplayPrice}
+            />
+
+            <ProductFormDialog
+                open={addProdDialogue}
+                onClose={handleDialogClose}
+                onSubmit={handleFormSubmit}
+                initialData={selectedProduct}
+                categories={categories}
+                brands={brands}
             />
 
             {/* Snackbar for notifications */}
