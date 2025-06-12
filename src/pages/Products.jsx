@@ -28,6 +28,7 @@ import { useNotification } from '../hooks/useNotification';
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
     const [isEditting, setisEditting] = useState(false);
+    const [loadingProductId, setLoadingProductId] = useState(null);
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -97,8 +98,8 @@ const ProductsPage = () => {
                 );
                 showNotification('Product updated successfully!', 'success');
             } else {
-                
-                
+
+
                 const res = await productService.createProduct(data);
                 setProducts(prev => [...prev, res]);
                 showNotification('Product added successfully!', 'success');
@@ -117,13 +118,23 @@ const ProductsPage = () => {
         setPage(0);
     };
 
-    const handleToggleFeatured = (productId) => {
-        setProducts(prev => prev.map(product =>
-            product.id === productId
-                ? { ...product, featured: !product.featured }
-                : product
-        ));
-        showNotification('Product featured status updated');
+    const handleToggleFeatured = async (product) => {
+        setLoadingProductId(product.id)
+        try {
+            await productService.updateProduct(product.id, { featured: !product.featured });
+            setProducts(prev => prev.map(p =>
+                p.id === product.id
+                    ? { ...p, featured: !p.featured }
+                    : p
+            ));
+            toast.success('Product featured status updated');
+        } catch (error) {
+            toast.error('Failed to update featured status');
+            console.error(error);
+        } finally {
+            setLoadingProductId(null)
+        }
+
     };
 
     const handleViewProduct = (product) => {
@@ -143,21 +154,21 @@ const ProductsPage = () => {
     };
 
     const handleProductDeleteConfirmed = async () => {
-            setLoading(true);
-            try {
-                await productService.deleteProduct(selectedProduct.id);
-                setProducts(products.filter(product => product.id !== selectedProduct.id))
-                toast.success('Product deleted successfully');
-    
-            } catch (error) {
-                toast.error('Failed to delete product. Please try again later.');
-                console.error('Error deleting product:', error);
-            } finally {
-                setLoading(false);
-                setSelectedProduct(null)
-                setOpen_Delete(false);
-            }
-        };
+        setLoading(true);
+        try {
+            await productService.deleteProduct(selectedProduct.id);
+            setProducts(products.filter(product => product.id !== selectedProduct.id))
+            toast.success('Product deleted successfully');
+
+        } catch (error) {
+            toast.error('Failed to delete product. Please try again later.');
+            console.error('Error deleting product:', error);
+        } finally {
+            setLoading(false);
+            setSelectedProduct(null)
+            setOpen_Delete(false);
+        }
+    };
 
     const handleAddProduct = () => {
         setSelectedProduct(null);
@@ -211,6 +222,7 @@ const ProductsPage = () => {
                     onEdit={handleEditProduct}
                     onDelete={handleDeleteProduct}
                     onToggleFeatured={handleToggleFeatured}
+                    loadingProductId={loadingProductId}
                     renderStockStatus={renderStockStatus}
                     renderRating={renderRating}
                     getDisplayPrice={getDisplayPrice}
@@ -233,6 +245,7 @@ const ProductsPage = () => {
                                     onView={handleViewProduct}
                                     onEdit={handleEditProduct}
                                     onToggleFeatured={handleToggleFeatured}
+                                    loadingProductId={loadingProductId}
                                     renderStockStatus={renderStockStatus}
                                     renderRating={renderRating}
                                     getDisplayPrice={getDisplayPrice}
@@ -260,7 +273,7 @@ const ProductsPage = () => {
                 initialData={selectedProduct}
                 categories={categories}
                 brands={brands}
-                isEditing = {isEditting}
+                isEditing={isEditting}
             />
 
             <ConfirmDialog

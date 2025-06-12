@@ -6,6 +6,7 @@ import {
     Box,
     Button,
     IconButton,
+    CircularProgress,
     Chip
 } from '@mui/material';
 import {
@@ -21,7 +22,8 @@ export const ProductCard = ({
     onToggleFeatured,
     renderStockStatus,
     renderRating,
-    getDisplayPrice
+    getDisplayPrice,
+    loadingProductId
 }) => (
     <Card sx={{
         height: '100%',
@@ -106,13 +108,17 @@ export const ProductCard = ({
                 >
                     Edit
                 </Button>
-                <IconButton
-                    size="small"
-                    onClick={() => onToggleFeatured(product.id)}
-                    color={product.featured ? "warning" : "default"}
-                >
-                    <Star />
-                </IconButton>
+                {loadingProductId === product.id ? (
+                    <CircularProgress size={20} />
+                ) : (
+                    <IconButton
+                        size="small"
+                        onClick={() => onToggleFeatured(product)}
+                        color={product.featured ? "warning" : "default"}
+                    >
+                        <Star />
+                    </IconButton>
+                )}
             </Box>
         </CardContent>
     </Card>

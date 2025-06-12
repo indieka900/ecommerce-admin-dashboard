@@ -13,7 +13,8 @@ import {
     Typography,
     Stack,
     Tooltip,
-    Paper
+    Paper,
+    CircularProgress
 } from '@mui/material';
 import {
     Edit,
@@ -22,11 +23,11 @@ import {
     Star
 } from '@mui/icons-material';
 
-export const ProductTable = ({ 
-    products, 
-    page, 
-    rowsPerPage, 
-    onChangePage, 
+export const ProductTable = ({
+    products,
+    page,
+    rowsPerPage,
+    onChangePage,
     onChangeRowsPerPage,
     onView,
     onEdit,
@@ -34,7 +35,8 @@ export const ProductTable = ({
     onToggleFeatured,
     renderStockStatus,
     renderRating,
-    getDisplayPrice
+    getDisplayPrice,
+    loadingProductId
 }) => (
     <Paper>
         <TableContainer>
@@ -55,99 +57,104 @@ export const ProductTable = ({
                     {products
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((product) => (
-                        <TableRow key={product.id} hover>
-                            <TableCell>
-                                <Box display="flex" alignItems="center">
-                                    <Avatar
-                                        src={product.prod_img}
-                                        alt={product.title}
-                                        sx={{ mr: 2, width: 50, height: 50 }}
-                                    />
+                            <TableRow key={product.id} hover>
+                                <TableCell>
+                                    <Box display="flex" alignItems="center">
+                                        <Avatar
+                                            src={product.prod_img}
+                                            alt={product.title}
+                                            sx={{ mr: 2, width: 50, height: 50 }}
+                                        />
+                                        <Box>
+                                            <Typography variant="subtitle2" fontWeight="bold">
+                                                {product.title}
+                                            </Typography>
+                                            {product.featured && (
+                                                <Chip label="Featured" size="small" color="primary" />
+                                            )}
+                                        </Box>
+                                    </Box>
+                                </TableCell>
+                                <TableCell>{product.brand_name}</TableCell>
+                                <TableCell>{product.category_name}</TableCell>
+                                <TableCell>
                                     <Box>
-                                        <Typography variant="subtitle2" fontWeight="bold">
-                                            {product.title}
+                                        <Typography variant="body2" fontWeight="bold">
+                                            {getDisplayPrice(product)}
                                         </Typography>
-                                        {product.featured && (
-                                            <Chip label="Featured" size="small" color="primary" />
+                                        {product.discount > 0 && (
+                                            <Typography variant="caption" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
+                                                Ksh {product.price.toLocaleString()}
+                                            </Typography>
                                         )}
                                     </Box>
-                                </Box>
-                            </TableCell>
-                            <TableCell>{product.brand_name}</TableCell>
-                            <TableCell>{product.category_name}</TableCell>
-                            <TableCell>
-                                <Box>
-                                    <Typography variant="body2" fontWeight="bold">
-                                        {getDisplayPrice(product)}
-                                    </Typography>
-                                    {product.discount > 0 && (
-                                        <Typography variant="caption" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
-                                            Ksh {product.price.toLocaleString()}
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </TableCell>
-                            <TableCell>
-                                {renderStockStatus(product.quantity, product.variants)}
-                            </TableCell>
-                            <TableCell>
-                                {renderRating(product.rating)}
-                            </TableCell>
-                            <TableCell>
-                                <Stack direction="row" spacing={1}>
-                                    {product.has_variants && (
-                                        <Chip 
-                                            label={`${product.variants.length} variants`} 
-                                            size="small" 
-                                            variant="outlined"
-                                        />
-                                    )}
-                                    {product.discount > 0 && (
-                                        <Chip 
-                                            label={`${product.discount}% OFF`} 
-                                            size="small" 
-                                            color="error"
-                                        />
-                                    )}
-                                </Stack>
-                            </TableCell>
-                            <TableCell>
-                                <Box display="flex" gap={1}>
-                                    <Tooltip title="View Details">
-                                        <IconButton 
-                                            size="small"
-                                            onClick={() => onView(product)}
-                                        >
-                                            <Visibility />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Edit Product">
-                                        <IconButton size="small" color="primary" onClick={() => onEdit(product)}>
-                                            <Edit />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Toggle Featured">
-                                        <IconButton 
-                                            size="small"
-                                            onClick={() => onToggleFeatured(product.id)}
-                                            color={product.featured ? "warning" : "default"}
-                                        >
-                                            <Star />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Delete Product">
-                                        <IconButton 
-                                            size="small" 
-                                            color="error"
-                                            onClick={() => onDelete(product)}
-                                        >
-                                            <Delete />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Box>
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                                </TableCell>
+                                <TableCell>
+                                    {renderStockStatus(product.quantity, product.variants)}
+                                </TableCell>
+                                <TableCell>
+                                    {renderRating(product.rating)}
+                                </TableCell>
+                                <TableCell>
+                                    <Stack direction="row" spacing={1}>
+                                        {product.has_variants && (
+                                            <Chip
+                                                label={`${product.variants.length} variants`}
+                                                size="small"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                        {product.discount > 0 && (
+                                            <Chip
+                                                label={`${product.discount}% OFF`}
+                                                size="small"
+                                                color="error"
+                                            />
+                                        )}
+                                    </Stack>
+                                </TableCell>
+                                <TableCell>
+                                    <Box display="flex" gap={1}>
+                                        <Tooltip title="View Details">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => onView(product)}
+                                            >
+                                                <Visibility />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Edit Product">
+                                            <IconButton size="small" color="primary" onClick={() => onEdit(product)}>
+                                                <Edit />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Toggle Featured">
+                                            {loadingProductId === product.id ? (
+                                                <CircularProgress size={20} />
+                                            ) : (
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => onToggleFeatured(product)}
+                                                    color={product.featured ? "warning" : "default"}
+                                                >
+                                                    <Star />
+                                                </IconButton>
+                                            )}
+
+                                        </Tooltip>
+                                        <Tooltip title="Delete Product">
+                                            <IconButton
+                                                size="small"
+                                                color="error"
+                                                onClick={() => onDelete(product)}
+                                            >
+                                                <Delete />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                 </TableBody>
             </Table>
         </TableContainer>
