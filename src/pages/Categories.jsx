@@ -431,17 +431,14 @@ const CategoryManagement = () => {
                                                                     <Typography variant="subtitle1" fontWeight="medium">
                                                                         {category.category_name}
                                                                     </Typography>
-                                                                    <Badge
-                                                                        badgeContent={category.product_count}
+
+                                                                    <Chip
+                                                                        label={`Products: ${category.product_count}`}
+                                                                        size="small"
+                                                                        variant="outlined"
                                                                         color="primary"
-                                                                        sx={{ '& .MuiBadge-badge': { position: 'static', transform: 'none' } }}
-                                                                    >
-                                                                        <Chip
-                                                                            label="products"
-                                                                            size="small"
-                                                                            variant="outlined"
-                                                                        />
-                                                                    </Badge>
+                                                                    />
+
 
                                                                 </Box>
                                                             }
