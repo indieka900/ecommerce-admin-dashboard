@@ -24,6 +24,7 @@ import {
     Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { blogService } from '../services/blogService';
+import { PageHeader } from '../components/products/PageHeader';
 import CommentSection from '../components/blog/CommentSection';
 import BlogCard from '../components/blog/BlogCard';
 import BlogFilters from '../components/blog/BlogFilters';
@@ -300,19 +301,6 @@ const Blog = () => {
     const BlogsTab = () => (
         <>
             <Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ArticleIcon /> Blogs
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={handleCreateBlog}
-                        sx={{ borderRadius: 2 }}
-                    >
-                        Create New Blog
-                    </Button>
-                </Box>
 
                 <BlogFilters
                     searchTerm={searchTerm}
@@ -432,9 +420,12 @@ const Blog = () => {
             padding: 0,
             margin: 0
         }} >
-            <Typography variant="h4" sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <DashboardIcon /> Blog Admin Dashboard
-            </Typography>
+            <PageHeader
+                title="Blogs"
+                subtitle="Manage your blogs and comments"
+                onAddClick={handleCreateBlog}
+                addButtonText="Add Blog"
+            />
             <Paper sx={{ p: 3, mb: 3 }}>
 
                 <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>

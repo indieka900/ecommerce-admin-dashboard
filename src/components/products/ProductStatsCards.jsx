@@ -14,7 +14,7 @@ import {
 export const ProductStatsCards = ({ products, categories }) => {
     const featuredCount = products.filter(p => p.featured).length;
     const lowStockCount = products.filter(p => p.quantity < 10).length;
-    const categoryCount = categories.length - 1;
+    const categoryCount = categories.length;
 
     return (
         <Grid container spacing={3} mb={3}>
