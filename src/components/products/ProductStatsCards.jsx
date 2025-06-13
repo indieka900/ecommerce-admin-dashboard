@@ -10,6 +10,7 @@ import {
     TrendingDown,
     Category
 } from '@mui/icons-material';
+import StatCard from '../common/Charts/StatsCard';
 
 export const ProductStatsCards = ({ products, categories }) => {
     const featuredCount = products.filter(p => p.featured).length;
@@ -19,20 +20,21 @@ export const ProductStatsCards = ({ products, categories }) => {
     return (
         <Grid container spacing={3} mb={3}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Paper sx={{ p: 3, textAlign: 'center', elevation: 2 }}>
-                    <Box display="flex" alignItems="center" justifyContent="center" mb={1}>
-                        <Inventory sx={{ fontSize: 40, color: '#6366f1', mr: 1 }} />
-                        <Typography variant="h4" fontWeight="bold">
-                            {products.length}
-                        </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                        Total Products
-                    </Typography>
-                </Paper>
+                <StatCard
+                    value={products.length}
+                    label="Total Products"
+                    icon={(props) => <Inventory {...props} />}
+                    iconColor="#6366f1"
+                />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Paper sx={{ p: 3, textAlign: 'center' }}>
+                <StatCard
+                    value={featuredCount}
+                    label="Featured Products"
+                    icon={(props) => <Star {...props} />}
+                    iconColor="#f59e0b"
+                />
+                {/* <Paper sx={{ p: 3, textAlign: 'center' }}>
                     <Box display="flex" alignItems="center" justifyContent="center" mb={1}>
                         <Star sx={{ fontSize: 40, color: '#f59e0b', mr: 1 }} />
                         <Typography variant="h4" fontWeight="bold">
@@ -42,33 +44,23 @@ export const ProductStatsCards = ({ products, categories }) => {
                     <Typography variant="body2" color="text.secondary">
                         Featured Products
                     </Typography>
-                </Paper>
+                </Paper> */}
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Paper sx={{ p: 3, textAlign: 'center' }}>
-                    <Box display="flex" alignItems="center" justifyContent="center" mb={1}>
-                        <TrendingDown sx={{ fontSize: 40, color: '#ef4444', mr: 1 }} />
-                        <Typography variant="h4" fontWeight="bold">
-                            {lowStockCount}
-                        </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                        Low Stock
-                    </Typography>
-                </Paper>
+                <StatCard
+                    value={lowStockCount}
+                    label="Low Stock"
+                    icon={(props) => <TrendingDown {...props} />}
+                    iconColor="#ef4444"
+                />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Paper sx={{ p: 3, textAlign: 'center' }}>
-                    <Box display="flex" alignItems="center" justifyContent="center" mb={1}>
-                        <Category sx={{ fontSize: 40, color: '#10b981', mr: 1 }} />
-                        <Typography variant="h4" fontWeight="bold">
-                            {categoryCount}
-                        </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                        Categories
-                    </Typography>
-                </Paper>
+                <StatCard
+                    value={categoryCount}
+                    label="Categories"
+                    icon={(props) => <Category {...props} />}
+                    iconColor="#10b981"
+                />
             </Grid>
         </Grid>
     );
