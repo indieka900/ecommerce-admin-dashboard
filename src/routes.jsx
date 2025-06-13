@@ -14,7 +14,7 @@ import AddAdmin from './pages/AddAdmin';
 import NotFound from './pages/NotFound';
 import ErrorPage from './pages/ErrorPage';
 import Products from './pages/Products';
-// import Categories from './pages/Categories';
+import Categories from './pages/Categories';
 // import Orders from './pages/Orders';
 // import Customers from './pages/Customers';
 // import Transactions from './pages/Transactions';
@@ -68,7 +68,7 @@ const router = createBrowserRouter([
             {
                 path: 'add-admin',
                 element: (
-                    <ProtectedRoute is_super_admin={true}> 
+                    <ProtectedRoute is_super_admin={true}>
                         <AddAdmin />
                     </ProtectedRoute>
                 )
@@ -77,10 +77,10 @@ const router = createBrowserRouter([
                 path: 'products',
                 element: <Products />
             },
-            // {
-            //     path: 'categories',
-            //     element: <Categories />
-            // },
+            {
+                path: 'categories',
+                element: <Categories />
+            },
             // {
             //     path: 'orders',
             //     element: <Orders />

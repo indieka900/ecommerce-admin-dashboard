@@ -34,6 +34,22 @@ export const productService = {
         }
     },
 
+    //get parent categories
+    getParentCategories: async () => {
+        try {
+            const response = await api.get(API_ENDPOINTS.PARENT_CATEGORIES);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to fetch parent categories. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
     // Fetch all product brands
     getProductBrands: async () => {
         try {
@@ -74,7 +90,7 @@ export const productService = {
     updateProduct: async (id, productData) => {
         try {
             const response = await api.patch(`${API_ENDPOINTS.PRODUCTS}${id}/`, productData, {
-                headers : {'Content-Type': 'multipart/form-data'}
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             return response.data;
         } catch (error) {

@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
     // Product endpoints
     PRODUCTS: '/ecommerce/products/',
     PRODUCT_CATEGORIES: '/ecommerce/categories/',
+    PARENT_CATEGORIES: '/ecommerce/parent-categories/',
     PRODUCT_BRANDS: '/ecommerce/brands/',
     PRODUCT_STATS: '/ecommerce/products/stats/',
 

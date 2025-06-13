@@ -56,7 +56,7 @@ const navigationItems = [
             {
                 title: 'Categories',
                 icon: Category,
-                path: '/admin/products/categories',
+                path: '/categories',
                 color: '#3b82f6'
             },
             {
