@@ -207,20 +207,20 @@ const Sidebar = ({ onItemClick }) => {
     return (
         <Box sx={{
             height: '100%',
-            display: 'flex', 
+            display: 'flex',
             flexDirection: 'column',
             borderRadius: 0,
-            overflow: 'hidden', 
+            overflow: 'hidden',
             '& > *': {
                 borderRadius: 0
             }
         }}>
             {/* Logo Section */}
-            <Box sx={{ 
-                p: 3, 
-                textAlign: 'center', 
+            <Box sx={{
+                p: 3,
+                textAlign: 'center',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                flexShrink: 0 
+                flexShrink: 0
             }}>
                 <Box
                     sx={{
@@ -252,17 +252,17 @@ const Sidebar = ({ onItemClick }) => {
             </Box>
 
             {/* Navigation */}
-            <Box sx={{ 
-                flexGrow: 1, 
-                overflowY: 'auto', 
-                overflowX: 'hidden', 
+            <Box sx={{
+                flexGrow: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
                 py: 2,
-                
+
                 '&::-webkit-scrollbar': {
-                    display: 'none', 
+                    display: 'none',
                 },
-                scrollbarWidth: 'none', 
-                msOverflowStyle: 'none', 
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
             }}>
                 <List sx={{ width: '100%' }}>
                     {navigationItems.map(item => renderNavItem(item))}
@@ -270,8 +270,8 @@ const Sidebar = ({ onItemClick }) => {
             </Box>
 
             {/* User Profile Section */}
-            <Box sx={{ 
-                p: 3, 
+            <Box sx={{
+                p: 3,
                 borderTop: '1px solid rgba(255, 255, 255, 0.1)',
                 flexShrink: 0
             }}>
@@ -308,11 +308,11 @@ const Sidebar = ({ onItemClick }) => {
                             </Avatar>
                         )}
                         <Box sx={{ minWidth: 0 }}>
-                            <Typography 
-                                variant="body2" 
-                                fontWeight="bold" 
+                            <Typography
+                                variant="body2"
+                                fontWeight="bold"
                                 color="white"
-                                sx={{ 
+                                sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap'
@@ -320,10 +320,10 @@ const Sidebar = ({ onItemClick }) => {
                             >
                                 {getDisplayName()}
                             </Typography>
-                            <Typography 
-                                variant="caption" 
+                            <Typography
+                                variant="caption"
                                 color="text.secondary"
-                                sx={{ 
+                                sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap'

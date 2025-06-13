@@ -7,15 +7,15 @@ export const useProductFilters = (products) => {
     const [selectedBrand, setSelectedBrand] = useState('All');
 
     useEffect(() => {
-        let filtered = products.filter(product => {
-            const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                product.brand_name.toLowerCase().includes(searchTerm.toLowerCase());
+        const filtered = products.filter(product => {
+            const matchesSearch =
+                product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.brand_name.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
             const matchesBrand = selectedBrand === 'All' || product.brand === selectedBrand;
-            
+
             return matchesSearch && matchesCategory && matchesBrand;
         });
-        
         setFilteredProducts(filtered);
     }, [searchTerm, selectedCategory, selectedBrand, products]);
 

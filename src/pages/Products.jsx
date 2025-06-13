@@ -52,8 +52,9 @@ const ProductsPage = () => {
                 console.log("Fetching Products......");
 
                 setProducts(fetchedProducts);
-                setCategories(["All", ...fetchedCategories]);
-                setBrands(["All", ...fetchedBrands]);
+                setCategories(fetchedCategories);
+                setBrands(fetchedBrands);
+
             } catch (err) {
                 console.error(err);
                 setError(err.message || "An error occurred");

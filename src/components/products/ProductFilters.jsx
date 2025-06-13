@@ -45,6 +45,7 @@ export const ProductFilters = ({
                     <CategoryDropdown
                         categories={categories}
                         value={selectedCategory}
+                        showAllOption={true}
                         onChange={(e) => onCategoryChange(e.target.value)}
                     />
 
@@ -55,6 +56,7 @@ export const ProductFilters = ({
                     <BrandDropdown
                         brands={brands}
                         value={selectedBrand}
+                        showAllOption={true}
                         onChange={(e) => onBrandChange(e.target.value)}
 
                     />
