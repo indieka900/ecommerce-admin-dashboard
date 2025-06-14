@@ -312,7 +312,7 @@ const CategoryManagement = () => {
                             value={0}
                             label="Total Products"
                             icon={(props) => <StoreIcon {...props} />}
-                            iconColor="#6366f1"
+                            iconColor="#06b6d4"
                         />
                     </Grid>
                     <Grid
@@ -433,10 +433,11 @@ const CategoryManagement = () => {
                                                                     </Typography>
 
                                                                     <Chip
-                                                                        label={`Products: ${category.product_count}`}
+                                                                        label={`Product(s): ${category.product_count}`}
                                                                         size="small"
                                                                         variant="outlined"
                                                                         color="primary"
+                                                                        background="secondary"
                                                                     />
 
 
