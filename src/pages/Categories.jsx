@@ -145,63 +145,102 @@ const CategoryManagement = () => {
         }));
     };
 
-    const handleSave = () => {
-        if (dialogType === 'parent') {
-            if (!currentItem.parent_name) {
-                showSnackbar('Parent category name is required', 'error');
-                return;
-            }
+    const handleSave = async () => {
+        try {
+            if (dialogType === 'parent') {
+                if (!currentItem.parent_name) {
+                    showSnackbar('Parent category name is required', 'error');
+                    return;
+                }
 
-            if (editMode) {
-                setParentCategories(prev => prev.map(parent =>
-                    parent.id === currentItem.id ? currentItem : parent
-                ));
-                showSnackbar('Parent category updated successfully', 'success');
-            } else {
-                const newParent = {
-                    ...currentItem,
-                    id: Math.max(...parentCategories.map(p => p.id)) + 1
-                };
-                setParentCategories(prev => [...prev, newParent]);
-                showSnackbar('Parent category added successfully', 'success');
-            }
-        } else {
-            if (!currentItem.category_name || !currentItem.parent_category) {
-                showSnackbar('Category name and parent category are required', 'error');
-                return;
-            }
+                if (editMode) {
+                    // UPDATE parent category
+                    setIsSaving(true)
+                    const updatedParent = await productService.updateParentCategory(currentItem.id, {
+                        parent_name: currentItem.parent_name
+                    });
 
-            if (editMode) {
-                setCategories(prev => prev.map(cat =>
-                    cat.id === currentItem.id ? currentItem : cat
-                ));
-                showSnackbar('Category updated successfully', 'success');
+                    setParentCategories(prev => prev.map(parent =>
+                        parent.id === currentItem.id ? updatedParent : parent
+                    ));
+                    showSnackbar('Parent category updated successfully', 'success');
+                } else {
+                    // CREATE new parent category
+                    setIsSaving(true)
+                    const newParent = await productService.addParentCategory({
+                        parent_name: currentItem.parent_name
+                    });
+
+                    setParentCategories(prev => [...prev, newParent]);
+                    showSnackbar('Parent category added successfully', 'success');
+                }
             } else {
-                const newCategory = {
-                    ...currentItem,
-                    id: Math.max(...categories.map(c => c.id)) + 1
-                };
-                setCategories(prev => [...prev, newCategory]);
-                showSnackbar('Category added successfully', 'success');
+                // Child category operations
+                if (!currentItem.category_name || !currentItem.parent_category) {
+                    showSnackbar('Category name and parent category are required', 'error');
+                    return;
+                }
+
+                if (editMode) {
+                    // UPDATE child category
+                    const updatedCategory = await productService.updateCategory(currentItem.id, {
+                        category_name: currentItem.category_name,
+                        parent_category: currentItem.parent_category
+                    });
+
+                    setCategories(prev => prev.map(cat =>
+                        cat.id === currentItem.id ? updatedCategory : cat
+                    ));
+                    showSnackbar('Category updated successfully', 'success');
+                } else {
+                    // CREATE new child category
+                    const newCategory = await productService.addCategory({
+                        category_name: currentItem.category_name,
+                        parent_category: currentItem.parent_category
+                    });
+
+                    setCategories(prev => [...prev, newCategory]);
+                    showSnackbar('Category added successfully', 'success');
+                }
             }
+            handleCloseDialog();
+        } catch (error) {
+            console.error('API Error:', error);
+
+            if (error.response) {
+                const message = error.response.data?.message || 'Operation failed';
+                showSnackbar(message, 'error');
+            } else if (error.request) {
+                showSnackbar('Network error. Please check your connection.', 'error');
+            } else {
+                showSnackbar('An unexpected error occurred', 'error');
+            }
+        } finally {
+            setIsSaving(false)
         }
-        handleCloseDialog();
     };
 
-    const handleDelete = (type, id, name) => {
-        if (type === 'parent') {
-            // Check if parent has categories
-            const hasCategories = categories.some(cat => cat.parent_category === name);
-            if (hasCategories) {
-                showSnackbar('Cannot delete parent category with existing categories', 'error');
-                return;
+    const handleDelete = async (type, id, name) => {
+        try {
+            if (type === 'parent') {
+                // Check if parent has categories
+                const hasCategories = categories.some(cat => cat.parent_category === name);
+                if (hasCategories) {
+                    showSnackbar('Cannot delete parent category with existing categories', 'error');
+                    return;
+                }
+                await productService.deleteParentCategory(id)
+                setParentCategories(prev => prev.filter(parent => parent.id !== id));
+                showSnackbar('Parent category deleted successfully', 'success');
+            } else {
+
+                setCategories(prev => prev.filter(cat => cat.id !== id));
+                showSnackbar('Category deleted successfully', 'success');
             }
-            setParentCategories(prev => prev.filter(parent => parent.id !== id));
-            showSnackbar('Parent category deleted successfully', 'success');
-        } else {
-            setCategories(prev => prev.filter(cat => cat.id !== id));
-            showSnackbar('Category deleted successfully', 'success');
+        } catch (error) {
+            showSnackbar(error, 'error')
         }
+
     };
 
     const showSnackbar = (message, severity) => {

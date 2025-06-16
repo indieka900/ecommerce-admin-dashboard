@@ -50,6 +50,54 @@ export const productService = {
         }
     },
 
+    //add Parent category
+    addParentCategory: async (data) => {
+        try {
+            const response = await api.post(API_ENDPOINTS.PARENT_CATEGORIES, data);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to create Parent Category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //update parent category
+    updateParentCategory: async (id, data) => {
+        try {
+            const response = await api.patch(`${API_ENDPOINTS.PARENT_CATEGORIES}${id}/`, data);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to update category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //delete parent category
+    deleteParentCategory: async (id) => {
+        try {
+            const response = await api.delete(`${API_ENDPOINTS.PARENT_CATEGORIES}${id}/`);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to delete category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
     // Fetch all product brands
     getProductBrands: async () => {
         try {
