@@ -15,6 +15,7 @@ import PageHeader from '../components/common/PageHeader';
 import SearchBar from '../components/common/SearchBar';
 import LoadingButton from '../components/ui/LoadingButton';
 import { productService } from '../services/productService';
+import toast from 'react-hot-toast';
 
 const Brands = () => {
     const [brands, setBrands] = useState([
@@ -66,24 +67,38 @@ const Brands = () => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleSaveBrand = () => {
-        if (editBrand) {
-            setBrands(prev =>
-                prev.map(b => (b.id === editBrand.id ? { ...b, ...formData } : b))
-            );
-        } else {
-            const newBrand = {
-                id: Date.now(),
-                ...formData,
-                product_count: Number(formData.product_count) || 0
-            };
-            setBrands(prev => [...prev, newBrand]);
+    const handleSaveBrand = async () => {
+        try {
+            setIsSaving(true)
+            if (editBrand) {
+                const res = await productService.updateBrand(editBrand.id, formData)
+                setBrands(prev =>
+                    prev.map(b => (b.id === editBrand.id ? { ...b, ...res } : b))
+                );
+                toast.success("Brand updated successfully")
+            } else {
+                const newBrand = await productService.addBrand(formData)
+                setBrands(prev => [...prev, newBrand]);
+                toast.success("Brand added successfully")
+            }
+        } catch (error) {
+            console.error('Error saving brand:', error);
+            toast.error("Failed to save brand")
+        } finally {
+            setIsSaving(false)
+            handleCloseDialog();
         }
-        handleCloseDialog();
     };
 
-    const handleDelete = (id) => {
-        setBrands(prev => prev.filter(brand => brand.id !== id));
+    const handleDelete = async (id) => {
+        try {
+            await productService.deleteBrand(id)
+            setBrands(prev => prev.filter(brand => brand.id !== id));
+            toast.success("Brand deleted successfully")
+        } catch (error) {
+            console.error('Error deleting brand:', error);
+            toast.error("Failed to delete brand")
+        }
     };
 
     return (
@@ -161,6 +176,7 @@ const Brands = () => {
                     <LoadingButton
                         variant="contained"
                         onClick={handleSaveBrand}
+                        disabled={!formData.brand_title?.trim()}
                         loading={isSaving}
                         loadingText={editBrand ? 'Updating...' : 'Adding...'}
                     >

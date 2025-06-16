@@ -162,6 +162,53 @@ export const productService = {
         }
     },
 
+    addBrand: async (data) => {
+        try {
+            const response = await api.post(API_ENDPOINTS.PRODUCT_BRANDS, data);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to create product. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //update brand
+    updateBrand: async (id, data) => {
+        try {
+            const response = await api.patch(`${API_ENDPOINTS.PRODUCT_BRANDS}${id}/`, data);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to create product. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //delete Brand
+    deleteBrand: async (id) => {
+        try {
+            const response = await api.delete(`${API_ENDPOINTS.PRODUCT_BRANDS}${id}/`);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to delete brand. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
     // Create a new product
     createProduct: async (productData) => {
         try {
