@@ -45,10 +45,8 @@ import {
     Add as AddIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
-    Search as SearchIcon,
     Category as CategoryIcon,
     AccountTree as TreeIcon,
-    Clear as ClearIcon,
     ExpandMore as ExpandMoreIcon,
     Store as StoreIcon,
     FolderOpenOutlined as FolderOpenIcon
@@ -68,6 +66,7 @@ const CategoryManagement = () => {
     const [currentItem, setCurrentItem] = useState({
         id: null,
         category_name: '',
+        parent_category_name: '',
         parent_category: '',
         parent_name: ''
     });
@@ -107,7 +106,7 @@ const CategoryManagement = () => {
 
     const filteredCategories = categories.filter(category =>
         category.category_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.parent_category.toLowerCase().includes(searchTerm.toLowerCase())
+        category.parent_category_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleOpenDialog = (type, item = null) => {
@@ -147,6 +146,7 @@ const CategoryManagement = () => {
 
     const handleSave = async () => {
         try {
+            setIsSaving(true)
             if (dialogType === 'parent') {
                 if (!currentItem.parent_name) {
                     showSnackbar('Parent category name is required', 'error');
@@ -155,7 +155,7 @@ const CategoryManagement = () => {
 
                 if (editMode) {
                     // UPDATE parent category
-                    setIsSaving(true)
+
                     const updatedParent = await productService.updateParentCategory(currentItem.id, {
                         parent_name: currentItem.parent_name
                     });
@@ -166,7 +166,7 @@ const CategoryManagement = () => {
                     showSnackbar('Parent category updated successfully', 'success');
                 } else {
                     // CREATE new parent category
-                    setIsSaving(true)
+
                     const newParent = await productService.addParentCategory({
                         parent_name: currentItem.parent_name
                     });
@@ -183,6 +183,7 @@ const CategoryManagement = () => {
 
                 if (editMode) {
                     // UPDATE child category
+
                     const updatedCategory = await productService.updateCategory(currentItem.id, {
                         category_name: currentItem.category_name,
                         parent_category: currentItem.parent_category
@@ -194,6 +195,7 @@ const CategoryManagement = () => {
                     showSnackbar('Category updated successfully', 'success');
                 } else {
                     // CREATE new child category
+
                     const newCategory = await productService.addCategory({
                         category_name: currentItem.category_name,
                         parent_category: currentItem.parent_category
@@ -224,7 +226,7 @@ const CategoryManagement = () => {
         try {
             if (type === 'parent') {
                 // Check if parent has categories
-                const hasCategories = categories.some(cat => cat.parent_category === name);
+                const hasCategories = categories.some(cat => cat.parent_category_name === name);
                 if (hasCategories) {
                     showSnackbar('Cannot delete parent category with existing categories', 'error');
                     return;
@@ -233,7 +235,7 @@ const CategoryManagement = () => {
                 setParentCategories(prev => prev.filter(parent => parent.id !== id));
                 showSnackbar('Parent category deleted successfully', 'success');
             } else {
-
+                await productService.deleteCategory(id)
                 setCategories(prev => prev.filter(cat => cat.id !== id));
                 showSnackbar('Category deleted successfully', 'success');
             }
@@ -248,7 +250,7 @@ const CategoryManagement = () => {
     };
 
     const getCategoriesForParent = (parentName) => {
-        return filteredCategories.filter(cat => cat.parent_category === parentName);
+        return filteredCategories.filter(cat => cat.parent_category_name === parentName);
     };
 
     return (
@@ -424,7 +426,7 @@ const CategoryManagement = () => {
                                                     variant="outlined"
                                                     startIcon={<AddIcon />}
                                                     onClick={() => {
-                                                        setCurrentItem(prev => ({ ...prev, parent_category: parent.parent_name }));
+                                                        setCurrentItem(prev => ({ ...prev, parent_category_name: parent.parent_name }));
                                                         handleOpenDialog('category');
                                                     }}
                                                 >
@@ -539,7 +541,7 @@ const CategoryManagement = () => {
                                             onChange={handleInputChange}
                                         >
                                             {parentCategories.map(parent => (
-                                                <MenuItem key={parent.id} value={parent.parent_name}>
+                                                <MenuItem key={parent.id} value={parent.id}>
                                                     <Box display="flex" alignItems="center" gap={1}>
                                                         <FolderOpenIcon fontSize="small" />
                                                         {parent.parent_name}

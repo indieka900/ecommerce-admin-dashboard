@@ -34,6 +34,54 @@ export const productService = {
         }
     },
 
+    //Create Category
+    addCategory: async (data) => {
+        try {
+            const response = await api.post(API_ENDPOINTS.PRODUCT_CATEGORIES, data);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to create Category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //Update category
+    updateCategory: async (id, data) => {
+        try {
+            const response = await api.patch(`${API_ENDPOINTS.PRODUCT_CATEGORIES}${id}/`, data);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //delete category
+    deleteCategory: async (id) => {
+        try {
+            const response = await api.delete(`${API_ENDPOINTS.PRODUCT_CATEGORIES}${id}/`);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to delete category. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
     //get parent categories
     getParentCategories: async () => {
         try {
