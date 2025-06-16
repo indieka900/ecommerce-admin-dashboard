@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { productService } from '../services/productService';
 import PageHeader from '../components/common/PageHeader';
 import StatCard from '../components/common/Charts/StatsCard'
+import LoadingButton from '../components/ui/LoadingButton';
 import {
     Box,
     Button,
@@ -54,12 +55,14 @@ import {
 
 
 
+
 const CategoryManagement = () => {
     const [parentCategories, setParentCategories] = useState([]);
     const [categories, setCategories] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogType, setDialogType] = useState('category');
+    const [isSaving, setIsSaving] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [currentItem, setCurrentItem] = useState({
         id: null,
@@ -452,15 +455,29 @@ const CategoryManagement = () => {
                     )}
                 </Paper>
 
-                {/* Add/Edit Dialog */}
                 <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
+                    <DialogTitle
+                        sx={{
+                            bgcolor: 'primary.main',
+                            color: 'white',
+                            px: 3,
+                            py: 2,
+                        }}
+                    >
                         <Box display="flex" alignItems="center" gap={1}>
                             {dialogType === 'parent' ? <FolderOpenIcon /> : <CategoryIcon />}
-                            {editMode ? 'Edit' : 'Add New'} {dialogType === 'parent' ? 'Parent Category' : 'Category'}
+                            {editMode ? 'Edit' : 'Add New'}{' '}
+                            {dialogType === 'parent' ? 'Parent Category' : 'Category'}
                         </Box>
                     </DialogTitle>
-                    <DialogContent sx={{ pt: 3 }}>
+
+                    <DialogContent
+                        dividers
+                        sx={{
+                            px: 3,
+                            py: 3,
+                        }}
+                    >
                         <Stack spacing={3}>
                             {dialogType === 'parent' ? (
                                 <TextField
@@ -505,13 +522,24 @@ const CategoryManagement = () => {
                             )}
                         </Stack>
                     </DialogContent>
-                    <DialogActions sx={{ p: 3 }}>
+
+                    <DialogActions
+                        sx={{
+                            px: 3,
+                            py: 2,
+                        }}
+                    >
                         <Button onClick={handleCloseDialog}>Cancel</Button>
-                        <Button onClick={handleSave} variant="contained">
+                        <LoadingButton
+                            onClick={handleSave}
+                            loading={isSaving}
+                            loadingText={editMode ? 'Updating...' : 'Adding...'}
+                        >
                             {editMode ? 'Update' : 'Add'} {dialogType === 'parent' ? 'Parent Category' : 'Category'}
-                        </Button>
+                        </LoadingButton>
                     </DialogActions>
                 </Dialog>
+
 
                 {/* Snackbar */}
                 <Snackbar

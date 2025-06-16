@@ -20,11 +20,9 @@ import {
     Comment as CommentIcon,
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,
-    Article as ArticleIcon,
-    Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { blogService } from '../services/blogService';
-import { PageHeader } from '../components/products/PageHeader';
+import PageHeader from '../components/common/PageHeader';
 import CommentSection from '../components/blog/CommentSection';
 import BlogCard from '../components/blog/BlogCard';
 import BlogFilters from '../components/blog/BlogFilters';
@@ -421,11 +419,17 @@ const Blog = () => {
             margin: 0
         }} >
             <PageHeader
-                title="Blogs"
-                subtitle="Manage your blogs and comments"
-                onAddClick={handleCreateBlog}
-                addButtonText="Add Blog"
+                title="Blogs Management"
+                subtitle="Manage Your Blogs and Comments"
+                actions={[
+                    {
+                        label: 'Add Parent Category',
+                        icon: <AddIcon />,
+                        onClick: () => handleCreateBlog(),
+                    },
+                ]}
             />
+
             <Paper sx={{ p: 3, mb: 3 }}>
 
                 <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>

@@ -10,8 +10,10 @@ import {
     Delete as DeleteIcon,
     Store as StoreIcon
 } from '@mui/icons-material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '../components/common/PageHeader';
+import LoadingButton from '../components/ui/LoadingButton';
+import { productService } from '../services/productService';
 
 const Brands = () => {
     const [brands, setBrands] = useState([
@@ -19,13 +21,33 @@ const Brands = () => {
         { id: 2, brand_title: "Nike", product_count: 2 }
     ]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [editBrand, setEditBrand] = useState(null);
     const [formData, setFormData] = useState({ brand_title: '', product_count: '' });
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const fetchedBrands = await productService.getProductBrands();
+                setBrands(fetchedBrands);
+
+            } catch (err) {
+                console.error(err);
+                // setError(err.message || "An error occurred");
+                // showNotification(err.message || "Failed to load product data", "error");
+            } finally {
+                // setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const filteredBrands = brands.filter(brand =>
         brand.brand_title.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
 
     const handleOpenDialog = (brand = null) => {
         setEditBrand(brand);
@@ -64,7 +86,7 @@ const Brands = () => {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Container maxWidth="lg">
             <PageHeader
                 title="Brand Management"
                 subtitle="Manage all product brands"
@@ -136,15 +158,21 @@ const Brands = () => {
                         label="Brand Title"
                         fullWidth
                         margin="normal"
+                        required={true}
                         value={formData.brand_title}
                         onChange={handleFormChange}
                     />
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={{ p: 3 }}>
                     <Button onClick={handleCloseDialog}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSaveBrand}>
+                    <LoadingButton
+                        variant="contained"
+                        onClick={handleSaveBrand}
+                        loading={isSaving}
+                        loadingText={editBrand ? 'Updating...' : 'Adding...'}
+                    >
                         {editBrand ? 'Update' : 'Add'}
-                    </Button>
+                    </LoadingButton>
                 </DialogActions>
             </Dialog>
         </Container>
