@@ -3,6 +3,7 @@ import { productService } from '../services/productService';
 import PageHeader from '../components/common/PageHeader';
 import StatCard from '../components/common/Charts/StatsCard'
 import SearchBar from '../components/common/SearchBar';
+import { formatters } from '../utils/formatters';
 import LoadingButton from '../components/ui/LoadingButton';
 import {
     Box,
@@ -318,7 +319,7 @@ const CategoryManagement = () => {
                             md: 3
                         }}>
                         <StatCard
-                            value={0}
+                            value={formatters.productCountTotal(categories)}
                             label="Total Products"
                             icon={(props) => <StoreIcon {...props} />}
                             iconColor="#06b6d4"
@@ -331,7 +332,7 @@ const CategoryManagement = () => {
                             md: 3
                         }}>
                         <StatCard
-                            value={0}
+                            value={formatters.avgProductsPerCategory(categories)}
                             label="Avg Products/Category"
                             icon={(props) => <TreeIcon {...props} />}
                             iconColor="#34d399"

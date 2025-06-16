@@ -87,7 +87,7 @@ const Brands = () => {
     };
 
     return (
-        <Container maxWidth="lg">
+        <Box>
             <PageHeader
                 title="Brand Management"
                 subtitle="Manage all product brands"
@@ -168,7 +168,7 @@ const Brands = () => {
                     </LoadingButton>
                 </DialogActions>
             </Dialog>
-        </Container>
+        </Box>
     );
 };
 

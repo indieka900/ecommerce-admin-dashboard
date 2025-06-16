@@ -84,4 +84,19 @@ export const formatters = {
         };
         return statusMap[status] || { color: 'default', label: status };
     },
+
+    // average products per category
+    avgProductsPerCategory: (categories, decimals = 2) => {
+        if (!Array.isArray(categories) || categories.length === 0) return 0;
+        const totalProducts = categories.reduce((sum, cat) => sum + (cat.product_count || 0), 0);
+        const avg = totalProducts / categories.length;
+        return parseFloat(avg.toFixed(decimals));
+    },
+
+    // Total products count from product_count fields
+    productCountTotal: (categories) => {
+        if (!Array.isArray(categories)) return 0;
+        return categories.reduce((sum, cat) => sum + (cat.product_count || 0), 0);
+    },
+
 }
