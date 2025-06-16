@@ -92,13 +92,17 @@ const Blog = () => {
     }, []);
 
 
-    // Filter and pagination logic
     const filteredBlogs = useMemo(() => {
         return blogs.filter(blog => {
+            const title = blog.title?.toLowerCase() || '';
+            const content = blog.content?.toLowerCase() || '';
+            const author = blog.author?.toLowerCase() || '';
+            const search = searchTerm.toLowerCase();
+
             const matchesSearch =
-                blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                blog.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                blog.author.toLowerCase().includes(searchTerm.toLowerCase());
+                title.includes(search) ||
+                content.includes(search) ||
+                author.includes(search);
 
             const matchesCategory = !selectedCategory || blog.category === selectedCategory;
             const matchesAuthor = !selectedAuthor || blog.author === selectedAuthor;

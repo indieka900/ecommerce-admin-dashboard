@@ -2,18 +2,16 @@ import {
     Paper,
     Typography,
     Grid,
-    TextField,
-    InputAdornment,
     FormControl,
     InputLabel,
     Select,
     MenuItem,
     Button,
 } from '@mui/material';
-
-import SearchIcon from '@mui/icons-material/Search';
+import { useEffect, useRef } from 'react';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ClearIcon from '@mui/icons-material/Clear';
+import SearchBar from '../common/SearchBar';
 
 const BlogFilters = ({
     searchTerm,
@@ -26,6 +24,11 @@ const BlogFilters = ({
     authors,
     onClearFilters,
 }) => {
+    const searchInputRef = useRef();
+
+    useEffect(() => {
+        searchInputRef.current?.focus();
+    }, []);
     return (
         <Paper sx={{ p: 2, mb: 3 }}>
             <Typography
@@ -40,20 +43,12 @@ const BlogFilters = ({
                         xs: 12,
                         md: 4
                     }}>
-                    <TextField
-                        fullWidth
-                        placeholder="Search blogs..."
+                    <SearchBar
+                        ref={searchInputRef}
                         value={searchTerm}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                ),
-                            }
-                        }}
+                        onChange={onSearchChange}
+                        usePaper={false}
+                        placeholder="Search blog titles or authors..."
                     />
                 </Grid>
                 <Grid

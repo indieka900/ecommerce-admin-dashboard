@@ -186,12 +186,6 @@ const ProductsPage = () => {
     ) :
         <Box>
             {/* Header */}
-            {/* <PageHeader
-                title="Products"
-                subtitle="Manage your product inventory"
-                onAddClick={handleAddProduct}
-                addButtonText="Add Product"
-            /> */}
 
             <PageHeader
                 title="Product Management"

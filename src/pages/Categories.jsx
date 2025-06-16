@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { productService } from '../services/productService';
 import PageHeader from '../components/common/PageHeader';
 import StatCard from '../components/common/Charts/StatsCard'
+import SearchBar from '../components/common/SearchBar';
 import LoadingButton from '../components/ui/LoadingButton';
 import {
     Box,
@@ -235,28 +236,11 @@ const CategoryManagement = () => {
 
 
                 {/* Search Bar */}
-                <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
-                    <TextField
-                        fullWidth
-                        placeholder="Search categories and parent categories..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon color="action" />
-                                </InputAdornment>
-                            ),
-                            endAdornment: searchTerm && (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={() => setSearchTerm('')} size="small">
-                                        <ClearIcon />
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
-                </Paper>
+                <SearchBar
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    placeholder="Search categories and parent categories..."
+                />
 
                 {/* Stats Cards */}
                 <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -370,19 +354,23 @@ const CategoryManagement = () => {
                                             </Box>
                                             <Box display="flex" gap={1} onClick={(e) => e.stopPropagation()}>
                                                 <IconButton
+                                                    component="span"
                                                     onClick={() => handleOpenDialog('parent', parent)}
                                                     size="small"
                                                     sx={{ color: 'white' }}
                                                 >
                                                     <EditIcon />
                                                 </IconButton>
+
                                                 <IconButton
+                                                    component="span"
                                                     onClick={() => handleDelete('parent', parent.id, parent.parent_name)}
                                                     size="small"
                                                     sx={{ color: 'white' }}
                                                 >
                                                     <DeleteIcon />
                                                 </IconButton>
+
                                             </Box>
                                         </Box>
                                     </AccordionSummary>
@@ -407,7 +395,9 @@ const CategoryManagement = () => {
                                         ) : (
                                             <List>
                                                 {parentCategories.map((category) => (
-                                                    <ListItem key={category.id} divider>
+                                                    <ListItem key={category.id} divider
+                                                    // secondaryAction={}
+                                                    >
                                                         <ListItemText
                                                             primary={
                                                                 <Box display="flex" alignItems="center" gap={2}>
@@ -428,6 +418,7 @@ const CategoryManagement = () => {
                                                                 </Box>
                                                             }
                                                         />
+
                                                         <ListItemSecondaryAction>
                                                             <IconButton
                                                                 onClick={() => handleOpenDialog('category', category)}

@@ -12,6 +12,7 @@ import {
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import PageHeader from '../components/common/PageHeader';
+import SearchBar from '../components/common/SearchBar';
 import LoadingButton from '../components/ui/LoadingButton';
 import { productService } from '../services/productService';
 
@@ -99,20 +100,12 @@ const Brands = () => {
                 ]}
             />
 
-            <TextField
-                fullWidth
-                placeholder="Search brands..."
+            <SearchBar
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
-                    ),
-                }}
-                sx={{ mb: 3 }}
+                onChange={setSearchTerm}
+                placeholder="Search brands..."
             />
+
             <Grid container spacing={2}>
                 {filteredBrands.map((brand) => (
                     <Grid
