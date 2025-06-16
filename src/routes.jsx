@@ -15,6 +15,7 @@ import NotFound from './pages/NotFound';
 import ErrorPage from './pages/ErrorPage';
 import Products from './pages/Products';
 import Categories from './pages/Categories';
+import Brands from './pages/Brands';
 // import Orders from './pages/Orders';
 // import Customers from './pages/Customers';
 // import Transactions from './pages/Transactions';
@@ -80,6 +81,10 @@ const router = createBrowserRouter([
             {
                 path: 'categories',
                 element: <Categories />
+            },
+            {
+                path: 'brands',
+                element: <Brands />
             },
             // {
             //     path: 'orders',
