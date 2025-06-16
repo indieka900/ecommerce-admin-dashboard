@@ -8,13 +8,15 @@ import {
     Snackbar,
     Alert
 } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import ConfirmDialog from '../components/blog/DeleteDialog';
 import { ProductFilters } from '../components/products/ProductFilters';
 import { ProductCard } from '../components/products/ProductCard';
 import { ProductTable } from '../components/products/ProductTable';
 import { ProductStatsCards } from '../components/products/ProductStatsCards';
 import { ProductDetailDialog } from '../components/products/ProductDetailDialog';
-import { PageHeader } from '../components/products/PageHeader';
+// import { PageHeader } from '../components/products/PageHeader';
+import PageHeader from '../components/common/PageHeader';
 import ProductFormDialog from '../components/products/ProductFormDialog';
 import { getDisplayPrice } from '../hooks/useProductUtils';
 import { renderStockStatus, renderRating } from '../utils/productDisplayUtils';
@@ -184,12 +186,25 @@ const ProductsPage = () => {
     ) :
         <Box>
             {/* Header */}
-            <PageHeader
+            {/* <PageHeader
                 title="Products"
                 subtitle="Manage your product inventory"
                 onAddClick={handleAddProduct}
                 addButtonText="Add Product"
+            /> */}
+
+            <PageHeader
+                title="Product Management"
+                subtitle="Manage your product inventory"
+                actions={[
+                    {
+                        label: 'Add Product',
+                        icon: <AddIcon />,
+                        onClick: () => handleAddProduct(),
+                    },
+                ]}
             />
+
 
             {/* Stats Cards */}
             <ProductStatsCards

@@ -62,7 +62,7 @@ const navigationItems = [
             {
                 title: 'Brands',
                 icon: Business,
-                path: '/admin/products/brands',
+                path: '/brands',
                 color: '#8b5cf6'
             }
         ]

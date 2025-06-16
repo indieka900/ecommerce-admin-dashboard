@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { productService } from '../services/productService';
+import PageHeader from '../components/common/PageHeader';
 import StatCard from '../components/common/Charts/StatsCard'
 import {
     Box,
@@ -211,44 +212,24 @@ const CategoryManagement = () => {
         <Container maxWidth="xl">
             <Box sx={{ py: 4 }}>
                 {/* Header */}
-                <Paper elevation={2} sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
-                        <Box>
-                            <Typography variant="h3" fontWeight="bold" gutterBottom>
-                                Category Management
-                            </Typography>
-                            <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
-                                Manage your product categories and parent categories
-                            </Typography>
-                        </Box>
-                        <Stack direction="row" spacing={2}>
-                            <Button
-                                variant="contained"
-                                startIcon={<FolderOpenIcon />}
-                                onClick={() => handleOpenDialog('parent')}
-                                sx={{
-                                    bgcolor: 'rgba(255,255,255,0.2)',
-                                    backdropFilter: 'blur(10px)',
-                                    '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
-                                }}
-                            >
-                                Add Parent Category
-                            </Button>
-                            <Button
-                                variant="contained"
-                                startIcon={<AddIcon />}
-                                onClick={() => handleOpenDialog('category')}
-                                sx={{
-                                    bgcolor: 'rgba(255,255,255,0.2)',
-                                    backdropFilter: 'blur(10px)',
-                                    '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
-                                }}
-                            >
-                                Add Category
-                            </Button>
-                        </Stack>
-                    </Box>
-                </Paper>
+                <PageHeader
+                    title="Category Management"
+                    subtitle="Manage your product categories and parent categories"
+                    color="purple"
+                    actions={[
+                        {
+                            label: 'Add Parent Category',
+                            icon: <FolderOpenIcon />,
+                            onClick: () => handleOpenDialog('parent'),
+                        },
+                        {
+                            label: 'Add Category',
+                            icon: <AddIcon />,
+                            onClick: () => handleOpenDialog('category'),
+                        },
+                    ]}
+                />
+
 
                 {/* Search Bar */}
                 <Paper elevation={1} sx={{ p: 2, mb: 3 }}>

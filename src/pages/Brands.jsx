@@ -11,6 +11,7 @@ import {
     Store as StoreIcon
 } from '@mui/icons-material';
 import { useState } from 'react';
+import PageHeader from '../components/common/PageHeader';
 
 const Brands = () => {
     const [brands, setBrands] = useState([
@@ -64,18 +65,18 @@ const Brands = () => {
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h4" fontWeight="bold">
-                    Brand Management
-                </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => handleOpenDialog()}
-                >
-                    Add Brand
-                </Button>
-            </Box>
+            <PageHeader
+                title="Brand Management"
+                subtitle="Manage all product brands"
+                actions={[
+                    {
+                        label: 'Add Brand',
+                        icon: <AddIcon />,
+                        onClick: () => handleOpenDialog(),
+                    },
+                ]}
+            />
+
             <TextField
                 fullWidth
                 placeholder="Search brands..."
@@ -136,15 +137,6 @@ const Brands = () => {
                         fullWidth
                         margin="normal"
                         value={formData.brand_title}
-                        onChange={handleFormChange}
-                    />
-                    <TextField
-                        name="product_count"
-                        label="Product Count"
-                        type="number"
-                        fullWidth
-                        margin="normal"
-                        value={formData.product_count}
                         onChange={handleFormChange}
                     />
                 </DialogContent>
