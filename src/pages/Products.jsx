@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { productService } from '../services/productService';
 import {
@@ -31,6 +31,7 @@ const ProductsPage = () => {
     const [products, setProducts] = useState([]);
     const [isEditting, setisEditting] = useState(false);
     const [loadingProductId, setLoadingProductId] = useState(null);
+    const [productImages, setProductImages] = useState([])
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -46,16 +47,18 @@ const ProductsPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [fetchedProducts, fetchedCategories, fetchedBrands] = await Promise.all([
+                const [fetchedProducts, fetchedCategories, fetchedBrands, fetchedImages] = await Promise.all([
                     productService.getProducts(),
                     productService.getProductCategories(),
-                    productService.getProductBrands()
+                    productService.getProductBrands(),
+                    productService.getProductImages(),
                 ]);
-                console.log("Fetching Products......");
+
 
                 setProducts(fetchedProducts);
                 setCategories(fetchedCategories);
                 setBrands(fetchedBrands);
+                setProductImages(fetchedImages)
 
             } catch (err) {
                 console.error(err);
@@ -68,6 +71,11 @@ const ProductsPage = () => {
 
         fetchData();
     }, []);
+
+    const filteredProductImages = useMemo(() => {
+        if (!selectedProduct) return [];
+        return productImages.filter(image => image.product === selectedProduct.id);
+    }, [selectedProduct, productImages]);
 
     const {
         filteredProducts,
@@ -274,6 +282,7 @@ const ProductsPage = () => {
                 renderStockStatus={renderStockStatus}
                 renderRating={renderRating}
                 getDisplayPrice={getDisplayPrice}
+                productImages={filteredProductImages}
             />
 
             <ProductFormDialog

@@ -257,7 +257,39 @@ export const productService = {
             },);
             return response.data;
         } catch (error) {
-            let errorMessage = 'Failed to create product. Please try again later.';
+            let errorMessage = 'Failed to add images. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //get all product images
+    getProductImages: async () => {
+        try {
+            const response = await api.get(API_ENDPOINTS.PRODUCT_IMAGES);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to get images. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //delete product images
+    deleteProductImage: async (id) => {
+        try {
+            const response = await api.delete(`${API_ENDPOINTS.PRODUCT_IMAGES}${id}/`);
+            return response.data
+        } catch (error) {
+            let errorMessage = 'Failed to delete image. Please try again later.';
             if (error.response?.data?.message) {
                 errorMessage = error.response.data.message;
             } else if (error.message) {

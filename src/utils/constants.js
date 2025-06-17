@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
     PRODUCT_BRANDS: '/ecommerce/brands/',
     PRODUCT_STATS: '/ecommerce/products/stats/',
     BULK_IMAGEUPLOAD: '/ecommerce/product-images/bulk-upload/',
+    PRODUCT_IMAGES: '/ecommerce/product-images/',
 
     // Blog endpoints
     BLOGS: '/blogs/blogs',
