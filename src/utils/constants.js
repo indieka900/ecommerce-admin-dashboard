@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
     PARENT_CATEGORIES: '/ecommerce/parent-categories/',
     PRODUCT_BRANDS: '/ecommerce/brands/',
     PRODUCT_STATS: '/ecommerce/products/stats/',
+    BULK_IMAGEUPLOAD: '/ecommerce/product-images/bulk-upload/',
 
     // Blog endpoints
     BLOGS: '/blogs/blogs',

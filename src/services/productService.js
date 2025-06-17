@@ -247,6 +247,26 @@ export const productService = {
         }
     },
 
+    // Upload images to the a product
+    bulkImageUpload: async (data) => {
+        try {
+            const response = await api.post(API_ENDPOINTS.BULK_IMAGEUPLOAD, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            },);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to create product. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
     // Delete a product
     deleteProduct: async (id) => {
         try {
