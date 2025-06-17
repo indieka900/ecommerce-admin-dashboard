@@ -31,7 +31,7 @@ const CategoryDropdown = ({
             {categories
                 .map((cat) => (
                     <MenuItem key={cat.id || cat} value={cat.id || cat}>
-                        {cat.category_name || cat} {cat.parent_category ? (`for ${cat.parent_category}`) : ''}
+                        {cat.category_name || cat} {cat.parent_category ? (`for ${cat.parent_category_name}`) : ''}
                     </MenuItem>
                 ))
             }

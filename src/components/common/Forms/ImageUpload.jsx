@@ -5,6 +5,7 @@ import {
 import UploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { productService } from '../../../services/productService';
+import LoadingButton from '../../ui/LoadingButton';
 
 const ProductImageUpload = ({ productId, onSuccess }) => {
     const [images, setImages] = useState([]);
@@ -101,15 +102,25 @@ const ProductImageUpload = ({ productId, onSuccess }) => {
                     {error}
                 </Typography>
             )}
+            <LoadingButton
+                variant="contained"
+                onClick={handleUpload}
+                disabled={uploading || images.length === 0}
+                loading={uploading}
+                loadingText={uploading ? 'Uploading...' : 'Upload Images'}
+                sx={{ borderRadius: 2, mt: 3 }}
+            >
+                Upload Images
+            </LoadingButton>
 
-            <Button
+            {/* <Button
                 variant="contained"
                 onClick={handleUpload}
                 disabled={uploading || images.length === 0}
                 sx={{ mt: 3 }}
             >
                 {uploading ? 'Uploading...' : 'Upload Images'}
-            </Button>
+            </Button> */}
         </Paper>
     );
 };
