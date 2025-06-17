@@ -12,7 +12,11 @@ import {
     Collapse,
     Avatar,
     Paper,
-    Chip
+    Chip,
+    IconButton,
+    Tooltip,
+    Fade,
+    Zoom
 } from '@mui/material';
 import {
     Dashboard,
@@ -27,6 +31,9 @@ import {
     ExpandLess,
     ExpandMore,
     Store,
+    MenuOpen,
+    Menu,
+    ChevronRight
 } from '@mui/icons-material';
 
 const navigationItems = [
@@ -113,11 +120,12 @@ const navigationItems = [
     }
 ];
 
-const Sidebar = ({ onItemClick }) => {
-    const { user } = useAuth()
+const Sidebar = ({ onItemClick, onToggleCollapse }) => {
+    const { user } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [expandedItems, setExpandedItems] = useState(['Products']);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const getDisplayName = () => {
         const first = user?.first_name || '';
@@ -125,18 +133,42 @@ const Sidebar = ({ onItemClick }) => {
         return `${first} ${last}`.trim() || 'User';
     };
 
+    const getInitials = () => {
+        const first = user?.first_name || '';
+        const last = user?.last_name || '';
+        return (first.charAt(0) + last.charAt(0)).toUpperCase() || 'U';
+    };
+
     const handleToggle = (title) => {
-        setExpandedItems(prev =>
-            prev.includes(title)
-                ? prev.filter(item => item !== title)
-                : [...prev, title]
-        );
+        if (isCollapsed) {
+            setIsCollapsed(false);
+            onToggleCollapse?.(false);
+            setTimeout(() => {
+                setExpandedItems([title]);
+            }, 200);
+        } else {
+            setExpandedItems(prev =>
+                prev.includes(title)
+                    ? prev.filter(item => item !== title)
+                    : [...prev, title]
+            );
+        }
     };
 
     const handleNavigation = (path) => {
         if (path) {
             navigate(path);
             onItemClick?.();
+        }
+    };
+
+    const toggleSidebar = () => {
+        const newCollapsedState = !isCollapsed;
+        setIsCollapsed(newCollapsedState);
+
+        onToggleCollapse?.(newCollapsedState);
+        if (!isCollapsed) {
+            setExpandedItems([]);
         }
     };
 
@@ -148,52 +180,110 @@ const Sidebar = ({ onItemClick }) => {
         return (
             <React.Fragment key={item.title}>
                 <ListItem disablePadding sx={{ pl: depth * 2 }}>
-                    <ListItemButton
-                        selected={isSelected}
-                        onClick={() => {
-                            if (hasChildren) {
-                                handleToggle(item.title);
-                            } else {
-                                handleNavigation(item.path);
-                            }
-                        }}
-                        sx={{
-                            minHeight: 48,
-                            pl: depth > 0 ? 4 : 2,
-                        }}
-                    >
-                        <ListItemIcon sx={{ minWidth: 40 }}>
-                            <item.icon sx={{ color: item.color, fontSize: 22 }} />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary={item.title}
-                            slotProps={{
-                                primary: {
-                                    fontSize: depth > 0 ? '0.875rem' : '0.95rem',
-                                    fontWeight: isSelected ? 600 : 500,
-                                    color: isSelected ? '#6366f1' : 'inherit'
+                    {isCollapsed && depth === 0 ? (
+                        <Tooltip
+                            title={item.title}
+                            placement="right"
+                            TransitionComponent={Zoom}
+                            arrow
+                        >
+                            <ListItemButton
+                                selected={isSelected}
+                                onClick={() => {
+                                    if (hasChildren) {
+                                        handleToggle(item.title);
+                                    } else {
+                                        handleNavigation(item.path);
+                                    }
+                                }}
+                                sx={{
+                                    minHeight: 48,
+                                    justifyContent: 'center',
+                                    px: 2.5,
+                                    position: 'relative'
+                                }}
+                            >
+                                <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+                                    <item.icon sx={{ color: item.color, fontSize: 22 }} />
+                                </ListItemIcon>
+                                {item.badge && (
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            width: 8,
+                                            height: 8,
+                                            borderRadius: '50%',
+                                            backgroundColor: '#ef4444',
+                                            animation: 'pulse 2s infinite'
+                                        }}
+                                    />
+                                )}
+                                {hasChildren && (
+                                    <ChevronRight
+                                        sx={{
+                                            position: 'absolute',
+                                            right: 4,
+                                            fontSize: 16,
+                                            color: 'text.secondary'
+                                        }}
+                                    />
+                                )}
+                            </ListItemButton>
+                        </Tooltip>
+                    ) : (
+                        <ListItemButton
+                            selected={isSelected}
+                            onClick={() => {
+                                if (hasChildren) {
+                                    handleToggle(item.title);
+                                } else {
+                                    handleNavigation(item.path);
                                 }
                             }}
-                        />
-                        {item.badge && (
-                            <Chip
-                                label={item.badge}
-                                size="small"
-                                sx={{
-                                    backgroundColor: '#ef4444',
-                                    color: 'white',
-                                    fontSize: '0.75rem',
-                                    height: 20,
-                                    minWidth: 20
-                                }}
-                            />
-                        )}
-                        {hasChildren && (
-                            isExpanded ? <ExpandLess /> : <ExpandMore />
-                        )}
-                    </ListItemButton>
+                            sx={{
+                                minHeight: 48,
+                                pl: depth > 0 ? 4 : 2,
+                                opacity: isCollapsed && depth > 0 ? 0 : 1,
+                                transition: 'opacity 0.2s ease-in-out'
+                            }}
+                        >
+                            <ListItemIcon sx={{ minWidth: 40 }}>
+                                <item.icon sx={{ color: item.color, fontSize: 22 }} />
+                            </ListItemIcon>
+                            <Fade in={!isCollapsed} timeout={200}>
+                                <ListItemText
+                                    primary={item.title}
+                                    slotProps={{
+                                        primary: {
+                                            fontSize: depth > 0 ? '0.875rem' : '0.95rem',
+                                            fontWeight: isSelected ? 600 : 500,
+                                            color: isSelected ? '#6366f1' : 'inherit'
+                                        }
+                                    }}
+                                />
+                            </Fade>
+                            {!isCollapsed && item.badge && (
+                                <Chip
+                                    label={item.badge}
+                                    size="small"
+                                    sx={{
+                                        backgroundColor: '#ef4444',
+                                        color: 'white',
+                                        fontSize: '0.75rem',
+                                        height: 20,
+                                        minWidth: 20
+                                    }}
+                                />
+                            )}
+                            {!isCollapsed && hasChildren && (
+                                isExpanded ? <ExpandLess /> : <ExpandMore />
+                            )}
+                        </ListItemButton>
+                    )}
                 </ListItem>
-                {hasChildren && (
+                {hasChildren && !isCollapsed && (
                     <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                         <List disablePadding>
                             {item.children.map(child => renderNavItem(child, depth + 1))}
@@ -206,6 +296,7 @@ const Sidebar = ({ onItemClick }) => {
 
     return (
         <Box sx={{
+            width: '100%',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
@@ -215,40 +306,89 @@ const Sidebar = ({ onItemClick }) => {
                 borderRadius: 0
             }
         }}>
-            {/* Logo Section */}
-            <Box sx={{
-                p: 3,
-                textAlign: 'center',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                flexShrink: 0
-            }}>
-                <Box
+            {/* Toggle Button */}
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: isCollapsed ? 'center' : 'flex-end',
+                    alignItems: 'center',
+                    px: 2,
+                    py: 1,
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                }}
+            >
+                <IconButton
+                    onClick={toggleSidebar}
                     sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mb: 2
+                        width: 40,
+                        height: 40,
+                        backgroundColor: 'background.paper',
+                        boxShadow: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        '&:hover': {
+                            backgroundColor: 'action.hover',
+                            transform: 'scale(1.05)',
+                        },
+                        transition: 'all 0.2s ease-in-out',
                     }}
                 >
-                    <Avatar
-                        sx={{
-                            width: 48,
-                            height: 48,
-                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
-                            mr: 2
-                        }}
-                    >
-                        <Store sx={{ fontSize: 24 }} />
-                    </Avatar>
-                    <Box>
-                        <Typography variant="h6" fontWeight="bold" color="white">
-                            AdminPro
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            Management System
-                        </Typography>
-                    </Box>
-                </Box>
+                    {isCollapsed ? <Menu sx={{ fontSize: 20 }} /> : <MenuOpen sx={{ fontSize: 20 }} />}
+                </IconButton>
+            </Box>
+
+            {/* Logo Section */}
+            <Box sx={{
+                p: isCollapsed ? 2 : 3,
+                textAlign: 'center',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                flexShrink: 0,
+                transition: 'padding 0.3s ease-in-out'
+            }}>
+                {isCollapsed ? (
+                    <Tooltip title="AdminPro Management System" placement="right" arrow>
+                        <Avatar
+                            sx={{
+                                width: 40,
+                                height: 40,
+                                background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                margin: '0 auto'
+                            }}
+                        >
+                            <Store sx={{ fontSize: 20 }} />
+                        </Avatar>
+                    </Tooltip>
+                ) : (
+                    <Fade in={!isCollapsed} timeout={300}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                mb: 2
+                            }}
+                        >
+                            <Avatar
+                                sx={{
+                                    width: 48,
+                                    height: 48,
+                                    background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                    mr: 2
+                                }}
+                            >
+                                <Store sx={{ fontSize: 24 }} />
+                            </Avatar>
+                            <Box>
+                                <Typography variant="h6" fontWeight="bold" color="white">
+                                    AdminPro
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    Management System
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Fade>
+                )}
             </Box>
 
             {/* Navigation */}
@@ -257,7 +397,6 @@ const Sidebar = ({ onItemClick }) => {
                 overflowY: 'auto',
                 overflowX: 'hidden',
                 py: 2,
-
                 '&::-webkit-scrollbar': {
                     display: 'none',
                 },
@@ -271,70 +410,132 @@ const Sidebar = ({ onItemClick }) => {
 
             {/* User Profile Section */}
             <Box sx={{
-                p: 3,
+                p: isCollapsed ? 2 : 3,
                 borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                flexShrink: 0
+                flexShrink: 0,
+                transition: 'padding 0.3s ease-in-out'
             }}>
-                <Paper
-                    sx={{
-                        p: 2,
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        border: '1px solid rgba(99, 102, 241, 0.2)',
-                        borderRadius: 2
-                    }}
-                >
-                    <Box display="flex" alignItems="center">
-                        {user?.profile_picture ? (
-                            <Avatar
-                                src={user.profile_picture}
-                                alt={getDisplayName()}
-                                sx={{
-                                    width: 40,
-                                    height: 40,
-                                    background: 'linear-gradient(45deg, #10b981, #06b6d4)',
-                                    mr: 2
-                                }}
-                            />
-                        ) : (
-                            <Avatar
-                                sx={{
-                                    width: 40,
-                                    height: 40,
-                                    background: 'linear-gradient(45deg, #10b981, #06b6d4)',
-                                    mr: 2
-                                }}
-                            >
-                                {getDisplayName().charAt(0)}
-                            </Avatar>
-                        )}
-                        <Box sx={{ minWidth: 0 }}>
-                            <Typography
-                                variant="body2"
-                                fontWeight="bold"
-                                color="white"
-                                sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-                                {getDisplayName()}
-                            </Typography>
-                            <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-                                {user?.role}
-                            </Typography>
+                {isCollapsed ? (
+                    <Tooltip
+                        title={`${getDisplayName()} (${user?.role})`}
+                        placement="right"
+                        arrow
+                    >
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                            {user?.profile_picture ? (
+                                <Avatar
+                                    src={user.profile_picture}
+                                    alt={getDisplayName()}
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                                        cursor: 'pointer',
+                                        transition: 'transform 0.2s ease-in-out',
+                                        '&:hover': {
+                                            transform: 'scale(1.1)'
+                                        }
+                                    }}
+                                />
+                            ) : (
+                                <Avatar
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                                        cursor: 'pointer',
+                                        transition: 'transform 0.2s ease-in-out',
+                                        '&:hover': {
+                                            transform: 'scale(1.1)'
+                                        }
+                                    }}
+                                >
+                                    {getInitials()}
+                                </Avatar>
+                            )}
                         </Box>
-                    </Box>
-                </Paper>
+                    </Tooltip>
+                ) : (
+                    <Fade in={!isCollapsed} timeout={300}>
+                        <Paper
+                            sx={{
+                                p: 2,
+                                background: 'rgba(99, 102, 241, 0.1)',
+                                border: '1px solid rgba(99, 102, 241, 0.2)',
+                                borderRadius: 2
+                            }}
+                        >
+                            <Box display="flex" alignItems="center">
+                                {user?.profile_picture ? (
+                                    <Avatar
+                                        src={user.profile_picture}
+                                        alt={getDisplayName()}
+                                        sx={{
+                                            width: 40,
+                                            height: 40,
+                                            background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                                            mr: 2
+                                        }}
+                                    />
+                                ) : (
+                                    <Avatar
+                                        sx={{
+                                            width: 40,
+                                            height: 40,
+                                            background: 'linear-gradient(45deg, #10b981, #06b6d4)',
+                                            mr: 2
+                                        }}
+                                    >
+                                        {getInitials()}
+                                    </Avatar>
+                                )}
+                                <Box sx={{ minWidth: 0 }}>
+                                    <Typography
+                                        variant="body2"
+                                        fontWeight="bold"
+                                        color="white"
+                                        sx={{
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+                                        {getDisplayName()}
+                                    </Typography>
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+                                        {user?.role}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Paper>
+                    </Fade>
+                )}
             </Box>
+
+            <style jsx>{`
+                @keyframes pulse {
+                    0% {
+                        transform: scale(0.95);
+                        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+                    }
+                    70% {
+                        transform: scale(1);
+                        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+                    }
+                    100% {
+                        transform: scale(0.95);
+                        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+                    }
+                }
+            `}</style>
         </Box>
     );
 };
