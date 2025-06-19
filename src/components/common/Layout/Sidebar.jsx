@@ -520,7 +520,7 @@ const Sidebar = ({ onItemClick, onToggleCollapse }) => {
                 )}
             </Box>
 
-            <style jsx>{`
+            <style jsx >{`
                 @keyframes pulse {
                     0% {
                         transform: scale(0.95);

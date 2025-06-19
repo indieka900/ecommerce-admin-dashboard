@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import {
     Dialog,
     DialogTitle,
@@ -19,6 +18,7 @@ import ProductImageUpload from "../common/Forms/ImageUpload";
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { productService } from '../../services/productService';
+import ConfirmDialog from '../blog/DeleteDialog';
 
 
 export const ProductDetailDialog = ({
@@ -33,6 +33,8 @@ export const ProductDetailDialog = ({
 }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [deletingImageId, setDeletingImageId] = useState(null);
+    const [open_Delete, setOpen_Delete] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [images, setImages] = useState([])
 
     useEffect(() => {
@@ -43,17 +45,16 @@ export const ProductDetailDialog = ({
     if (!product) return null;
 
     // Handle image deletion
-    const handleImageDelete = async (imageObj, index) => {
+    const handleImageDelete = async (id) => {
 
-        setDeletingImageId(imageObj.id);
-        console.log(`Deleting image: ${deletingImageId}`);
+        setLoading(true);
 
         try {
-            await productService.deleteProductImage(imageObj.id)
+            await productService.deleteProductImage(id)
             toast.success('Image deleted successfully');
-            const remainingImages = images.filter(img => img.image !== imageObj.image);
+            const remainingImages = images.filter(img => img.id !== id);
             setImages(remainingImages);
-            if (selectedImage === imageObj.image) {
+            if (selectedImage.id === id) {
                 setSelectedImage(remainingImages.length > 0 ? remainingImages[0].image : null);
             }
         } catch (error) {
@@ -61,6 +62,7 @@ export const ProductDetailDialog = ({
             console.error('Error deleting image:', error);
         } finally {
             setDeletingImageId(null);
+            setLoading(false);
         }
     };
 
@@ -145,11 +147,12 @@ export const ProductDetailDialog = ({
                                                     <IconButton
                                                         className="delete-button"
                                                         size="small"
-                                                        onClick={(e) => {
-                                                            console.log(`Clicked............${imageObj.id}`);
+                                                        onClick={() => {
 
+                                                            setDeletingImageId(imageObj.id);
+                                                            setOpen_Delete(true);
                                                             // e.stopPropagation();
-                                                            handleImageDelete(imageObj, index);
+                                                            // handleImageDelete(imageObj);
                                                         }}
                                                         sx={{
                                                             position: 'absolute',
@@ -244,6 +247,20 @@ export const ProductDetailDialog = ({
                             </Box>
                         )}
                     </Grid>
+                    <ConfirmDialog
+                        open={open_Delete}
+                        title="Delete image"
+                        content="Are you sure you want to delete this image?"
+                        onClose={() => {
+                            setDeletingImageId(null);
+                            setOpen_Delete(false);
+                        }}
+                        onConfirm={() => {
+                            handleImageDelete(deletingImageId);
+                            setOpen_Delete(false);
+                        }}
+                        loading={loading}
+                    />
                 </Grid>
             </DialogContent>
             <DialogActions>
@@ -253,5 +270,6 @@ export const ProductDetailDialog = ({
                 </Button>
             </DialogActions>
         </Dialog>
+
     );
 };
