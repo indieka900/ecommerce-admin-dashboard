@@ -21,24 +21,17 @@ import {
     MenuItem,
     IconButton,
     Chip,
+    Accordion,
     Alert,
     Snackbar,
     Grid,
-    Card,
-    CardContent,
-    CardActions,
-    Divider,
-    InputAdornment,
-    Fab,
-    Tooltip,
     List,
     ListItem,
     ListItemText,
     ListItemSecondaryAction,
-    Badge,
     Container,
     Stack,
-    Accordion,
+
     AccordionSummary,
     AccordionDetails
 } from '@mui/material';
@@ -52,7 +45,7 @@ import {
     Store as StoreIcon,
     FolderOpenOutlined as FolderOpenIcon
 } from '@mui/icons-material';
-
+import ConfirmDialog from '../components/blog/DeleteDialog';
 
 
 
@@ -64,6 +57,13 @@ const CategoryManagement = () => {
     const [dialogType, setDialogType] = useState('category');
     const [isSaving, setIsSaving] = useState(false);
     const [editMode, setEditMode] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState({
+        type: null,
+        id: null,
+        name: '',
+    });
+    const [loading, setLoading] = useState(false);
     const [currentItem, setCurrentItem] = useState({
         id: null,
         category_name: '',
@@ -223,25 +223,35 @@ const CategoryManagement = () => {
         }
     };
 
-    const handleDelete = async (type, id, name) => {
+    const handleDelete = (type, id, name) => {
+        setDeleteTarget({ type, id, name });
+        setDeleteDialogOpen(true);
+    };
+
+
+    const confirmDelete = async () => {
+        setLoading(true);
         try {
-            if (type === 'parent') {
+            if (deleteTarget.type === 'parent') {
                 // Check if parent has categories
-                const hasCategories = categories.some(cat => cat.parent_category_name === name);
+                const hasCategories = categories.some(cat => cat.parent_category_name === deleteTarget.name);
                 if (hasCategories) {
                     showSnackbar('Cannot delete parent category with existing categories', 'error');
                     return;
                 }
-                await productService.deleteParentCategory(id)
-                setParentCategories(prev => prev.filter(parent => parent.id !== id));
+                await productService.deleteParentCategory(deleteTarget.id);
+                setParentCategories(prev => prev.filter(parent => parent.id !== deleteTarget.id));
                 showSnackbar('Parent category deleted successfully', 'success');
             } else {
-                await productService.deleteCategory(id)
-                setCategories(prev => prev.filter(cat => cat.id !== id));
+                await productService.deleteCategory(deleteTarget.id)
+                setCategories(prev => prev.filter(cat => cat.id !== deleteTarget.id));
                 showSnackbar('Category deleted successfully', 'success');
             }
         } catch (error) {
             showSnackbar(error, 'error')
+        } finally {
+            setLoading(false);
+            setDeleteDialogOpen(false);
         }
 
     };
@@ -369,7 +379,10 @@ const CategoryManagement = () => {
                         filteredParentCategories.map((parent) => {
                             const parentCategories = getCategoriesForParent(parent.parent_name);
                             return (
-                                <Accordion key={parent.id} defaultExpanded sx={{ mb: 2, boxShadow: 2 }}>
+                                <Accordion
+                                    key={parent.id} defaultExpanded
+                                    sx={{ mb: 2, boxShadow: 2 }}
+                                >
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
                                         sx={{
@@ -405,7 +418,6 @@ const CategoryManagement = () => {
                                                 </IconButton>
 
                                                 <IconButton
-                                                    component="span"
                                                     onClick={() => handleDelete('parent', parent.id, parent.parent_name)}
                                                     size="small"
                                                     sx={{ color: 'white' }}
@@ -482,6 +494,15 @@ const CategoryManagement = () => {
                                             </List>
                                         )}
                                     </AccordionDetails>
+                                    <ConfirmDialog
+                                        open={deleteDialogOpen}
+                                        title={`Delete ${deleteTarget.type === 'parent' ? 'Parent Category' : 'Category'}`}
+                                        content={`Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`}
+                                        onClose={() => setDeleteDialogOpen(false)}
+                                        onConfirm={confirmDelete}
+                                        loading={loading}
+                                    />
+
                                 </Accordion>
                             );
                         })
