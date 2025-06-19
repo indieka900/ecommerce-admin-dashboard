@@ -3,8 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useGlobalLoading} from '../context/LoadingContext';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { useGlobalLoading } from '../context/LoadingContext';
 import {
     Box,
     Card,
@@ -77,9 +76,8 @@ const Login = () => {
 
     const onSubmit = async (data) => {
         setLoginError('');
-            try {
+        try {
 
-            // Attempt login
             setIsLoading(true);
             setGlobalLoading('Loging In', true, 'Veryfying Credetials please wait...');
             const response = await login(data);
@@ -114,9 +112,9 @@ const Login = () => {
             setIsLoading(false);
             setGlobalLoading('Loging In', false);
         }
-        
 
-        
+
+
     };
 
     const handleTogglePassword = () => {

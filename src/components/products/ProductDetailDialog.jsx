@@ -45,17 +45,17 @@ export const ProductDetailDialog = ({
     if (!product) return null;
 
     // Handle image deletion
-    const handleImageDelete = async (id) => {
+    const handleImageDelete = async () => {
 
         setLoading(true);
 
         try {
-            await productService.deleteProductImage(id)
+            await productService.deleteProductImage(deletingImageId)
             toast.success('Image deleted successfully');
-            const remainingImages = images.filter(img => img.id !== id);
+            const remainingImages = images.filter(img => img.id !== deletingImageId);
             setImages(remainingImages);
-            if (selectedImage.id === id) {
-                setSelectedImage(remainingImages.length > 0 ? remainingImages[0].image : null);
+            if (selectedImage && selectedImage.id === deletingImageId) {
+                setSelectedImage(remainingImages.length > 0 ? remainingImages[0] : null);
             }
         } catch (error) {
             toast.error('Failed to delete image');
@@ -63,6 +63,7 @@ export const ProductDetailDialog = ({
         } finally {
             setDeletingImageId(null);
             setLoading(false);
+            setOpen_Delete(false);
         }
     };
 
@@ -255,10 +256,7 @@ export const ProductDetailDialog = ({
                             setDeletingImageId(null);
                             setOpen_Delete(false);
                         }}
-                        onConfirm={() => {
-                            handleImageDelete(deletingImageId);
-                            setOpen_Delete(false);
-                        }}
+                        onConfirm={handleImageDelete}
                         loading={loading}
                     />
                 </Grid>
