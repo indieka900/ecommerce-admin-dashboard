@@ -1,11 +1,10 @@
 import {
-    Container, Box, Typography, TextField, InputAdornment,
-    IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions,
+    Box, Typography, TextField, IconButton, Button,
+    Dialog, DialogTitle, DialogContent, DialogActions,
     Grid, Card, CardContent, Avatar, Chip, Paper, Skeleton,
     Alert, Fade, Grow, CardActionArea, Tooltip, Divider
 } from '@mui/material';
 import {
-    Search as SearchIcon,
     Add as AddIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
@@ -18,21 +17,12 @@ import PageHeader from '../components/common/PageHeader';
 import SearchBar from '../components/common/SearchBar';
 import LoadingButton from '../components/ui/LoadingButton';
 import { productService } from '../services/productService';
+import ConfirmDialog from '../components/blog/DeleteDialog';
 import toast from 'react-hot-toast';
 import { useBrands } from '../hooks/useBrands';
 
 // Brand Card Component
-const BrandCard = ({ brand, onEdit, onDelete }) => {
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    const handleDelete = async () => {
-        setIsDeleting(true);
-        try {
-            await onDelete(brand.id);
-        } finally {
-            setIsDeleting(false);
-        }
-    };
+const BrandCard = ({ brand, onEdit, requestDelete }) => {
 
     return (
         <Grow in timeout={300}>
@@ -127,11 +117,7 @@ const BrandCard = ({ brand, onEdit, onDelete }) => {
                             <Tooltip title="Delete Brand">
                                 <IconButton
                                     color="error"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDelete();
-                                    }}
-                                    disabled={isDeleting}
+                                    onClick={() => requestDelete(brand)}
                                     size="small"
                                     sx={{
                                         '&:hover': {
@@ -143,6 +129,7 @@ const BrandCard = ({ brand, onEdit, onDelete }) => {
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>
+
                         </Box>
                     </CardContent>
                 </CardActionArea>
@@ -229,6 +216,10 @@ const Brands = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [editBrand, setEditBrand] = useState(null);
     const [formData, setFormData] = useState({ brand_title: '' });
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [brandToDelete, setBrandToDelete] = useState(null);
+    const [loading_d, setLoading_d] = useState(false);
+
 
     // Memoized filtered brands for performance
     const filteredBrands = useMemo(() =>
@@ -285,19 +276,22 @@ const Brands = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this brand? This action cannot be undone.')) {
-            return;
-        }
-
+        setLoading_d(true);
         try {
             await productService.deleteBrand(id);
             setBrands(prev => prev.filter(brand => brand.id !== id));
+            setConfirmOpen(false);
+            setBrandToDelete(null);
             toast.success("Brand deleted successfully");
         } catch (error) {
             console.error('Error deleting brand:', error);
             toast.error(error.message || "Failed to delete brand");
+        } finally {
+            setLoading_d(false);
         }
     };
+
+
 
     return (
         <Box>
@@ -357,9 +351,15 @@ const Brands = () => {
                             <BrandCard
                                 brand={brand}
                                 onEdit={handleOpenDialog}
-                                onDelete={handleDelete}
+                                requestDelete={(brand) => {
+                                    setBrandToDelete(brand);
+                                    setConfirmOpen(true);
+                                }}
                             />
+
+
                         </Grid>
+
                     ))}
                 </Grid>
             )}
@@ -425,6 +425,14 @@ const Brands = () => {
                     </LoadingButton>
                 </DialogActions>
             </Dialog>
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Delete Brand"
+                content={`Are you sure you want to delete "${brandToDelete?.brand_title}"?`}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={() => handleDelete(brandToDelete.id)}
+                loading={loading_d}
+            />
         </Box>
     );
 };
