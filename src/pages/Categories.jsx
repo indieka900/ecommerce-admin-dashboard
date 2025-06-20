@@ -1,39 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { productService } from '../services/productService';
 import PageHeader from '../components/common/PageHeader';
 import StatCard from '../components/common/Charts/StatsCard'
 import SearchBar from '../components/common/SearchBar';
 import { formatters } from '../utils/formatters';
 import LoadingButton from '../components/ui/LoadingButton';
 import {
-    Box,
-    Button,
-    Paper,
-    Typography,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    IconButton,
-    Chip,
-    Accordion,
-    Alert,
-    Snackbar,
-    Grid,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemSecondaryAction,
-    Container,
-    Stack,
-
-    AccordionSummary,
-    AccordionDetails
+    Box, Button, Paper, Typography,
+    Dialog, DialogTitle, DialogContent,
+    DialogActions, TextField, FormControl,
+    InputLabel, Select, MenuItem, IconButton,
+    Chip, Accordion, Alert, Grid, List,
+    ListItem, ListItemText, ListItemSecondaryAction,
+    Container, Stack, AccordionSummary, AccordionDetails
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -47,226 +24,44 @@ import {
 } from '@mui/icons-material';
 import ConfirmDialog from '../components/blog/DeleteDialog';
 import CategoryLoadingSkeleton from '../components/categories/CategorySkelleton';
+import useCategory from '../hooks/useCategory';
 
 
 
 const CategoryManagement = () => {
-    const [parentCategories, setParentCategories] = useState([]);
-    const [loadingData, setLoadingData] = useState(true);
-    const [categories, setCategories] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [dialogType, setDialogType] = useState('category');
-    const [isSaving, setIsSaving] = useState(false);
-    const [editMode, setEditMode] = useState(false);
-    const [error, setError] = useState(null);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [deleteTarget, setDeleteTarget] = useState({
-        type: null,
-        id: null,
-        name: '',
-    });
-    const [loading, setLoading] = useState(false);
-    const [currentItem, setCurrentItem] = useState({
-        id: null,
-        category_name: '',
-        parent_category_name: '',
-        parent_category: '',
-        parent_name: ''
-    });
-    const [snackbar, setSnackbar] = useState({
-        open: false,
-        message: '',
-        severity: 'success'
-    });
+    const {
+        parentCategories,
+        categories,
+        filteredParentCategories,
+        filteredCategories,
+        loadingData,
+        searchTerm,
+        dialogOpen,
+        dialogType,
+        isSaving,
+        editMode,
+        error,
+        deleteDialogOpen,
+        deleteTarget,
+        loading,
+        currentItem,
+        // snackbar,
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [fetchedCategories, fetchedParentsC] = await Promise.all([
-                    productService.getProductCategories(),
-                    productService.getParentCategories()
-                ]);
+        // Handlers
+        handleOpenDialog,
+        handleCloseDialog,
+        handleInputChange,
+        handleSave,
+        handleDelete,
+        confirmDelete,
+        getCategoriesForParent,
 
-                setCategories(fetchedCategories);
-                setParentCategories(fetchedParentsC)
-
-            } catch (err) {
-                console.error(err);
-                setError(err.message || "An error occurred while fetching data");
-                // setError(err.message || "An error occurred");
-                // showNotification(err.message || "Failed to load product data", "error");
-            } finally {
-                setLoadingData(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    // Filter items based on search
-    const filteredParentCategories = parentCategories.filter(parent =>
-        parent.parent_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const filteredCategories = categories.filter(category =>
-        category.category_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.parent_category_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const handleOpenDialog = (type, item = null) => {
-        setDialogType(type);
-        if (item) {
-            setCurrentItem(item);
-            setEditMode(true);
-        } else {
-            setCurrentItem({
-                id: null,
-                category_name: '',
-                parent_category: '',
-                parent_name: ''
-            });
-            setEditMode(false);
-        }
-        setDialogOpen(true);
-    };
-
-    const handleCloseDialog = () => {
-        setDialogOpen(false);
-        setCurrentItem({
-            id: null,
-            category_name: '',
-            parent_category: '',
-            parent_name: ''
-        });
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setCurrentItem(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSave = async () => {
-        try {
-            setIsSaving(true)
-            if (dialogType === 'parent') {
-                if (!currentItem.parent_name) {
-                    showSnackbar('Parent category name is required', 'error');
-                    return;
-                }
-
-                if (editMode) {
-                    // UPDATE parent category
-
-                    const updatedParent = await productService.updateParentCategory(currentItem.id, {
-                        parent_name: currentItem.parent_name
-                    });
-
-                    setParentCategories(prev => prev.map(parent =>
-                        parent.id === currentItem.id ? updatedParent : parent
-                    ));
-                    showSnackbar('Parent category updated successfully', 'success');
-                } else {
-                    // CREATE new parent category
-
-                    const newParent = await productService.addParentCategory({
-                        parent_name: currentItem.parent_name
-                    });
-
-                    setParentCategories(prev => [...prev, newParent]);
-                    showSnackbar('Parent category added successfully', 'success');
-                }
-            } else {
-                // Child category operations
-                if (!currentItem.category_name || !currentItem.parent_category) {
-                    showSnackbar('Category name and parent category are required', 'error');
-                    return;
-                }
-
-                if (editMode) {
-                    // UPDATE child category
-
-                    const updatedCategory = await productService.updateCategory(currentItem.id, {
-                        category_name: currentItem.category_name,
-                        parent_category: currentItem.parent_category
-                    });
-
-                    setCategories(prev => prev.map(cat =>
-                        cat.id === currentItem.id ? updatedCategory : cat
-                    ));
-                    showSnackbar('Category updated successfully', 'success');
-                } else {
-                    // CREATE new child category
-
-                    const newCategory = await productService.addCategory({
-                        category_name: currentItem.category_name,
-                        parent_category: currentItem.parent_category
-                    });
-
-                    setCategories(prev => [...prev, newCategory]);
-                    showSnackbar('Category added successfully', 'success');
-                }
-            }
-            handleCloseDialog();
-        } catch (error) {
-            console.error('API Error:', error);
-
-            if (error.response) {
-                const message = error.response.data?.message || 'Operation failed';
-                showSnackbar(message, 'error');
-            } else if (error.request) {
-                showSnackbar('Network error. Please check your connection.', 'error');
-            } else {
-                showSnackbar('An unexpected error occurred', 'error');
-            }
-        } finally {
-            setIsSaving(false)
-        }
-    };
-
-    const handleDelete = (type, id, name) => {
-        setDeleteTarget({ type, id, name });
-        setDeleteDialogOpen(true);
-    };
-
-
-    const confirmDelete = async () => {
-        setLoading(true);
-        try {
-            if (deleteTarget.type === 'parent') {
-                // Check if parent has categories
-                const hasCategories = categories.some(cat => cat.parent_category_name === deleteTarget.name);
-                if (hasCategories) {
-                    showSnackbar('Cannot delete parent category with existing categories', 'error');
-                    return;
-                }
-                await productService.deleteParentCategory(deleteTarget.id);
-                setParentCategories(prev => prev.filter(parent => parent.id !== deleteTarget.id));
-                showSnackbar('Parent category deleted successfully', 'success');
-            } else {
-                await productService.deleteCategory(deleteTarget.id)
-                setCategories(prev => prev.filter(cat => cat.id !== deleteTarget.id));
-                showSnackbar('Category deleted successfully', 'success');
-            }
-        } catch (error) {
-            showSnackbar(error, 'error')
-        } finally {
-            setLoading(false);
-            setDeleteDialogOpen(false);
-        }
-
-    };
-
-    const showSnackbar = (message, severity) => {
-        setSnackbar({ open: true, message, severity });
-    };
-
-    const getCategoriesForParent = (parentName) => {
-        return filteredCategories.filter(cat => cat.parent_category_name === parentName);
-    };
+        // Utilities
+        setCurrentItem,
+        setSearchTerm,
+        // setSnackbar,
+        setDeleteDialogOpen,
+    } = useCategory();
 
     if (loadingData) return (
         <CategoryLoadingSkeleton />
@@ -621,7 +416,7 @@ const CategoryManagement = () => {
 
 
                 {/* Snackbar */}
-                <Snackbar
+                {/* <Snackbar
                     open={snackbar.open}
                     autoHideDuration={6000}
                     onClose={() => setSnackbar({ ...snackbar, open: false })}
@@ -633,7 +428,7 @@ const CategoryManagement = () => {
                     >
                         {snackbar.message}
                     </Alert>
-                </Snackbar>
+                </Snackbar> */}
             </Box>
         </Container>
     );
