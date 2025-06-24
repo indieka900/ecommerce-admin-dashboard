@@ -43,7 +43,13 @@ const CategoryLoadingSkeleton = () => {
                 {/* Stats Cards Skeleton */}
                 <Grid container spacing={3} sx={{ mb: 4 }}>
                     {[1, 2, 3, 4].map((index) => (
-                        <Grid key={index} item xs={12} sm={6} md={3}>
+                        <Grid
+                            key={index}
+                            size={{
+                                xs: 12,
+                                sm: 6,
+                                md: 3
+                            }}>
                             <Card elevation={2}>
                                 <CardContent>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">

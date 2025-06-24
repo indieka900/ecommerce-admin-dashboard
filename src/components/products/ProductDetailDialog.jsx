@@ -13,7 +13,8 @@ import {
     IconButton,
     Tooltip, CircularProgress
 } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, Add } from '@mui/icons-material';
+import ProductVariant from './ProductVariant';
 import ProductImageUpload from "../common/Forms/ImageUpload";
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
@@ -33,6 +34,7 @@ export const ProductDetailDialog = ({
 }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [deletingImageId, setDeletingImageId] = useState(null);
+    const [variantOpen, setVariantOpen] = useState(false);
     const [open_Delete, setOpen_Delete] = useState(false);
     const [loading, setLoading] = useState(false);
     const [images, setImages] = useState([])
@@ -263,10 +265,22 @@ export const ProductDetailDialog = ({
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Close</Button>
+                <Button variant="outlined" startIcon={<Add />} onClick={() => setVariantOpen(true)}>
+                    Manage Variants
+                </Button>
                 <Button variant="contained" startIcon={<Edit />} onClick={() => onEdit(product)}>
                     Edit Product
                 </Button>
             </DialogActions>
+            <ProductVariant
+                product={product}
+                open={variantOpen}
+                onClose={() => setVariantOpen(false)}
+                onVariantsUpdate={() => {
+                    // Refresh product data or variants
+                    // loadProductData();
+                }}
+            />
         </Dialog>
 
     );

@@ -314,4 +314,71 @@ export const productService = {
             throw new Error(errorMessage);
         }
     },
+
+    // fetch product variants as per product id
+    getProductVariants: async (productID) => {
+        try {
+            const response = await api.get(`${API_ENDPOINTS.PRODUCT_VARIANTS}product-variants/`, {
+                params: { product: productID },
+            });
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to fetch product variants. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //update product variants
+    updateProductVariant: async (id, data) => {
+        try {
+            const response = await api.patch(`${API_ENDPOINTS.PRODUCT_VARIANTS}${id}/`, data);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to update product variants. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    // add product variants
+    addProductVariant: async (data) => {
+        try {
+            const response = await api.post(API_ENDPOINTS.PRODUCT_VARIANTS, data);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to add product variants. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+        }
+    },
+
+    //delete product variants
+    deleteProductVariant: async (id) => {
+        try {
+            const response = await api.delete(`${API_ENDPOINTS.PRODUCT_VARIANTS}${id}/`);
+            return response.data;
+        } catch (error) {
+            let errorMessage = 'Failed to delete product variants. Please try again later.';
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            throw new Error(errorMessage);
+
+        }
+    }
 };
