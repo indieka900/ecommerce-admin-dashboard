@@ -29,7 +29,6 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     Save as SaveIcon,
-    Cancel as CancelIcon,
     Inventory as InventoryIcon,
     ColorLens as ColorIcon,
     Straighten as SizeIcon

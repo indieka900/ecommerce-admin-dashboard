@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useMemo } from 'react';
 import {
     Box,
@@ -427,7 +428,7 @@ const Blog = () => {
                 subtitle="Manage Your Blogs and Comments"
                 actions={[
                     {
-                        label: 'Add Parent Category',
+                        label: 'Add Blog',
                         icon: <AddIcon />,
                         onClick: () => handleCreateBlog(),
                     },

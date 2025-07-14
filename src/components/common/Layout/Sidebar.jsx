@@ -54,12 +54,12 @@ const navigationItems = [
                 path: '/products',
                 color: '#f59e0b'
             },
-            {
-                title: 'Add Product',
-                icon: Add,
-                path: '/admin/products/add',
-                color: '#10b981'
-            },
+            // {
+            //     title: 'Add Product',
+            //     icon: Add,
+            //     path: '/admin/products/add',
+            //     color: '#10b981'
+            // },
             {
                 title: 'Categories',
                 icon: Category,
