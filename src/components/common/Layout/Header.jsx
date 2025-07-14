@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/ThemeProvider';
 import {
     Box,
     Toolbar,
@@ -21,13 +22,15 @@ import {
     Search,
     Logout,
     Person,
+    LightMode,
     DarkMode,
 } from '@mui/icons-material';
 
 
-const Header = ({ onMenuClick, toggleTheme, mode }) => {
+const Header = ({ onMenuClick }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const { user, logout } = useAuth()
+    const { mode, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [notificationAnchor, setNotificationAnchor] = useState(null);
 
@@ -84,7 +87,7 @@ const Header = ({ onMenuClick, toggleTheme, mode }) => {
                     </IconButton>
 
                     <IconButton color="inherit" onClick={toggleTheme}>
-                        {mode === 'dark' ? <DarkMode /> : <DarkMode sx={{ opacity: 0.5 }} />}
+                        {mode === 'dark' ? <LightMode /> : <DarkMode />}
                     </IconButton>
 
                     <IconButton onClick={handleProfileClick} sx={{ p: 0 }}>
