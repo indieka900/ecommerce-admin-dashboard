@@ -21,7 +21,7 @@ export const orderService = {
     // Fetch single order details
     getOrderDetails: async (orderId) => {
         try {
-            const response = await api.get(`${API_ENDPOINTS.ORDERS}/${orderId}/`);
+            const response = await api.get(`${API_ENDPOINTS.ORDERS}${orderId}/`);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to fetch order details. Please try again later.';
@@ -37,7 +37,7 @@ export const orderService = {
     // Update order status
     updateOrderStatus: async (orderId, status) => {
         try {
-            const response = await api.post(`${API_ENDPOINTS.ORDERS}/${orderId}/update_status/`, { status });
+            const response = await api.post(`${API_ENDPOINTS.ORDERS}${orderId}/update_status/`, { status });
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to update order status. Please try again later.';
@@ -53,7 +53,7 @@ export const orderService = {
     // Update payment status
     updatePaymentStatus: async (orderId, paymentStatus) => {
         try {
-            const response = await api.post(`${API_ENDPOINTS.ORDERS}/${orderId}/update_payment_status/`, {
+            const response = await api.post(`${API_ENDPOINTS.ORDERS}${orderId}/update_payment_status/`, {
                 payment_status: paymentStatus
             });
             return response.data;
@@ -165,7 +165,7 @@ export const orderService = {
     // Get order analytics
     getOrderAnalytics: async (days = 30) => {
         try {
-            const response = await api.get(`${API_ENDPOINTS.ANALYTICS}/orders/`, {
+            const response = await api.get(API_ENDPOINTS.ORDER_STATS, {
                 params: { days }
             });
             return response.data;
@@ -183,7 +183,7 @@ export const orderService = {
     // Get dashboard statistics
     getDashboardStats: async () => {
         try {
-            const response = await api.get(`${API_ENDPOINTS.ANALYTICS}/dashboard-stats/`);
+            const response = await api.get(API_ENDPOINTS.DASHBOARD_STATS);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to fetch dashboard statistics. Please try again later.';
@@ -204,7 +204,7 @@ export const orderService = {
                 params.month = month;
             }
 
-            const response = await api.get(`${API_ENDPOINTS.ANALYTICS}/revenue/`, { params });
+            const response = await api.get(API_ENDPOINTS.REVENUE_ANALYTICS, { params });
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to fetch revenue analytics. Please try again later.';

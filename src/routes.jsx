@@ -16,11 +16,13 @@ import ErrorPage from './pages/ErrorPage';
 import Products from './pages/Products';
 import Categories from './pages/Categories';
 import Brands from './pages/Brands';
-// import Orders from './pages/Orders';
 // import Customers from './pages/Customers';
 // import Transactions from './pages/Transactions';
 import Blog from './pages/Blog';
 import BlogCategories from './pages/BlogCategories';
+import OrdersList from './pages/Orders';
+import OrdersDashboard from './pages/OrderDashboard';
+import OrderDetails from './pages/OrderDetail';
 // // import Reviews from './pages/Reviews';
 // import Settings from './pages/Settings';
 
@@ -86,10 +88,23 @@ const router = createBrowserRouter([
                 path: 'brands',
                 element: <Brands />
             },
-            // {
-            //     path: 'orders',
-            //     element: <Orders />
-            // },
+            {
+                path: 'orders',
+                children: [
+                    {
+                        index: true,
+                        element: <OrdersList />
+                    },
+                    {
+                        path: ':orderId',
+                        element: <OrderDetails />
+                    },
+                    {
+                        path: 'analytics',
+                        element: <OrdersDashboard />
+                    }
+                ]
+            },
             // {
             //     path: 'customers',
             //     element: <Customers />

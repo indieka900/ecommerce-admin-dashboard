@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
     BULK_IMAGEUPLOAD: '/ecommerce/product-images/bulk-upload/',
     PRODUCT_IMAGES: '/ecommerce/product-images/',
     PRODUCT_VARIANTS: '/ecommerce/product-variants/',
+    REVENUE_ANALYTICS: '/analytics/revenue/',
 
     // Blog endpoints
     BLOGS: '/blogs/blogs',
@@ -28,7 +29,8 @@ export const API_ENDPOINTS = {
 
     // Order endpoints
     ORDERS: '/orders/',
-    ORDER_STATS: '/orders/stats/',
+    ORDER_STATS: '/analytics/orders/',
+    DASHBOARD_STATS: 'analytics/dashboard-stats/',
 
     // Customer endpoints
     CUSTOMERS: '/customers/',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { useDashboardStats } from '../../../hooks/userOrder';
 import {
     Box,
     Typography,
@@ -16,116 +17,28 @@ import {
     IconButton,
     Tooltip,
     Fade,
-    Zoom
+    Zoom,
+    Divider
 } from '@mui/material';
 import {
-    Dashboard,
-    Inventory,
-    People,
-    ShoppingCart,
-    Analytics,
-    Settings,
-    Add,
-    Category,
-    Business,
     ExpandLess,
     ExpandMore,
-    Store,
     MenuOpen,
     Menu,
     ChevronRight
 } from '@mui/icons-material';
-
-const navigationItems = [
-    {
-        title: 'Dashboard',
-        icon: Dashboard,
-        path: '/dashboard',
-        color: '#6366f1'
-    },
-    {
-        title: 'Products',
-        icon: Inventory,
-        color: '#f59e0b',
-        children: [
-            {
-                title: 'Product List',
-                icon: Inventory,
-                path: '/products',
-                color: '#f59e0b'
-            },
-            // {
-            //     title: 'Add Product',
-            //     icon: Add,
-            //     path: '/admin/products/add',
-            //     color: '#10b981'
-            // },
-            {
-                title: 'Categories',
-                icon: Category,
-                path: '/categories',
-                color: '#3b82f6'
-            },
-            {
-                title: 'Brands',
-                icon: Business,
-                path: '/brands',
-                color: '#8b5cf6'
-            }
-        ]
-    },
-    {
-        title: 'Orders',
-        icon: ShoppingCart,
-        path: '/admin/orders',
-        color: '#ef4444',
-        badge: 12
-    },
-    {
-        title: 'Customers',
-        icon: People,
-        path: '/admin/customers',
-        color: '#06b6d4'
-    },
-    {
-        title: 'Analytics',
-        icon: Analytics,
-        path: '/admin/analytics',
-        color: '#84cc16'
-    },
-    {
-        title: 'Blogs',
-        icon: Analytics,
-        color: '#84cc16',
-        children: [
-            {
-                title: 'Blog List',
-                icon: Analytics,
-                path: '/blog',
-                color: '#84cc16'
-            },
-            {
-                title: 'Blog Categories',
-                icon: Category,
-                path: '/blog/categories',
-                color: '#3b82f6'
-            }
-        ]
-    },
-    {
-        title: 'Settings',
-        icon: Settings,
-        path: '/admin/settings',
-        color: '#6b7280'
-    }
-];
+import { navigationItems } from '../../../utils/navigationItems';
 
 const Sidebar = ({ onItemClick, onToggleCollapse }) => {
     const { user } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
-    const [expandedItems, setExpandedItems] = useState(['Products']);
+    const [expandedItems, setExpandedItems] = useState(['Orders']); // Default expanded
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Get pending orders count for badge
+    const { stats } = useDashboardStats();
+    const pendingOrdersCount = stats?.pending_orders || 0;
 
     const getDisplayName = () => {
         const first = user?.first_name || '';
@@ -133,49 +46,71 @@ const Sidebar = ({ onItemClick, onToggleCollapse }) => {
         return `${first} ${last}`.trim() || 'User';
     };
 
-    const getInitials = () => {
-        const first = user?.first_name || '';
-        const last = user?.last_name || '';
-        return (first.charAt(0) + last.charAt(0)).toUpperCase() || 'U';
+    const handleNavigation = (path) => {
+        navigate(path);
+        if (onItemClick) onItemClick();
     };
 
     const handleToggle = (title) => {
-        if (isCollapsed) {
-            setIsCollapsed(false);
-            onToggleCollapse?.(false);
-            setTimeout(() => {
-                setExpandedItems([title]);
-            }, 200);
-        } else {
-            setExpandedItems(prev =>
-                prev.includes(title)
-                    ? prev.filter(item => item !== title)
-                    : [...prev, title]
-            );
-        }
-    };
-
-    const handleNavigation = (path) => {
-        if (path) {
-            navigate(path);
-            onItemClick?.();
-        }
+        setExpandedItems(prev =>
+            prev.includes(title)
+                ? prev.filter(item => item !== title)
+                : [...prev, title]
+        );
     };
 
     const toggleSidebar = () => {
-        const newCollapsedState = !isCollapsed;
-        setIsCollapsed(newCollapsedState);
+        setIsCollapsed(!isCollapsed);
+        if (onToggleCollapse) onToggleCollapse(!isCollapsed);
+    };
 
-        onToggleCollapse?.(newCollapsedState);
-        if (!isCollapsed) {
-            setExpandedItems([]);
+    // Check if current path matches the item path
+    const isPathActive = (path) => {
+        if (!path) return false;
+        // Handle query params in path
+        const [basePath, queryString] = path.split('?');
+        const isActive = location.pathname === basePath;
+
+        // If there's a query string, check if it matches current search params
+        if (queryString && isActive) {
+            const itemParams = new URLSearchParams(queryString);
+            const currentParams = new URLSearchParams(location.search);
+
+            // Check if all item params match current params
+            for (let [key, value] of itemParams) {
+                if (currentParams.get(key) !== value) return false;
+            }
         }
+
+        return isActive;
+    };
+
+    // Update navigation items with dynamic data
+    const getNavigationItems = () => {
+        return navigationItems.map(item => {
+            if (item.title === 'Orders' && item.children) {
+                return {
+                    ...item,
+                    badge: pendingOrdersCount,
+                    children: item.children.map(child => {
+                        if (child.path === '/orders?status=Pending') {
+                            return { ...child, badge: pendingOrdersCount };
+                        }
+                        return child;
+                    })
+                };
+            }
+            return item;
+        });
     };
 
     const renderNavItem = (item, depth = 0) => {
-        const isSelected = location.pathname === item.path;
+        const isSelected = isPathActive(item.path);
         const hasChildren = item.children && item.children.length > 0;
         const isExpanded = expandedItems.includes(item.title);
+
+        // Check if any child is selected
+        const hasSelectedChild = hasChildren && item.children.some(child => isPathActive(child.path));
 
         return (
             <React.Fragment key={item.title}>
@@ -188,7 +123,7 @@ const Sidebar = ({ onItemClick, onToggleCollapse }) => {
                             arrow
                         >
                             <ListItemButton
-                                selected={isSelected}
+                                selected={isSelected || hasSelectedChild}
                                 onClick={() => {
                                     if (hasChildren) {
                                         handleToggle(item.title);
@@ -234,7 +169,7 @@ const Sidebar = ({ onItemClick, onToggleCollapse }) => {
                         </Tooltip>
                     ) : (
                         <ListItemButton
-                            selected={isSelected}
+                            selected={isSelected || hasSelectedChild}
                             onClick={() => {
                                 if (hasChildren) {
                                     handleToggle(item.title);
@@ -255,12 +190,10 @@ const Sidebar = ({ onItemClick, onToggleCollapse }) => {
                             <Fade in={!isCollapsed} timeout={200}>
                                 <ListItemText
                                     primary={item.title}
-                                    slotProps={{
-                                        primary: {
-                                            fontSize: depth > 0 ? '0.875rem' : '0.95rem',
-                                            fontWeight: isSelected ? 600 : 500,
-                                            color: isSelected ? '#6366f1' : 'inherit'
-                                        }
+                                    primaryTypographyProps={{
+                                        fontSize: depth > 0 ? '0.875rem' : '0.95rem',
+                                        fontWeight: isSelected || hasSelectedChild ? 600 : 500,
+                                        color: isSelected || hasSelectedChild ? '#6366f1' : 'inherit'
                                     }}
                                 />
                             </Fade>
@@ -295,247 +228,108 @@ const Sidebar = ({ onItemClick, onToggleCollapse }) => {
     };
 
     return (
-        <Box sx={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: 0,
-            overflow: 'hidden',
-            '& > *': {
-                borderRadius: 0
-            }
-        }}>
-            {/* Toggle Button */}
+        <Box
+            sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: 'background.paper',
+                borderRight: 1,
+                borderColor: 'divider',
+            }}
+        >
+            {/* Header */}
             <Box
                 sx={{
+                    p: 2,
                     display: 'flex',
-                    justifyContent: isCollapsed ? 'center' : 'flex-end',
                     alignItems: 'center',
-                    px: 2,
-                    py: 1,
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                    justifyContent: 'space-between',
+                    minHeight: 64,
                 }}
             >
-                <IconButton
-                    onClick={toggleSidebar}
-                    sx={{
-                        width: 40,
-                        height: 40,
-                        backgroundColor: 'background.paper',
-                        boxShadow: 2,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        '&:hover': {
-                            backgroundColor: 'action.hover',
-                            transform: 'scale(1.05)',
-                        },
-                        transition: 'all 0.2s ease-in-out',
-                    }}
-                >
-                    {isCollapsed ? <Menu sx={{ fontSize: 20 }} /> : <MenuOpen sx={{ fontSize: 20 }} />}
+                {!isCollapsed && (
+                    <Fade in={!isCollapsed}>
+                        <Typography variant="h6" fontWeight="bold" color="primary">
+                            Admin Panel
+                        </Typography>
+                    </Fade>
+                )}
+                <IconButton onClick={toggleSidebar} size="small">
+                    {isCollapsed ? <Menu /> : <MenuOpen />}
                 </IconButton>
             </Box>
 
-            {/* Logo Section */}
-            <Box sx={{
-                p: isCollapsed ? 2 : 3,
-                textAlign: 'center',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                flexShrink: 0,
-                transition: 'padding 0.3s ease-in-out'
-            }}>
+            <Divider />
+
+            {/* User Info */}
+            <Box sx={{ p: 2 }}>
                 {isCollapsed ? (
-                    <Tooltip title="AdminPro Management System" placement="right" arrow>
+                    <Tooltip title={getDisplayName()} placement="right" arrow>
                         <Avatar
                             sx={{
                                 width: 40,
                                 height: 40,
-                                background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
-                                margin: '0 auto'
+                                margin: 'auto',
+                                cursor: 'pointer',
+                                backgroundColor: 'primary.main'
                             }}
                         >
-                            <Store sx={{ fontSize: 20 }} />
+                            {getDisplayName().charAt(0).toUpperCase()}
                         </Avatar>
                     </Tooltip>
                 ) : (
-                    <Fade in={!isCollapsed} timeout={300}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                mb: 2
-                            }}
-                        >
-                            <Avatar
-                                sx={{
-                                    width: 48,
-                                    height: 48,
-                                    background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
-                                    mr: 2
-                                }}
-                            >
-                                <Store sx={{ fontSize: 24 }} />
-                            </Avatar>
-                            <Box>
-                                <Typography variant="h6" fontWeight="bold" color="white">
-                                    AdminPro
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                    Management System
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Fade>
-                )}
-            </Box>
-
-            {/* Navigation */}
-            <Box sx={{
-                flexGrow: 1,
-                overflowY: 'auto',
-                overflowX: 'hidden',
-                py: 2,
-                '&::-webkit-scrollbar': {
-                    display: 'none',
-                },
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-            }}>
-                <List sx={{ width: '100%' }}>
-                    {navigationItems.map(item => renderNavItem(item))}
-                </List>
-            </Box>
-
-            {/* User Profile Section */}
-            <Box sx={{
-                p: isCollapsed ? 2 : 3,
-                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                flexShrink: 0,
-                transition: 'padding 0.3s ease-in-out'
-            }}>
-                {isCollapsed ? (
-                    <Tooltip
-                        title={`${getDisplayName()} (${user?.role})`}
-                        placement="right"
-                        arrow
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 2,
+                            backgroundColor: 'action.hover',
+                            borderRadius: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 2,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            '&:hover': {
+                                backgroundColor: 'action.selected',
+                            }
+                        }}
+                        onClick={() => handleNavigation('/profile')}
                     >
-                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                            {user?.profile_picture ? (
-                                <Avatar
-                                    src={user.profile_picture}
-                                    alt={getDisplayName()}
-                                    sx={{
-                                        width: 40,
-                                        height: 40,
-                                        background: 'linear-gradient(45deg, #10b981, #06b6d4)',
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.2s ease-in-out',
-                                        '&:hover': {
-                                            transform: 'scale(1.1)'
-                                        }
-                                    }}
-                                />
-                            ) : (
-                                <Avatar
-                                    sx={{
-                                        width: 40,
-                                        height: 40,
-                                        background: 'linear-gradient(45deg, #10b981, #06b6d4)',
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.2s ease-in-out',
-                                        '&:hover': {
-                                            transform: 'scale(1.1)'
-                                        }
-                                    }}
-                                >
-                                    {getInitials()}
-                                </Avatar>
-                            )}
+                        <Avatar sx={{ backgroundColor: 'primary.main' }}>
+                            {getDisplayName().charAt(0).toUpperCase()}
+                        </Avatar>
+                        <Box flex={1}>
+                            <Typography variant="body2" fontWeight="medium">
+                                {getDisplayName()}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                {user?.email}
+                            </Typography>
                         </Box>
-                    </Tooltip>
-                ) : (
-                    <Fade in={!isCollapsed} timeout={300}>
-                        <Paper
-                            sx={{
-                                p: 2,
-                                background: 'rgba(99, 102, 241, 0.1)',
-                                border: '1px solid rgba(99, 102, 241, 0.2)',
-                                borderRadius: 2
-                            }}
-                        >
-                            <Box display="flex" alignItems="center">
-                                {user?.profile_picture ? (
-                                    <Avatar
-                                        src={user.profile_picture}
-                                        alt={getDisplayName()}
-                                        sx={{
-                                            width: 40,
-                                            height: 40,
-                                            background: 'linear-gradient(45deg, #10b981, #06b6d4)',
-                                            mr: 2
-                                        }}
-                                    />
-                                ) : (
-                                    <Avatar
-                                        sx={{
-                                            width: 40,
-                                            height: 40,
-                                            background: 'linear-gradient(45deg, #10b981, #06b6d4)',
-                                            mr: 2
-                                        }}
-                                    >
-                                        {getInitials()}
-                                    </Avatar>
-                                )}
-                                <Box sx={{ minWidth: 0 }}>
-                                    <Typography
-                                        variant="body2"
-                                        fontWeight="bold"
-                                        color="white"
-                                        sx={{
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                    >
-                                        {getDisplayName()}
-                                    </Typography>
-                                    <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        sx={{
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                    >
-                                        {user?.role}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </Paper>
-                    </Fade>
+                    </Paper>
                 )}
             </Box>
 
-            <style jsx >{`
-                @keyframes pulse {
-                    0% {
-                        transform: scale(0.95);
-                        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-                    }
-                    70% {
-                        transform: scale(1);
-                        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
-                    }
-                    100% {
-                        transform: scale(0.95);
-                        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-                    }
-                }
-            `}</style>
+            <Divider />
+
+            {/* Navigation Items */}
+            <List sx={{ flex: 1, overflow: 'auto', px: 1, py: 2 }}>
+                {getNavigationItems().map(item => renderNavItem(item))}
+            </List>
+
+            {/* Footer */}
+            <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+                {!isCollapsed ? (
+                    <Typography variant="caption" color="text.secondary" align="center" display="block">
+                        © 2024 Admin Dashboard
+                    </Typography>
+                ) : (
+                    <Typography variant="caption" color="text.secondary" align="center" display="block">
+                        v1.0
+                    </Typography>
+                )}
+            </Box>
         </Box>
     );
 };
