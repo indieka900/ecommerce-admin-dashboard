@@ -352,8 +352,8 @@ const OrderDetails = () => {
                                                 </Box>
                                             </TableCell>
                                             <TableCell align="center">{item.quantity}</TableCell>
-                                            <TableCell align="right">${parseFloat(item.unit_price).toFixed(2)}</TableCell>
-                                            <TableCell align="right">${parseFloat(item.subtotal).toFixed(2)}</TableCell>
+                                            <TableCell align="right">Ksh {parseFloat(item.unit_price).toFixed(2)}</TableCell>
+                                            <TableCell align="right">Ksh {parseFloat(item.subtotal).toFixed(2)}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -385,21 +385,21 @@ const OrderDetails = () => {
                                     }}>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body2">Subtotal:</Typography>
-                                        <Typography variant="body2">${parseFloat(order.subtotal).toFixed(2)}</Typography>
+                                        <Typography variant="body2">Ksh {parseFloat(order.subtotal).toFixed(2)}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body2">Shipping:</Typography>
-                                        <Typography variant="body2">${parseFloat(order.shipping_cost).toFixed(2)}</Typography>
+                                        <Typography variant="body2">Ksh {parseFloat(order.shipping_cost).toFixed(2)}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body2">Tax:</Typography>
-                                        <Typography variant="body2">${parseFloat(order.tax).toFixed(2)}</Typography>
+                                        <Typography variant="body2">Ksh {parseFloat(order.tax).toFixed(2)}</Typography>
                                     </Box>
                                     <Divider sx={{ my: 1 }} />
                                     <Box display="flex" justifyContent="space-between">
                                         <Typography variant="h6" fontWeight="bold">Total:</Typography>
                                         <Typography variant="h6" fontWeight="bold" color="primary">
-                                            ${parseFloat(order.total).toFixed(2)}
+                                            Ksh {parseFloat(order.total).toFixed(2)}
                                         </Typography>
                                     </Box>
                                 </Grid>

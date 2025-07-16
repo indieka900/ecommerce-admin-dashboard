@@ -357,7 +357,7 @@ const OrdersList = () => {
                                         />
                                     </TableCell>
                                     <TableCell align="right">
-                                        ${parseFloat(order.total).toFixed(2)}
+                                        Ksh {parseFloat(order.total).toFixed(2)}
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title="View Details">
