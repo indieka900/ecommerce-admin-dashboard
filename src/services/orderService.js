@@ -71,7 +71,7 @@ export const orderService = {
     // Add tracking number
     addTracking: async (orderId, trackingNumber) => {
         try {
-            const response = await api.post(`${API_ENDPOINTS.ORDERS}/${orderId}/add_tracking/`, {
+            const response = await api.post(`${API_ENDPOINTS.ORDERS}${orderId}/add_tracking/`, {
                 tracking_number: trackingNumber
             });
             return response.data;
@@ -93,7 +93,7 @@ export const orderService = {
             orderIds.forEach(id => params.append('ids[]', id));
             params.append('status', status);
 
-            const response = await api.get(`${API_ENDPOINTS.ORDERS}/bulk_update_status/?${params}`);
+            const response = await api.get(`${API_ENDPOINTS.ORDERS}bulk_update_status/?${params}`);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to bulk update orders. Please try again later.';
@@ -109,7 +109,7 @@ export const orderService = {
     // Search orders
     searchOrders: async (query) => {
         try {
-            const response = await api.get(`${API_ENDPOINTS.ORDERS}/search/`, {
+            const response = await api.get(`${API_ENDPOINTS.ORDERS}search/`, {
                 params: { q: query }
             });
             return response.data;
@@ -236,7 +236,7 @@ export const orderService = {
     // Create a new order (if needed)
     createOrder: async (orderData) => {
         try {
-            const response = await api.post(`${API_ENDPOINTS.ORDERS}/`, orderData);
+            const response = await api.post(API_ENDPOINTS.ORDERS, orderData);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to create order. Please try again later.';
@@ -252,7 +252,7 @@ export const orderService = {
     // Update an existing order
     updateOrder: async (orderId, orderData) => {
         try {
-            const response = await api.patch(`${API_ENDPOINTS.ORDERS}/${orderId}/`, orderData);
+            const response = await api.patch(`${API_ENDPOINTS.ORDERS}${orderId}/`, orderData);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to update order. Please try again later.';
@@ -267,7 +267,7 @@ export const orderService = {
 
     deleteOrder: async (orderId) => {
         try {
-            const response = await api.delete(`${API_ENDPOINTS.ORDERS}/${orderId}/`);
+            const response = await api.delete(`${API_ENDPOINTS.ORDERS}${orderId}/`);
             return response.data;
         } catch (error) {
             let errorMessage = 'Failed to delete order. Please try again later.';

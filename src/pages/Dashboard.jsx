@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+// src/pages/Dashboard/Dashboard.jsx
+import { useState, useEffect } from 'react';
 import {
     Grid,
     Card,
@@ -9,28 +11,57 @@ import {
     Avatar,
     LinearProgress,
     Chip,
-    useTheme
+    useTheme,
+    Skeleton,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemAvatar,
+    IconButton,
+    Menu,
+    MenuItem,
+    FormControl,
+    Select,
+    InputLabel
 } from '@mui/material';
 import {
     TrendingUp,
     ShoppingCart,
     People,
-    AttachMoney
-} from '@mui/icons-material';
-import {
+    AttachMoney,
     ArrowUpward,
-    ArrowDownward
+    ArrowDownward,
+    MoreVert,
+    Refresh,
+    Receipt,
+    LocalShipping,
+    Warning,
+    CheckCircle
 } from '@mui/icons-material';
 import {
-    getGradientBackground,
-    getGlassmorphismStyles,
-    getHoverTransition
+    getGradientBackground, getHoverTransition,
+    getGlassmorphismStyles
 } from '../context/ThemeContext';
+import { LineChart, BarChart } from '../components/charts/index';
+import { format } from 'date-fns';
+import {
+    useDashboardStats,
+    useOrderAnalytics,
+    useRevenueAnalytics,
+    useCustomerAnalytics
+} from '../hooks/userOrder';
 
-import { LineChart, BarChart } from '../components/charts';
-
-const StatCard = ({ title, value, icon: Icon, color, trend, trendValue, gradient }) => {
+const StatCard = ({ title, value, icon: Icon, color, trend, trendValue, gradient, loading }) => {
     const theme = useTheme();
+
+    if (loading) {
+        return (
+            <Card elevation={0} sx={{ p: 3, height: '100%' }}>
+                <Skeleton variant="rectangular" height={150} />
+            </Card>
+        );
+    }
+
     return (
         <Card
             elevation={0}
@@ -59,17 +90,17 @@ const StatCard = ({ title, value, icon: Icon, color, trend, trendValue, gradient
                     >
                         <Icon fontSize="large" />
                     </Avatar>
-                    {trend && (
+                    {trend !== undefined && (
                         <Chip
-                            icon={trend === 'up' ? <ArrowUpward /> : <ArrowDownward />}
-                            label={trendValue}
+                            icon={trend > 0 ? <ArrowUpward /> : <ArrowDownward />}
+                            label={`${trend > 0 ? '+' : ''}${trendValue || trend}%`}
                             size="small"
                             sx={{
                                 backgroundColor:
-                                    trend === 'up' ? theme.palette.success[50] : theme.palette.error[50],
+                                    trend > 0 ? theme.palette.success[50] : theme.palette.error[50],
                                 color:
-                                    trend === 'up' ? theme.palette.success.main : theme.palette.error.main,
-                                border: `1px solid ${trend === 'up' ? theme.palette.success[100] : theme.palette.error[100]
+                                    trend > 0 ? theme.palette.success.main : theme.palette.error.main,
+                                border: `1px solid ${trend > 0 ? theme.palette.success[100] : theme.palette.error[100]
                                     }`,
                             }}
                         />
@@ -107,7 +138,7 @@ const StatCard = ({ title, value, icon: Icon, color, trend, trendValue, gradient
     );
 };
 
-const ChartCard = ({ title, children, height = 400 }) => {
+const ChartCard = ({ title, children, height = 400, action }) => {
     const theme = useTheme();
     return (
         <Paper
@@ -115,16 +146,19 @@ const ChartCard = ({ title, children, height = 400 }) => {
             sx={{
                 p: 4,
                 height,
-                background: getGradientBackground(theme, ['primary', 'secondary']),
+                background: theme.palette.background.paper,
                 position: 'relative',
                 overflow: 'hidden',
-                ...getGlassmorphismStyles(theme, 0.02),
+                border: `1px solid ${theme.palette.divider}`,
             }}
         >
             <Box position="relative" zIndex={1} height="100%">
-                <Typography variant="h6" gutterBottom color="text.primary" sx={{ mb: 3 }}>
-                    {title}
-                </Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                    <Typography variant="h6" color="text.primary">
+                        {title}
+                    </Typography>
+                    {action}
+                </Box>
                 {children}
             </Box>
         </Paper>
@@ -133,103 +167,153 @@ const ChartCard = ({ title, children, height = 400 }) => {
 
 const Dashboard = () => {
     const theme = useTheme();
+    const [analyticsPeriod, setAnalyticsPeriod] = useState(30);
+    const [revenuePeriod, setRevenuePeriod] = useState('monthly');
+
+    // Fetch real data using hooks
+    const { stats, loading: statsLoading, refetch: refetchStats } = useDashboardStats();
+    const { analytics, loading: analyticsLoading, refetch: refetchAnalytics } = useOrderAnalytics(analyticsPeriod);
+    const { revenue, loading: revenueLoading } = useRevenueAnalytics(revenuePeriod);
+    const { customerData, loading: customerLoading } = useCustomerAnalytics();
+
+    // Calculate trends
+    const calculateTrend = (current, previous) => {
+        if (!previous || previous === 0) return 0;
+        return ((current - previous) / previous * 100).toFixed(1);
+    };
+
+    // Format currency
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(value || 0);
+    };
+
+    // Prepare chart data
+    const getSalesChartData = () => {
+        if (!revenue?.data) return null;
+
+        const labels = revenue.data.map(item => {
+            if (revenuePeriod === 'daily') return format(new Date(item.date), 'MMM dd');
+            if (revenuePeriod === 'monthly') return format(new Date(item.month), 'MMM');
+            return item.year;
+        });
+
+        return {
+            labels,
+            datasets: [
+                {
+                    label: 'Revenue',
+                    data: revenue.data.map(item => item.revenue),
+                    borderColor: theme.palette.success.main,
+                    backgroundColor: `${theme.palette.success.main}20`,
+                    tension: 0.4,
+                    fill: true,
+                },
+                {
+                    label: 'Orders',
+                    data: revenue.data.map(item => item.orders * 100), // Scale for visibility
+                    borderColor: theme.palette.primary.main,
+                    backgroundColor: `${theme.palette.primary.main}20`,
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y1',
+                },
+            ],
+        };
+    };
+
+    const getOrderStatusChartData = () => {
+        if (!analytics?.orders_by_status) return null;
+
+        return {
+            labels: analytics.orders_by_status.map(item => item.status),
+            datasets: [
+                {
+                    label: 'Orders by Status',
+                    data: analytics.orders_by_status.map(item => item.count),
+                    backgroundColor: [
+                        theme.palette.warning.main,
+                        theme.palette.info.main,
+                        theme.palette.primary.main,
+                        theme.palette.success.main,
+                        theme.palette.error.main,
+                    ],
+                    borderWidth: 0,
+                },
+            ],
+        };
+    };
+
+    const handleRefreshAll = () => {
+        refetchStats();
+        refetchAnalytics();
+    };
 
     const statsData = [
         {
             title: 'Total Revenue',
-            value: '$124,563',
+            value: formatCurrency(stats?.this_month?.revenue),
             icon: AttachMoney,
             gradient: getGradientBackground(theme, ['purple', 'pink']),
-            trend: 'up',
-            trendValue: '+12.5%',
+            trend: 12.5, // You could calculate this from historical data
+            loading: statsLoading,
         },
         {
-            title: 'Orders',
-            value: '2,847',
+            title: 'Total Orders',
+            value: stats?.this_month?.orders || '0',
             icon: ShoppingCart,
             gradient: getGradientBackground(theme, ['pink', 'error']),
-            trend: 'up',
-            trendValue: '+8.2%',
+            trend: 8.2,
+            loading: statsLoading,
         },
         {
-            title: 'Customers',
-            value: '1,429',
-            icon: People,
-            gradient: getGradientBackground(theme, ['info', 'cyan']),
-            trend: 'up',
-            trendValue: '+23.1%',
+            title: 'Pending Orders',
+            value: stats?.pending_orders || '0',
+            icon: Receipt,
+            gradient: getGradientBackground(theme, ['warning', 'orange']),
+            loading: statsLoading,
         },
         {
-            title: 'Growth Rate',
-            value: '+28.4%',
+            title: 'Conversion Rate',
+            value: `${stats?.conversion_rate || 0}%`,
             icon: TrendingUp,
             gradient: getGradientBackground(theme, ['success', 'cyan']),
-            trend: 'up',
-            trendValue: '+2.4%',
+            trend: 2.4,
+            loading: statsLoading,
         },
     ];
 
-    const salesChartData = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-        datasets: [
-            {
-                label: 'Revenue',
-                data: [12000, 15000, 14000, 16000, 18000, 20000, 22000],
-                // borderColor: theme.palette.success.main,
-                // backgroundColor: theme.palette.success.light,
-                tension: 0.4,
-                fill: true,
-            },
-            {
-                label: 'Expenses',
-                data: [8000, 10000, 9000, 11000, 13000, 14000, 16000],
-                fill: true,
-            },
-        ],
-    };
-
-    const ordersChartData = {
-        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-        datasets: [
-            {
-                label: 'New Orders',
-                data: [600, 800, 700, 900],
-                borderWidth: 2,
-            },
-        ],
-    };
-
     return (
-        <Box
-            sx={{
-                minHeight: '100vh',
-                background: getGradientBackground(theme, [
-                    'background.default',
-                    'background.paper',
-                    'secondary',
-                ]),
-                p: 4,
-            }}
-        >
-            <Box sx={{ mb: 4 }}>
-                <Typography
-                    variant="h4"
-                    fontWeight="bold"
-                    sx={{
-                        mb: 1,
-                        background: getGradientBackground(theme, ['primary', 'purple']),
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                    }}
-                >
-                    Dashboard Overview
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    Welcome back! Here's what's happening with your business today.
-                </Typography>
+        <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box>
+                    <Typography
+                        variant="h4"
+                        fontWeight="bold"
+                        sx={{
+                            mb: 1,
+                            background: getGradientBackground(theme, ['primary', 'purple']),
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}
+                    >
+                        Dashboard Overview
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                        Welcome back! Here's what's happening with your business today.
+                    </Typography>
+                </Box>
+                <IconButton onClick={handleRefreshAll} color="primary">
+                    <Refresh />
+                </IconButton>
             </Box>
             <Grid container spacing={4}>
+                {/* Stats Cards */}
                 {statsData.map((stat, idx) => (
                     <Grid
                         key={idx}
@@ -242,95 +326,217 @@ const Dashboard = () => {
                     </Grid>
                 ))}
 
+                {/* Revenue Chart */}
                 <Grid
                     size={{
                         xs: 12,
                         lg: 8
                     }}>
-                    <ChartCard title="Sales Analytics" height={450}>
-                        <Box sx={{ height: '90%' }}>
-                            <LineChart data={salesChartData} title="" />
-                        </Box>
+                    <ChartCard
+                        title="Revenue Analytics"
+                        height={450}
+                        action={
+                            <FormControl size="small" sx={{ minWidth: 120 }}>
+                                <Select
+                                    value={revenuePeriod}
+                                    onChange={(e) => setRevenuePeriod(e.target.value)}
+                                >
+                                    <MenuItem value="daily">Daily</MenuItem>
+                                    <MenuItem value="monthly">Monthly</MenuItem>
+                                    <MenuItem value="yearly">Yearly</MenuItem>
+                                </Select>
+                            </FormControl>
+                        }
+                    >
+                        {revenueLoading ? (
+                            <Skeleton variant="rectangular" height="90%" />
+                        ) : (
+                            <Box sx={{ height: '90%' }}>
+                                <LineChart
+                                    data={getSalesChartData()}
+                                    title=""
+                                    loading={revenueLoading}
+                                />
+                            </Box>
+                        )}
                     </ChartCard>
                 </Grid>
 
+                {/* Order Status Chart */}
                 <Grid
                     size={{
                         xs: 12,
                         lg: 4
                     }}>
-                    <ChartCard title="Quarterly Orders" height={450}>
-                        <Box sx={{ height: '90%' }}>
-                            <BarChart data={ordersChartData} title="" />
-                        </Box>
+                    <ChartCard title="Order Status Distribution" height={450}>
+                        {analyticsLoading ? (
+                            <Skeleton variant="rectangular" height="90%" />
+                        ) : (
+                            <Box sx={{ height: '90%' }}>
+                                <BarChart
+                                    data={getOrderStatusChartData()}
+                                    title=""
+                                    loading={analyticsLoading}
+                                />
+                            </Box>
+                        )}
                     </ChartCard>
                 </Grid>
 
+                {/* Recent Orders */}
+                <Grid
+                    size={{
+                        xs: 12,
+                        md: 6
+                    }}>
+                    <ChartCard title="Recent Orders" height={400}>
+                        {analyticsLoading ? (
+                            <Skeleton variant="rectangular" height="90%" />
+                        ) : (
+                            <List sx={{ height: '90%', overflow: 'auto' }}>
+                                {analytics?.recent_orders?.slice(0, 5).map((order) => (
+                                    <ListItem
+                                        key={order.id}
+                                        secondaryAction={
+                                            <Chip
+                                                label={order.status}
+                                                size="small"
+                                                color={
+                                                    order.status === 'Delivered' ? 'success' :
+                                                        order.status === 'Processing' ? 'info' :
+                                                            order.status === 'Pending' ? 'warning' : 'default'
+                                                }
+                                            />
+                                        }
+                                    >
+                                        <ListItemAvatar>
+                                            <Avatar sx={{ bgcolor: theme.palette.primary.light }}>
+                                                <ShoppingCart />
+                                            </Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={order.order_number}
+                                            secondary={
+                                                <>
+                                                    {order.customer_name} • {formatCurrency(order.total)}
+                                                    <br />
+                                                    {format(new Date(order.created_at), 'MMM dd, yyyy hh:mm a')}
+                                                </>
+                                            }
+                                        />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        )}
+                    </ChartCard>
+                </Grid>
+
+                {/* Top Products */}
+                <Grid
+                    size={{
+                        xs: 12,
+                        md: 6
+                    }}>
+                    <ChartCard title="Top Selling Products" height={400}>
+                        {analyticsLoading ? (
+                            <Skeleton variant="rectangular" height="90%" />
+                        ) : (
+                            <List sx={{ height: '90%', overflow: 'auto' }}>
+                                {analytics?.top_products?.slice(0, 5).map((product, index) => (
+                                    <ListItem key={index}>
+                                        <ListItemAvatar>
+                                            <Avatar sx={{ bgcolor: theme.palette.secondary.light }}>
+                                                {index + 1}
+                                            </Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={product.product_name}
+                                            secondary={`${product.quantity_sold} units • ${formatCurrency(product.revenue)}`}
+                                        />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        )}
+                    </ChartCard>
+                </Grid>
+
+                {/* Quick Stats */}
                 <Grid size={12}>
-                    <ChartCard title="Quick Stats" height={450}>
-                        <Box sx={{ height: '80%' }}>
+                    <ChartCard title="Performance Metrics" height={300}>
+                        <Grid container spacing={3}>
                             {[
-                                { label: 'Conversion Rate', value: '3.2%', color: 'success.main' },
-                                { label: 'Avg. Order Value', value: '$87.50', color: 'warning.main' },
-                                { label: 'Customer Satisfaction', value: '94%', color: 'info.main' },
-                                { label: 'Return Rate', value: '2.1%', color: 'error.main' },
+                                {
+                                    label: 'Today\'s Revenue',
+                                    value: formatCurrency(stats?.today?.revenue),
+                                    color: 'success.main',
+                                    icon: <AttachMoney />
+                                },
+                                {
+                                    label: 'Today\'s Orders',
+                                    value: stats?.today?.orders || '0',
+                                    color: 'primary.main',
+                                    icon: <ShoppingCart />
+                                },
+                                {
+                                    label: 'Processing Orders',
+                                    value: stats?.processing_orders || '0',
+                                    color: 'info.main',
+                                    icon: <LocalShipping />
+                                },
+                                {
+                                    label: 'Failed Payments',
+                                    value: stats?.failed_payments || '0',
+                                    color: 'error.main',
+                                    icon: <Warning />
+                                },
                             ].map((item, i) => (
-                                <Box
+                                <Grid
                                     key={i}
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        py: 2,
-                                        px: 3,
-                                        mb: 2,
-                                        backgroundColor:
-                                            theme.palette.mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.05)'
-                                                : 'rgba(0, 0, 0, 0.02)',
-                                        borderRadius: theme.shape.borderRadius,
-                                        border: `1px solid ${theme.palette.divider}`,
-                                    }}
-                                >
-                                    <Typography variant="body2" color="text.secondary">
-                                        {item.label}
-                                    </Typography>
-                                    <Typography
-                                        variant="h6"
-                                        fontWeight="bold"
+                                    size={{
+                                        xs: 12,
+                                        sm: 6,
+                                        md: 3
+                                    }}>
+                                    <Box
                                         sx={{
-                                            color: theme.palette[item.color.split('.')[0]][item.color.split('.')[1]],
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            p: 3,
+                                            backgroundColor:
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.05)'
+                                                    : 'rgba(0, 0, 0, 0.02)',
+                                            borderRadius: theme.shape.borderRadius,
+                                            border: `1px solid ${theme.palette.divider}`,
                                         }}
                                     >
-                                        {item.value}
-                                    </Typography>
-                                </Box>
+                                        <Avatar
+                                            sx={{
+                                                bgcolor: `${theme.palette[item.color.split('.')[0]].light}20`,
+                                                color: theme.palette[item.color.split('.')[0]].main,
+                                                mr: 2
+                                            }}
+                                        >
+                                            {item.icon}
+                                        </Avatar>
+                                        <Box>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {item.label}
+                                            </Typography>
+                                            <Typography
+                                                variant="h5"
+                                                fontWeight="bold"
+                                                sx={{
+                                                    color: theme.palette[item.color.split('.')[0]][item.color.split('.')[1]],
+                                                }}
+                                            >
+                                                {statsLoading ? <Skeleton width={80} /> : item.value}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
                             ))}
-                        </Box>
-                    </ChartCard>
-                </Grid>
-
-                <Grid size={12}>
-                    <ChartCard title="Recent Activity" height={300}>
-                        <Box
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            height="80%"
-                            sx={{
-                                background: `linear-gradient(45deg, ${theme.palette.warning[50]}, ${theme.palette.error[50]})`,
-                                borderRadius: theme.shape.borderRadius,
-                                border: `1px dashed ${theme.palette.warning[200]}`,
-                            }}
-                        >
-                            <Typography variant="h6" color="text.secondary" textAlign="center">
-                                📋 Recent Orders & Activity Feed
-                                <br />
-                                <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
-                                    Real-time activity monitoring
-                                </Typography>
-                            </Typography>
-                        </Box>
+                        </Grid>
                     </ChartCard>
                 </Grid>
             </Grid>

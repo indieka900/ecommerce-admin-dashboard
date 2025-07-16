@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 import { Line, Bar, Doughnut, Pie } from 'react-chartjs-2';
-import { Paper, Typography, Box } from '@mui/material';
+import { Paper, Typography, Box, Skeleton } from '@mui/material';
 
 const LineChart = ({
     data,
@@ -8,9 +7,63 @@ const LineChart = ({
     height = 300,
     showGrid = true,
     tension = 0.4,
-    colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#06b6d4']
+    colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'],
+    loading = false
 }) => {
-    // Default options for consistent styling
+    // Handle loading state
+    if (loading) {
+        return (
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: 2
+                }}
+            >
+                {title && (
+                    <Typography variant="h6" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
+                        {title}
+                    </Typography>
+                )}
+                <Skeleton variant="rectangular" height={height} />
+            </Paper>
+        );
+    }
+
+    // Handle null or missing data
+    if (!data || !data.datasets || !data.labels) {
+        return (
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: 2
+                }}
+            >
+                {title && (
+                    <Typography variant="h6" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
+                        {title}
+                    </Typography>
+                )}
+                <Box
+                    sx={{
+                        height: height,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'text.secondary'
+                    }}
+                >
+                    <Typography variant="body2">No data available</Typography>
+                </Box>
+            </Paper>
+        );
+    }
+
     const defaultOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -60,7 +113,22 @@ const LineChart = ({
                     color: '#64748b',
                     font: {
                         size: 11
+                    },
+                    callback: function (value) {
+                        // Format large numbers
+                        if (value >= 1000) {
+                            return '$' + (value / 1000).toFixed(0) + 'k';
+                        }
+                        return '$' + value;
                     }
+                }
+            },
+            y1: {
+                type: 'linear',
+                display: false,
+                position: 'right',
+                grid: {
+                    drawOnChartArea: false,
                 }
             }
         },
@@ -112,16 +180,68 @@ const LineChart = ({
     );
 };
 
-// src/components/charts/BarChart.js
 const BarChart = ({
     data,
     title,
     height = 300,
-    horizontal = false,
     showGrid = true,
-    colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#06b6d4']
+    colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'],
+    loading = false,
+    horizontal = false
 }) => {
-    // Bar is now imported at the top
+    // Handle loading state
+    if (loading) {
+        return (
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: 2
+                }}
+            >
+                {title && (
+                    <Typography variant="h6" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
+                        {title}
+                    </Typography>
+                )}
+                <Skeleton variant="rectangular" height={height} />
+            </Paper>
+        );
+    }
+
+    // Handle null or missing data
+    if (!data || !data.datasets || !data.labels) {
+        return (
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: 2
+                }}
+            >
+                {title && (
+                    <Typography variant="h6" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
+                        {title}
+                    </Typography>
+                )}
+                <Box
+                    sx={{
+                        height: height,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'text.secondary'
+                    }}
+                >
+                    <Typography variant="body2">No data available</Typography>
+                </Box>
+            </Paper>
+        );
+    }
 
     const defaultOptions = {
         responsive: true,
@@ -176,18 +296,23 @@ const BarChart = ({
                     }
                 }
             }
+        },
+        elements: {
+            bar: {
+                borderWidth: 0,
+                borderRadius: 4
+            }
         }
     };
 
+    // Auto-assign colors to datasets
     const processedData = {
         ...data,
         datasets: data.datasets.map((dataset, index) => ({
             ...dataset,
-            backgroundColor: dataset.backgroundColor || `${colors[index % colors.length]}80`,
+            backgroundColor: dataset.backgroundColor || colors[index % colors.length],
             borderColor: dataset.borderColor || colors[index % colors.length],
-            borderWidth: dataset.borderWidth || 2,
-            borderRadius: dataset.borderRadius || 4,
-            borderSkipped: false
+            borderWidth: dataset.borderWidth || 0
         }))
     };
 
@@ -213,108 +338,75 @@ const BarChart = ({
     );
 };
 
-// src/components/charts/DoughnutChart.js
-const DoughnutChart = ({
-    data,
-    title,
-    height = 300,
-    showLegend = true,
-    cutout = '60%',
-    colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6', '#ec4899']
-}) => {
-    // Doughnut is now imported at the top
-
-    const defaultOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: showLegend,
-                position: 'right',
-                labels: {
-                    usePointStyle: true,
-                    padding: 20,
-                    color: '#64748b',
-                    font: {
-                        size: 12,
-                        weight: '500'
-                    }
-                }
-            },
-            tooltip: {
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                titleColor: '#f1f5f9',
-                bodyColor: '#cbd5e1',
-                borderColor: '#334155',
-                borderWidth: 1,
-                cornerRadius: 8,
-                displayColors: true,
-                padding: 12,
-                callbacks: {
-                    label: function (context) {
-                        const label = context.label || '';
-                        const value = context.raw || 0;
-                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = ((value / total) * 100).toFixed(1);
-                        return `${label}: ${value} (${percentage}%)`;
-                    }
-                }
-            }
-        },
-        cutout: cutout
-    };
-
-    const processedData = {
-        ...data,
-        datasets: data.datasets.map((dataset, _index) => ({
-            ...dataset,
-            backgroundColor: dataset.backgroundColor || colors.slice(0, data.labels.length),
-            borderColor: dataset.borderColor || '#1e293b',
-            borderWidth: dataset.borderWidth || 2,
-            hoverBorderWidth: 3,
-            hoverBorderColor: '#ffffff'
-        }))
-    };
-
-    return (
-        <Paper
-            elevation={0}
-            sx={{
-                p: 3,
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 2
-            }}
-        >
-            {title && (
-                <Typography variant="h6" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
-                    {title}
-                </Typography>
-            )}
-            <Box sx={{ height: height }}>
-                <Doughnut data={processedData} options={defaultOptions} />
-            </Box>
-        </Paper>
-    );
-};
-
-// src/components/charts/PieChart.js
 const PieChart = ({
     data,
     title,
     height = 300,
-    showLegend = true,
-    colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6', '#ec4899']
+    colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6'],
+    loading = false,
+    showLegend = true
 }) => {
-    // Pie is now imported at the top
+    // Handle loading state
+    if (loading) {
+        return (
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: 2
+                }}
+            >
+                {title && (
+                    <Typography variant="h6" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
+                        {title}
+                    </Typography>
+                )}
+                <Skeleton variant="circular" width={height * 0.8} height={height * 0.8} />
+            </Paper>
+        );
+    }
+
+    // Handle null or missing data
+    if (!data || !data.datasets || !data.labels) {
+        return (
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: 2
+                }}
+            >
+                {title && (
+                    <Typography variant="h6" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
+                        {title}
+                    </Typography>
+                )}
+                <Box
+                    sx={{
+                        height: height,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'text.secondary'
+                    }}
+                >
+                    <Typography variant="body2">No data available</Typography>
+                </Box>
+            </Paper>
+        );
+    }
 
     const defaultOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: showLegend,
                 position: 'right',
+                display: showLegend,
                 labels: {
                     usePointStyle: true,
                     padding: 20,
@@ -322,6 +414,24 @@ const PieChart = ({
                     font: {
                         size: 12,
                         weight: '500'
+                    },
+                    generateLabels: (chart) => {
+                        const data = chart.data;
+                        if (data.labels.length && data.datasets.length) {
+                            const dataset = data.datasets[0];
+                            const total = dataset.data.reduce((a, b) => a + b, 0);
+                            return data.labels.map((label, i) => {
+                                const value = dataset.data[i];
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return {
+                                    text: `${label} (${percentage}%)`,
+                                    fillStyle: dataset.backgroundColor[i],
+                                    hidden: false,
+                                    index: i
+                                };
+                            });
+                        }
+                        return [];
                     }
                 }
             },
@@ -335,9 +445,9 @@ const PieChart = ({
                 displayColors: true,
                 padding: 12,
                 callbacks: {
-                    label: function (context) {
+                    label: (context) => {
                         const label = context.label || '';
-                        const value = context.raw || 0;
+                        const value = context.parsed;
                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
                         const percentage = ((value / total) * 100).toFixed(1);
                         return `${label}: ${value} (${percentage}%)`;
@@ -347,15 +457,14 @@ const PieChart = ({
         }
     };
 
+    // Auto-assign colors to datasets
     const processedData = {
         ...data,
-        datasets: data.datasets.map((dataset, _index) => ({
+        datasets: data.datasets.map((dataset) => ({
             ...dataset,
-            backgroundColor: dataset.backgroundColor || colors.slice(0, data.labels.length),
-            borderColor: dataset.borderColor || '#1e293b',
-            borderWidth: dataset.borderWidth || 2,
-            hoverBorderWidth: 3,
-            hoverBorderColor: '#ffffff'
+            backgroundColor: dataset.backgroundColor || colors,
+            borderColor: dataset.borderColor || '#ffffff',
+            borderWidth: dataset.borderWidth || 2
         }))
     };
 
@@ -381,4 +490,9 @@ const PieChart = ({
     );
 };
 
-export { LineChart, BarChart, DoughnutChart, PieChart };
+const DoughnutChart = ({ ...props }) => {
+    // Doughnut is just a Pie with cutout
+    return <PieChart {...props} />;
+};
+
+export { LineChart, BarChart, PieChart, DoughnutChart };

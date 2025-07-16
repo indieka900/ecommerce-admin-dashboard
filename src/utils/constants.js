@@ -31,6 +31,7 @@ export const API_ENDPOINTS = {
     ORDERS: '/orders/',
     ORDER_STATS: '/analytics/orders/',
     DASHBOARD_STATS: 'analytics/dashboard-stats/',
+    DASHBOARD: '/dashboard/comprehensive/',
 
     // Customer endpoints
     CUSTOMERS: '/customers/',
