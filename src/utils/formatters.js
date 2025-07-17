@@ -5,7 +5,7 @@ dayjs.extend(relativeTime);
 
 export const formatters = {
     // Currency formatting
-    currency: (amount, currency = 'USD') => {
+    currency: (amount, currency = 'KSH') => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currency,

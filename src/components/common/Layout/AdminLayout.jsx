@@ -106,7 +106,7 @@ const AdminLayout = () => {
                 sx={{
                     flexGrow: 1,
                     width: { md: `calc(100% - ${sidebarWidth}px)` },
-                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+                    // background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
                     minHeight: '100vh',
                 }}
             >
