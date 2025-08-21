@@ -25,8 +25,8 @@ const PageHeader = ({
             sx={{
                 p: 3,
                 mb: 4,
-                background: getGradient(color),
-                color: 'white',
+                // background: getGradient(color),
+                color: 'primary',
             }}
         >
             <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>

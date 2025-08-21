@@ -12,7 +12,7 @@ const SummaryCards = ({ orders, realtime }) => {
                     size={{
                         xs: 12,
                         sm: 6,
-                        md: 3
+                        md: 4
                     }}>
                     <Alert severity="info" icon={<Speed />}>
                         <Typography variant="body2" fontWeight="medium">
@@ -23,7 +23,7 @@ const SummaryCards = ({ orders, realtime }) => {
                         </Typography>
                     </Alert>
                 </Grid>
-                <Grid
+                {/* <Grid
                     size={{
                         xs: 12,
                         sm: 6,
@@ -37,12 +37,12 @@ const SummaryCards = ({ orders, realtime }) => {
                             {((realtime.abandoned_carts / (realtime.active_carts + realtime.abandoned_carts)) * 100).toFixed(1)}%
                         </Typography>
                     </Alert>
-                </Grid>
+                </Grid> */}
                 <Grid
                     size={{
                         xs: 12,
                         sm: 6,
-                        md: 3
+                        md: 4
                     }}>
                     <Alert severity="success" icon={<LocalShipping />}>
                         <Typography variant="body2" fontWeight="medium">
@@ -57,7 +57,7 @@ const SummaryCards = ({ orders, realtime }) => {
                     size={{
                         xs: 12,
                         sm: 6,
-                        md: 3
+                        md: 4
                     }}>
                     <Alert severity="error" icon={<Assignment />}>
                         <Typography variant="body2" fontWeight="medium">

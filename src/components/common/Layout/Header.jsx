@@ -70,7 +70,7 @@ const Header = ({ onMenuClick }) => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" fontWeight="bold" color="white">
+                    <Typography variant="h6" fontWeight="bold" color="primary">
                         Admin Dashboard
                     </Typography>
                 </Box>

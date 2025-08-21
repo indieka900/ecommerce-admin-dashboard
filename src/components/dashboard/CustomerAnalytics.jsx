@@ -44,7 +44,7 @@ const CustomerAnalytics = ({
                                         secondary={`${customers.segments?.active || 0} customers`}
                                     />
                                 </ListItem>
-                                <ListItem>
+                                {/* <ListItem>
                                     <ListItemAvatar>
                                         <Avatar sx={{ bgcolor: theme.palette.warning.light }}>
                                             <Warning />
@@ -54,7 +54,7 @@ const CustomerAnalytics = ({
                                         primary="At Risk"
                                         secondary={`${customers.segments?.at_risk || 0} customers`}
                                     />
-                                </ListItem>
+                                </ListItem> */}
                             </List>
                             <Divider sx={{ my: 2 }} />
                             <Box textAlign="center">

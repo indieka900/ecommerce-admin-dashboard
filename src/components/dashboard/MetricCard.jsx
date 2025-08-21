@@ -46,7 +46,7 @@ const MetricCard = ({
                         <Typography color="text.secondary" variant="body2" gutterBottom>
                             {title}
                         </Typography>
-                        <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+                        <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
                             {value}
                         </Typography>
                         {subtitle && (
@@ -60,8 +60,9 @@ const MetricCard = ({
                             sx={{
                                 bgcolor: alpha(color || theme.palette.primary.main, 0.2),
                                 color: color || theme.palette.primary.main,
-                                width: 48,
-                                height: 48
+                                width: 28,
+                                height: 28,
+                                p: 0.5,
                             }}
                         >
                             <Icon />

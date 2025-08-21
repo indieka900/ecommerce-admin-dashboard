@@ -51,7 +51,7 @@ export const navigationItems = [
         title: 'Orders',
         icon: ShoppingCart,
         color: '#ef4444',
-        badge: 12, // This can be dynamic based on pending orders
+        badge: 12,
         children: [
             {
                 title: 'All Orders',
@@ -59,13 +59,13 @@ export const navigationItems = [
                 path: '/orders',
                 color: '#ef4444'
             },
-            {
-                title: 'Pending Orders',
-                icon: Assignment,
-                path: '/orders?status=Pending',
-                color: '#f59e0b',
-                badge: 8 // Dynamic pending count
-            },
+            // {
+            //     title: 'Pending Orders',
+            //     icon: Assignment,
+            //     path: '/orders?status=Pending',
+            //     color: '#f59e0b',
+            //     badge: 8 
+            // },
             {
                 title: 'Order Analytics',
                 icon: TrendingUp,

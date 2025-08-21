@@ -51,6 +51,8 @@ const BrandCard = ({ brand, onEdit, requestDelete }) => {
                     }}>
                         <Box>
                             <Avatar
+                                src={brand.image}
+                                alt={brand.title}
                                 sx={{
                                     margin: '0 auto 16px',
                                     width: 56,
@@ -59,9 +61,7 @@ const BrandCard = ({ brand, onEdit, requestDelete }) => {
                                     fontSize: '1.5rem',
                                     fontWeight: 'bold'
                                 }}
-                            >
-                                {brand.brand_title.charAt(0).toUpperCase()}
-                            </Avatar>
+                            />
 
                             <Typography
                                 variant="h6"

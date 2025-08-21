@@ -353,7 +353,7 @@ const lightComponentOverrides = {
                     width: '8px',
                 },
                 '&::-webkit-scrollbar-track': {
-                    background: '#f1f5f9',
+                    background: '#e5ebf0f1',
                 },
                 '&::-webkit-scrollbar-thumb': {
                     backgroundColor: '#cbd5e1',
@@ -368,7 +368,7 @@ const lightComponentOverrides = {
     MuiDrawer: {
         styleOverrides: {
             paper: {
-                backgroundColor: '#ffffff',
+                backgroundColor: '#fafafa',
                 borderRight: '1px solid rgba(0, 0, 0, 0.08)',
                 boxShadow: '4px 0 24px rgba(0, 0, 0, 0.06)',
             },
@@ -525,22 +525,25 @@ const lightTheme = createTheme({
     palette: {
         mode: 'light',
         primary: {
-            main: '#6366f1',
-            light: '#818cf8',
-            dark: '#4f46e5',
+            main: '#7c8db0',
+            light: '#aab8d4',
+            dark: '#5a6b8f',
         },
+        // secondary: {
+        //     main: '#d6a244',
+        // },
         secondary: {
-            main: '#f59e0b',
-            light: '#fbbf24',
-            dark: '#d97706',
+            main: '#e0ac23',
+            light: '#eab543',
+            dark: '#c1901f',
         },
         background: {
-            default: '#f8fafc',
-            paper: '#ffffff',
+            default: '#f4f6f8',
+            paper: '#ffffffeb',
         },
         text: {
-            primary: '#111827',
-            secondary: '#6b7280',
+            primary: '#2d3748',
+            secondary: '#718096',
         },
         success: customColors.success,
         warning: customColors.warning,
@@ -553,7 +556,7 @@ const lightTheme = createTheme({
     },
     typography,
     shape: {
-        borderRadius: 12,
+        // borderRadius: 12,
     },
     shadows: [
         'none',

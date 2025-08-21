@@ -35,8 +35,6 @@ import CustomTextField from '../CustomTextField';
 import { useForm, Controller } from 'react-hook-form';
 
 
-
-// Main Component
 const ProductFormDialog = ({
     open,
     onClose,
@@ -80,7 +78,6 @@ const ProductFormDialog = ({
 
     const hasVariants = watch('has_variants');
 
-    // Reset form when dialog opens
     useEffect(() => {
         if (open) {
             const safeData = initialData || {};
@@ -142,7 +139,6 @@ const ProductFormDialog = ({
                 handleRemoveImage();
             }
 
-            // Close dialog after delay
             setTimeout(() => {
                 onClose();
                 setSubmitStatus(null);
@@ -157,7 +153,6 @@ const ProductFormDialog = ({
         }
     };
 
-    // Image upload handler
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -192,7 +187,6 @@ const ProductFormDialog = ({
         setSubmitStatus(null);
     };
 
-    // Remove image handler
     const handleRemoveImage = () => {
         setImageFile(null);
         setImagePreview('');
@@ -202,7 +196,6 @@ const ProductFormDialog = ({
         }
     };
 
-    // Close dialog handler
     const handleClose = () => {
         if (!isSubmitting) {
             setSubmitStatus(null);
@@ -450,7 +443,7 @@ const ProductFormDialog = ({
                                 type="number"
                                 register={() => register('rating', {
                                     validate: value => {
-                                        if (!value) return true; // Optional field
+                                        if (!value) return true;
                                         const num = parseFloat(value);
                                         if (isNaN(num)) return 'Rating must be a number';
                                         if (num < 0) return 'Rating cannot be negative';
@@ -466,7 +459,6 @@ const ProductFormDialog = ({
                             />
                         </Grid>
 
-                        {/* Variant Pricing Section - Conditional */}
                         {hasVariants && (
                             <>
                                 <Grid size={12}>
