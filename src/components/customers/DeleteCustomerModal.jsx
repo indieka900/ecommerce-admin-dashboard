@@ -11,18 +11,21 @@ import {
     Alert,
 } from '@mui/material';
 import {
+    Delete,
     Warning,
 } from '@mui/icons-material';
+import LoadingButton from '../ui/LoadingButton';
+import customerService from '../../services/customerService';
 
 
-const DeleteCustomerModal = ({ open, onClose, customer, onConfirm }) => {
+const DeleteCustomerModal = ({ open, onClose, customer }) => {
     const [loading, setLoading] = useState(false);
 
     const handleDelete = async () => {
         setLoading(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 1000));
-            onConfirm(customer);
+            await customerService.deleteCustomer(customer.id)
             onClose();
         } catch (error) {
             console.error('Error deleting customer:', error);
@@ -48,7 +51,7 @@ const DeleteCustomerModal = ({ open, onClose, customer, onConfirm }) => {
                 <Typography>
                     Are you sure you want to delete <strong>{customer?.name}</strong>?
                 </Typography>
-                <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+                <Box sx={{ mt: 2, p: 2, bgcolor: 'info.900', borderRadius: 1 }}>
                     <Typography variant="body2" color="textSecondary">
                         Customer Details:
                     </Typography>
@@ -67,15 +70,16 @@ const DeleteCustomerModal = ({ open, onClose, customer, onConfirm }) => {
                 <Button onClick={onClose} disabled={loading}>
                     Cancel
                 </Button>
-                <Button
-                    onClick={handleDelete}
-                    color="error"
-                    variant="contained"
+                <LoadingButton
+                    loading={loading}
+                    loadingText="Deleting Customer..."
                     disabled={loading}
-                    startIcon={loading ? <CircularProgress size={20} /> : null}
+                    onClick={handleDelete}
+                    color='#ef4444'
+                    startIcon= {<Delete/>}
                 >
-                    {loading ? 'Deleting...' : 'Delete Customer'}
-                </Button>
+                    Delete Customer
+                </LoadingButton>
             </DialogActions>
         </Dialog>
     );

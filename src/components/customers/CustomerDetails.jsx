@@ -26,8 +26,9 @@ import {
     RadioGroup,
     Radio,
     FormLabel,
-    
-    Badge} from '@mui/material';
+
+    Badge
+} from '@mui/material';
 import {
     Timeline,
     TimelineItem,
@@ -43,10 +44,10 @@ import {
     Person,
     Email,
     Phone,
-    LocationOn,
     CreditCard,
     Star,
-    ShoppingCart} from '@mui/icons-material';
+    ShoppingCart
+} from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
 import { customerService } from '../../services/customerService';
 import dayjs from 'dayjs';
@@ -68,19 +69,19 @@ export const CustomerDetailsModal = ({ open, onClose, customerID }) => {
     const getStatusColor = (status) => {
         const colors = {
             'Active': 'success',
-            'Inactive': 'default',
+            'Inactive': 'info',
             'Pending': 'warning',
             'Blocked': 'error'
         };
-        return colors[status] || 'default';
+        return colors[status] || 'info';
     };
 
     const getTierColor = (tier) => {
         const colors = {
-            'Bronze': '#cd7f32',
-            'Silver': '#c0c0c0',
-            'Gold': '#ffd700',
-            'Platinum': '#e5e4e2'
+            'Bronze': '#a05a2c',
+            'Silver': '#7e7e7e',
+            'Gold': '#b89c00',
+            'Platinum': '#581c87'
         };
         return colors[tier] || '#666';
     };
@@ -109,17 +110,37 @@ export const CustomerDetailsModal = ({ open, onClose, customerID }) => {
                 <Box display="flex" alignItems="center" justifyContent="between">
                     <Box display="flex" alignItems="center">
                         <Badge
-                            badgeContent={customer.is_vip ? <Star sx={{ fontSize: 12 }} /> : 0}
+                            invisible={!customer.is_vip}
+                            badgeContent={
+                                <Star sx={{ fontSize: 14, color: 'black' }} />  
+                            }
                             color="warning"
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            sx={{
+                                '& .MuiBadge-badge': {
+                                    width: 18,
+                                    height: 18,
+                                    minWidth: 0,
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    top: 2,
+                                    right: 2,
+                                }
+                            }}
                         >
                             <Avatar
                                 src={customer.avatar}
-                                sx={{ mr: 2, width: 56, height: 56 }}
+                                sx={{ width: 40, height: 40 }}
                             >
                                 {customer?.full_name?.charAt(0)}
                             </Avatar>
                         </Badge>
-                        <Box>
+                        <Box sx={{ ml: 2 }}>
                             <Typography variant="h5" fontWeight="bold">
                                 {customer.full_name}
                             </Typography>
@@ -197,17 +218,6 @@ export const CustomerDetailsModal = ({ open, onClose, customerID }) => {
                                                     secondary={customer.phone_number}
                                                 />
                                             </ListItem>
-                                            {/* <ListItem>
-                                                <ListItemAvatar>
-                                                    <Avatar sx={{ bgcolor: 'info.light' }}>
-                                                        <LocationOn />
-                                                    </Avatar>
-                                                </ListItemAvatar>
-                                                <ListItemText
-                                                    primary="Location"
-                                                    secondary={customer.country}
-                                                />
-                                            </ListItem> */}
                                         </List>
                                     </CardContent>
                                 </Card>
@@ -245,7 +255,7 @@ export const CustomerDetailsModal = ({ open, onClose, customerID }) => {
                                                 </Box>
                                             </Grid>
                                             <Grid size={12}>
-                                                <Box p={2} bgcolor="grey.100" borderRadius={2}>
+                                                <Box p={2} bgcolor="info.900" borderRadius={2}>
                                                     <Typography variant="body2" color="textSecondary" gutterBottom>
                                                         Last Activity
                                                     </Typography>

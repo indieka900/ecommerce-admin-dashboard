@@ -104,7 +104,11 @@ const CustomerPage = () => {
             const matchesSearch = customer?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 customer.phone_number.includes(searchTerm);
-            const matchesStatus = statusFilter === 'All' || customer.status === statusFilter;
+            const matchesStatus =
+                statusFilter === 'All' ||
+                (statusFilter === 'Active' && customer.is_active) ||
+                (statusFilter === 'Inactive' && !customer.is_active);
+
             const matchesTier = tierFilter === 'All' || customer.tier === tierFilter;
 
             return matchesSearch && matchesStatus && matchesTier;
@@ -140,10 +144,10 @@ const CustomerPage = () => {
 
     const getTierColor = (tier) => {
         const colors = {
-            'Bronze': '#cd7f32',
-            'Silver': '#c0c0c0',
-            'Gold': '#ffd700',
-            'Platinum': '#e5e4e2'
+            'Bronze': '#a05a2c',
+            'Silver': '#7e7e7e',
+            'Gold': '#b89c00',
+            'Platinum': '#581c87'
         };
         return colors[tier] || '#666';
     };
@@ -174,12 +178,6 @@ const CustomerPage = () => {
         }
     };
 
-
-    const openCustomerDialog = (customer) => {
-        setSelectedCustomer(customer);
-        // setModals(prev => ({ ...prev, details: true }));
-        // setDialogOpen(true);
-    };
 
     const StatCard = ({ title, value, icon, color = 'primary', trend, trendValue }) => (
         <Card>
@@ -218,19 +216,48 @@ const CustomerPage = () => {
     );
 
     const CustomerCard = ({ customer }) => (
-        <Card sx={{ mb: 2, cursor: 'pointer' }} onClick={() => openCustomerDialog(customer)}>
+        <Card 
+            sx={{ mb: 2, cursor: 'pointer' }}
+            onClick={() => {
+                setSelectedCustomer(customer);
+                handleCustomerAction('view');
+            }}
+        >
             <CardContent>
                 <Box display="flex" alignItems="center" justifyContent="space-between">
                     <Box display="flex" alignItems="center">
                         <Badge
-                            badgeContent={customer.is_vip ? <Star sx={{ fontSize: 12 }} /> : 0}
+                            invisible={!customer.is_vip}
+                            badgeContent={
+                                <Star sx={{ fontSize: 14, color: 'black' }} />  
+                            }
                             color="warning"
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            sx={{
+                                '& .MuiBadge-badge': {
+                                    width: 18,
+                                    height: 18,
+                                    minWidth: 0,
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    top: 2,
+                                    right: 2,
+                                }
+                            }}
                         >
-                            <Avatar src={customer.avatar} sx={{ mr: 2 }}>
-                                {customer.full_name.charAt(0)}
+                            <Avatar
+                                src={customer.avatar}
+                                sx={{ width: 40, height: 40 }}
+                            >
+                                {customer?.full_name?.charAt(0)}
                             </Avatar>
                         </Badge>
-                        <Box>
+                        <Box sx={{ ml: 2 }}>
                             <Typography variant="h6">{customer.full_name}</Typography>
                             <Typography color="textSecondary" variant="body2">
                                 {customer.email}
@@ -403,8 +430,6 @@ const CustomerPage = () => {
                                     <MenuItem value="All">All Statuses</MenuItem>
                                     <MenuItem value="Active">Active</MenuItem>
                                     <MenuItem value="Inactive">Inactive</MenuItem>
-                                    <MenuItem value="Pending">Pending</MenuItem>
-                                    <MenuItem value="Blocked">Blocked</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -485,14 +510,37 @@ const CustomerPage = () => {
                                                 <TableCell>
                                                     <Box display="flex" alignItems="center">
                                                         <Badge
-                                                            badgeContent={customer.is_vip ? <Star sx={{ fontSize: 12 }} /> : 0}
+                                                            invisible={!customer.is_vip}
+                                                            badgeContent={
+                                                                <Star sx={{ fontSize: 14, color: 'black' }} />  // Optional color
+                                                            }
                                                             color="warning"
+                                                            anchorOrigin={{
+                                                                vertical: 'top',
+                                                                horizontal: 'right',
+                                                            }}
+                                                            sx={{
+                                                                '& .MuiBadge-badge': {
+                                                                    width: 18,
+                                                                    height: 18,
+                                                                    minWidth: 0,
+                                                                    borderRadius: '50%',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    top: 2,
+                                                                    right: 2,
+                                                                }
+                                                            }}
                                                         >
-                                                            <Avatar src={customer.avatar} sx={{ mr: 2, width: 40, height: 40 }}>
+                                                            <Avatar
+                                                                src={customer.avatar}
+                                                                sx={{ width: 40, height: 40 }}
+                                                            >
                                                                 {customer?.full_name?.charAt(0)}
                                                             </Avatar>
                                                         </Badge>
-                                                        <Box>
+                                                        <Box sx={{ ml: 2 }}>
                                                             <Typography variant="body1" fontWeight="medium">
                                                                 {customer?.full_name}
                                                             </Typography>
@@ -612,27 +660,11 @@ const CustomerPage = () => {
                 open={modals.form}
                 onClose={() => setModals(prev => ({ ...prev, form: false }))}
                 customer={selectedCustomer} 
-                onSave={(customerData) => {
-                    console.log('Save customer:', customerData);
-                    // setNotification({
-                    //     open: true,
-                    //     message: 'Customer saved successfully!',
-                    //     type: 'success'
-                    // });
-                }}
             />
             <DeleteCustomerModal
                 open={modals.delete}
                 onClose={() => setModals(prev => ({ ...prev, delete: false }))}
                 customer={selectedCustomer}
-                onConfirm={(customer) => {
-                    console.log('Delete customer:', customer);
-                    // setNotification({
-                    //     open: true,
-                    //     message: 'Customer deleted successfully!',
-                    //     type: 'success'
-                    // });
-                }}
             />
         </Box>
     );
