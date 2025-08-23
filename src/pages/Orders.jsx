@@ -194,8 +194,10 @@ const OrdersList = () => {
                             value={filters.search}
                             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                             onKeyPress={handleSearch}
-                            InputProps={{
-                                startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />
+                            slotProps={{
+                                input: {
+                                    startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />
+                                }
                             }}
                         />
                     </Grid>
@@ -251,7 +253,9 @@ const OrdersList = () => {
                             label="Start Date"
                             value={filters.start_date}
                             onChange={(e) => handleFilterChange('start_date', e.target.value)}
-                            InputLabelProps={{ shrink: true }}
+                            slotProps={{
+                                inputLabel: { shrink: true }
+                            }}
                         />
                     </Grid>
                     <Grid
@@ -265,7 +269,9 @@ const OrdersList = () => {
                             label="End Date"
                             value={filters.end_date}
                             onChange={(e) => handleFilterChange('end_date', e.target.value)}
-                            InputLabelProps={{ shrink: true }}
+                            slotProps={{
+                                inputLabel: { shrink: true }
+                            }}
                         />
                     </Grid>
                 </Grid>

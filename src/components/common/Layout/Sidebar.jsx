@@ -119,8 +119,10 @@ const Sidebar = ({ onItemClick, onToggleCollapse }) => {
                         <Tooltip
                             title={item.title}
                             placement="right"
-                            TransitionComponent={Zoom}
                             arrow
+                            slots={{
+                                transition: Zoom
+                            }}
                         >
                             <ListItemButton
                                 selected={isSelected || hasSelectedChild}
@@ -190,10 +192,12 @@ const Sidebar = ({ onItemClick, onToggleCollapse }) => {
                             <Fade in={!isCollapsed} timeout={200}>
                                 <ListItemText
                                     primary={item.title}
-                                    primaryTypographyProps={{
-                                        fontSize: depth > 0 ? '0.875rem' : '0.95rem',
-                                        fontWeight: isSelected || hasSelectedChild ? 600 : 500,
-                                        color: isSelected || hasSelectedChild ? '#6366f1' : 'inherit'
+                                    slotProps={{
+                                        primary: {
+                                            fontSize: depth > 0 ? '0.875rem' : '0.95rem',
+                                            fontWeight: isSelected || hasSelectedChild ? 600 : 500,
+                                            color: isSelected || hasSelectedChild ? '#6366f1' : 'inherit'
+                                        }
                                     }}
                                 />
                             </Fade>

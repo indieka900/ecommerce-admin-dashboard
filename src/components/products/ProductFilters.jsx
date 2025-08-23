@@ -31,12 +31,14 @@ export const ProductFilters = ({
                     placeholder="Search products..."
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Search />
-                            </InputAdornment>
-                        ),
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search />
+                                </InputAdornment>
+                            ),
+                        }
                     }}
                 />
             </Grid>

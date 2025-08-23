@@ -335,12 +335,14 @@ const ProductVariant = ({ product, open, onClose, onVariantsUpdate }) => {
                                 value={formData.size}
                                 onChange={(e) => setFormData(prev => ({ ...prev, size: e.target.value }))}
                                 placeholder="e.g., S, M, L, XL, 32, 34"
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SizeIcon />
-                                        </InputAdornment>
-                                    ),
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SizeIcon />
+                                            </InputAdornment>
+                                        ),
+                                    }
                                 }}
                             />
                         </Grid>
@@ -355,12 +357,14 @@ const ProductVariant = ({ product, open, onClose, onVariantsUpdate }) => {
                                 value={formData.color}
                                 onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
                                 placeholder="e.g., Red, Blue, Black"
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <ColorIcon />
-                                        </InputAdornment>
-                                    ),
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <ColorIcon />
+                                            </InputAdornment>
+                                        ),
+                                    }
                                 }}
                             />
                         </Grid>
@@ -377,7 +381,9 @@ const ProductVariant = ({ product, open, onClose, onVariantsUpdate }) => {
                                 onChange={(e) => setFormData(prev => ({ ...prev, stock: e.target.value }))}
                                 error={!!formErrors.stock}
                                 helperText={formErrors.stock}
-                                inputProps={{ min: 0 }}
+                                slotProps={{
+                                    htmlInput: { min: 0 }
+                                }}
                             />
                         </Grid>
                         <Grid
@@ -393,7 +399,9 @@ const ProductVariant = ({ product, open, onClose, onVariantsUpdate }) => {
                                 onChange={(e) => setFormData(prev => ({ ...prev, variant_price: e.target.value }))}
                                 error={!!formErrors.variant_price}
                                 helperText={formErrors.variant_price}
-                                inputProps={{ min: 0, step: 0.01 }}
+                                slotProps={{
+                                    htmlInput: { min: 0, step: 0.01 }
+                                }}
                             />
                         </Grid>
                     </Grid>

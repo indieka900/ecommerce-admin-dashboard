@@ -241,7 +241,9 @@ export const ProductsPageError = ({ error, onRetry }) => (
                 Unable to Load Products
             </Typography>
 
-            <Typography variant="body2" color="text.secondary" paragraph>
+            <Typography variant="body2" color="text.secondary" sx={{
+                marginBottom: "16px"
+            }}>
                 We're having trouble connecting to our servers. This might be a temporary issue.
             </Typography>
 

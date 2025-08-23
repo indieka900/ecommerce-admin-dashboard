@@ -307,7 +307,6 @@ const Brands = () => {
                     },
                 ]}
             />
-
             {error && (
                 <Alert
                     severity="error"
@@ -321,16 +320,13 @@ const Brands = () => {
                     {error}
                 </Alert>
             )}
-
             <BrandStats brands={brands} />
-
             <SearchBar
                 value={searchTerm}
                 onChange={setSearchTerm}
                 placeholder="Search brands..."
                 sx={{ mb: 3 }}
             />
-
             {loading ? (
                 <Grid container spacing={3}>
                     {[...Array(6)].map((_, index) => (
@@ -363,17 +359,20 @@ const Brands = () => {
                     ))}
                 </Grid>
             )}
-
             {/* Add/Edit Dialog */}
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
                 fullWidth
                 maxWidth="sm"
-                TransitionComponent={Fade}
-                PaperProps={{
-                    sx: {
-                        borderRadius: 2,
+                slots={{
+                    transition: Fade
+                }}
+                slotProps={{
+                    paper: {
+                        sx: {
+                            borderRadius: 2,
+                        }
                     }
                 }}
             >
