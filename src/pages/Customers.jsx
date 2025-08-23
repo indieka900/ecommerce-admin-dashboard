@@ -606,7 +606,7 @@ const CustomerPage = () => {
             <CustomerDetailsModal
                 open={modals.details}
                 onClose={() => setModals(prev => ({ ...prev, details: false }))}
-                customer={selectedCustomer}
+                customerID={selectedCustomer?.id}
             />
             <CustomerFormModal
                 open={modals.form}

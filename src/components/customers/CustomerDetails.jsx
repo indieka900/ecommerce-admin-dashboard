@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -47,10 +47,21 @@ import {
     CreditCard,
     Star,
     ShoppingCart} from '@mui/icons-material';
+import { CircularProgress } from '@mui/material';
+import { customerService } from '../../services/customerService';
+import dayjs from 'dayjs';
 
-// 1. Customer Details View Modal
-export const CustomerDetailsModal = ({ open, onClose, customer }) => {
+export const CustomerDetailsModal = ({ open, onClose, customerID }) => {
     const [activeTab, setActiveTab] = useState(0);
+    const [customer, setCustomer] = useState({});
+
+    useEffect(() => {
+        if (!open) setActiveTab(0);
+        if (!customerID) return;
+        customerService.getCustomer(customerID).then(data => {
+            setCustomer(data);
+        }).catch(err => console.error(err));
+    }, [open, customerID]);
 
     if (!customer) return null;
 
@@ -74,12 +85,6 @@ export const CustomerDetailsModal = ({ open, onClose, customer }) => {
         return colors[tier] || '#666';
     };
 
-    // Mock order data
-    const orders = [
-        { id: 1001, date: '2024-01-15', amount: 299.99, status: 'Delivered', items: 3 },
-        { id: 1002, date: '2024-01-10', amount: 149.50, status: 'Processing', items: 1 },
-        { id: 1003, date: '2024-01-05', amount: 89.99, status: 'Shipped', items: 2 }
-    ];
 
     // Mock activity data
     const activities = [
@@ -104,27 +109,27 @@ export const CustomerDetailsModal = ({ open, onClose, customer }) => {
                 <Box display="flex" alignItems="center" justifyContent="between">
                     <Box display="flex" alignItems="center">
                         <Badge
-                            badgeContent={customer.isVip ? <Star sx={{ fontSize: 12 }} /> : 0}
+                            badgeContent={customer.is_vip ? <Star sx={{ fontSize: 12 }} /> : 0}
                             color="warning"
                         >
                             <Avatar
                                 src={customer.avatar}
                                 sx={{ mr: 2, width: 56, height: 56 }}
                             >
-                                {customer.name.charAt(0)}
+                                {customer?.full_name?.charAt(0)}
                             </Avatar>
                         </Badge>
                         <Box>
                             <Typography variant="h5" fontWeight="bold">
-                                {customer.name}
+                                {customer.full_name}
                             </Typography>
                             <Typography color="textSecondary" variant="body2">
-                                Customer ID: {customer.id} | Joined: {customer.joinDate}
+                                Customer ID: {customer.id} | Joined: {dayjs(customer.date_joined).format('MMM D, YYYY')}
                             </Typography>
                             <Box mt={1} display="flex" gap={1}>
                                 <Chip
-                                    label={customer.status}
-                                    color={getStatusColor(customer.status)}
+                                    label={customer.is_active ? 'Active' : 'Inactive'}
+                                    color={getStatusColor(customer.is_active ? 'Active' : 'Inactive')}
                                     size="small"
                                 />
                                 <Chip
@@ -189,10 +194,10 @@ export const CustomerDetailsModal = ({ open, onClose, customer }) => {
                                                 </ListItemAvatar>
                                                 <ListItemText
                                                     primary="Phone"
-                                                    secondary={customer.phone}
+                                                    secondary={customer.phone_number}
                                                 />
                                             </ListItem>
-                                            <ListItem>
+                                            {/* <ListItem>
                                                 <ListItemAvatar>
                                                     <Avatar sx={{ bgcolor: 'info.light' }}>
                                                         <LocationOn />
@@ -202,7 +207,7 @@ export const CustomerDetailsModal = ({ open, onClose, customer }) => {
                                                     primary="Location"
                                                     secondary={customer.country}
                                                 />
-                                            </ListItem>
+                                            </ListItem> */}
                                         </List>
                                     </CardContent>
                                 </Card>
@@ -222,7 +227,7 @@ export const CustomerDetailsModal = ({ open, onClose, customer }) => {
                                             <Grid size={6}>
                                                 <Box textAlign="center" p={2} bgcolor="primary.light" borderRadius={2}>
                                                     <Typography variant="h4" color="primary">
-                                                        {customer.totalOrders}
+                                                        {customer?.stats?.total_orders}
                                                     </Typography>
                                                     <Typography variant="body2" color="textSecondary">
                                                         Total Orders
@@ -232,7 +237,7 @@ export const CustomerDetailsModal = ({ open, onClose, customer }) => {
                                             <Grid size={6}>
                                                 <Box textAlign="center" p={2} bgcolor="success.light" borderRadius={2}>
                                                     <Typography variant="h4" color="success.dark">
-                                                        ${customer.totalSpent.toLocaleString()}
+                                                        Ksh {customer?.stats?.total_spent?.toLocaleString()}
                                                     </Typography>
                                                     <Typography variant="body2" color="textSecondary">
                                                         Total Spent
@@ -245,7 +250,7 @@ export const CustomerDetailsModal = ({ open, onClose, customer }) => {
                                                         Last Activity
                                                     </Typography>
                                                     <Typography variant="body1" fontWeight="medium">
-                                                        {customer.lastActivity}
+                                                        {dayjs(customer.last_activity).format('MMM D, YYYY')}
                                                     </Typography>
                                                 </Box>
                                             </Grid>
@@ -262,25 +267,25 @@ export const CustomerDetailsModal = ({ open, onClose, customer }) => {
                             <Typography variant="h6" gutterBottom>
                                 Order History
                             </Typography>
-                            {orders.map((order) => (
+                            {customer.orders.map((order) => (
                                 <Card key={order.id} sx={{ mb: 2 }}>
                                     <CardContent>
                                         <Box display="flex" justifyContent="between" alignItems="center">
                                             <Box>
                                                 <Typography variant="h6">
-                                                    Order #{order.id}
+                                                    Order #{order.order_number}
                                                 </Typography>
                                                 <Typography color="textSecondary" gutterBottom>
-                                                    {order.date} • {order.items} items
+                                                    {dayjs(order.created_at).format('MMM D, YYYY')} • {order.items} items
                                                 </Typography>
                                                 <Chip
                                                     label={order.status}
-                                                    color={order.status === 'Delivered' ? 'success' : 'primary'}
+                                                    color={order.status == 'Delivered' ? 'success' : 'primary'}
                                                     size="small"
                                                 />
                                             </Box>
                                             <Typography variant="h6" color="primary">
-                                                ${order.amount}
+                                                Ksh {order.total}
                                             </Typography>
                                         </Box>
                                     </CardContent>
