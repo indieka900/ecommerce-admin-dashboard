@@ -34,7 +34,7 @@ export const API_ENDPOINTS = {
     DASHBOARD: '/dashboard/comprehensive/',
 
     // Customer endpoints
-    CUSTOMERS: '/customers/',
+    CUSTOMERS: '/accounts/customers/',
     CUSTOMER_STATS: '/customers/stats/',
 
     // Transaction endpoints

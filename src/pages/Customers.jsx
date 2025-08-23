@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
     Box,
     Card,
@@ -48,6 +48,8 @@ import {
 
 import CustomerFormModal from '../components/customers/CustomerForm';
 import DeleteCustomerModal from '../components/customers/DeleteCustomerModal';
+import { customerService } from '../services/customerService';
+import dayjs from 'dayjs';
 
 // Mock customer data
 const generateMockCustomers = () => {
@@ -63,17 +65,17 @@ const generateMockCustomers = () => {
         status: statuses[Math.floor(Math.random() * statuses.length)],
         tier: tiers[Math.floor(Math.random() * tiers.length)],
         country: countries[Math.floor(Math.random() * countries.length)],
-        joinDate: new Date(2020 + Math.floor(Math.random() * 4), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-        totalOrders: Math.floor(Math.random() * 100),
-        totalSpent: Math.floor(Math.random() * 10000),
-        lastActivity: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        date_joined: new Date(2020 + Math.floor(Math.random() * 4), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
+        total_orders: Math.floor(Math.random() * 100),
+        total_spent: Math.floor(Math.random() * 10000),
+        last_activity: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         avatar: `https://ui-avatars.com/api/?name=Customer+${i + 1}&background=random`,
-        isVip: Math.random() > 0.8
+        is_vip: Math.random() > 0.8
     }));
 };
 
 const CustomerPage = () => {
-    const [customers] = useState(generateMockCustomers());
+    const [customers, setCustomers] = useState(generateMockCustomers());
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
@@ -90,15 +92,18 @@ const CustomerPage = () => {
         bulk: false
     });
 
-
+    useEffect(() => {
+        // Fetch customers from API if needed
+        customerService.getCustomers().then(data => setCustomers(data));
+    }, []);
 
 
     // Filter customers based on search and filters
     const filteredCustomers = useMemo(() => {
         return customers.filter(customer => {
-            const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            const matchesSearch = customer?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                customer.phone.includes(searchTerm);
+                customer.phone_number.includes(searchTerm);
             const matchesStatus = statusFilter === 'All' || customer.status === statusFilter;
             const matchesTier = tierFilter === 'All' || customer.tier === tierFilter;
 
@@ -115,10 +120,10 @@ const CustomerPage = () => {
     // Statistics
     const stats = useMemo(() => {
         const total = customers.length;
-        const active = customers.filter(c => c.status === 'Active').length;
-        const inactive = customers.filter(c => c.status === 'Inactive').length;
-        const vip = customers.filter(c => c.isVip).length;
-        const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
+        const active = customers.filter(c => c.is_active === true).length;
+        const inactive = customers.filter(c => c.is_active === false).length;
+        const vip = customers.filter(c => c.is_vip).length;
+        const totalRevenue = customers.reduce((sum, c) => sum + c.total_spent, 0);
 
         return { total, active, inactive, vip, totalRevenue };
     }, [customers]);
@@ -218,22 +223,22 @@ const CustomerPage = () => {
                 <Box display="flex" alignItems="center" justifyContent="space-between">
                     <Box display="flex" alignItems="center">
                         <Badge
-                            badgeContent={customer.isVip ? <Star sx={{ fontSize: 12 }} /> : 0}
+                            badgeContent={customer.is_vip ? <Star sx={{ fontSize: 12 }} /> : 0}
                             color="warning"
                         >
                             <Avatar src={customer.avatar} sx={{ mr: 2 }}>
-                                {customer.name.charAt(0)}
+                                {customer.full_name.charAt(0)}
                             </Avatar>
                         </Badge>
                         <Box>
-                            <Typography variant="h6">{customer.name}</Typography>
+                            <Typography variant="h6">{customer.full_name}</Typography>
                             <Typography color="textSecondary" variant="body2">
                                 {customer.email}
                             </Typography>
                             <Box display="flex" alignItems="center" mt={1} gap={1}>
                                 <Chip
-                                    label={customer.status}
-                                    color={getStatusColor(customer.status)}
+                                    label={customer.is_active ? 'Active' : 'Inactive'}
+                                    color={getStatusColor(customer.is_active ? 'Active' : 'Inactive')}
                                     size="small"
                                 />
                                 <Chip
@@ -249,10 +254,10 @@ const CustomerPage = () => {
                     </Box>
                     <Box textAlign="right">
                         <Typography variant="h6" color="primary">
-                            Ksh {customer.totalSpent.toLocaleString()}
+                            Ksh {customer.total_spent.toLocaleString()}
                         </Typography>
                         <Typography color="textSecondary" variant="body2">
-                            {customer.totalOrders} orders
+                            {customer.total_orders} orders
                         </Typography>
                     </Box>
                 </Box>
@@ -480,16 +485,16 @@ const CustomerPage = () => {
                                                 <TableCell>
                                                     <Box display="flex" alignItems="center">
                                                         <Badge
-                                                            badgeContent={customer.isVip ? <Star sx={{ fontSize: 12 }} /> : 0}
+                                                            badgeContent={customer.is_vip ? <Star sx={{ fontSize: 12 }} /> : 0}
                                                             color="warning"
                                                         >
                                                             <Avatar src={customer.avatar} sx={{ mr: 2, width: 40, height: 40 }}>
-                                                                {customer.name.charAt(0)}
+                                                                {customer?.full_name?.charAt(0)}
                                                             </Avatar>
                                                         </Badge>
                                                         <Box>
                                                             <Typography variant="body1" fontWeight="medium">
-                                                                {customer.name}
+                                                                {customer?.full_name}
                                                             </Typography>
                                                             <Typography variant="body2" color="textSecondary">
                                                                 ID: {customer.id}
@@ -500,13 +505,13 @@ const CustomerPage = () => {
                                                 <TableCell>
                                                     <Typography variant="body2">{customer.email}</Typography>
                                                     <Typography variant="body2" color="textSecondary">
-                                                        {customer.phone}
+                                                        {customer.phone_number}
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Chip
-                                                        label={customer.status}
-                                                        color={getStatusColor(customer.status)}
+                                                        label={customer.is_active ? 'Active' : 'Inactive'}
+                                                        color={getStatusColor(customer.is_active ? 'Active' : 'Inactive')}
                                                         size="small"
                                                     />
                                                 </TableCell>
@@ -520,13 +525,13 @@ const CustomerPage = () => {
                                                         }}
                                                     />
                                                 </TableCell>
-                                                <TableCell>{customer.totalOrders}</TableCell>
+                                                <TableCell>{customer.total_orders}</TableCell>
                                                 <TableCell>
                                                     <Typography variant="body2" fontWeight="medium">
-                                                        Ksh {customer.totalSpent.toLocaleString()}
+                                                        Ksh {customer?.total_spent?.toLocaleString()}
                                                     </Typography>
                                                 </TableCell>
-                                                <TableCell>{customer.joinDate}</TableCell>
+                                                <TableCell>{dayjs(customer.date_joined).format('MMM D, YYYY')}</TableCell>
                                                 <TableCell>
                                                     <IconButton
                                                         onClick={(e) => {
