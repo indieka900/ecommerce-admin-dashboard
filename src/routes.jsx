@@ -1,5 +1,10 @@
-import React from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+// routes.js
+import {
+    createBrowserRouter,
+    createRoutesFromElements,
+    Route,
+    Navigate
+} from 'react-router-dom';
 import ProtectedRoute from './components/common/ProtectectedRoute';
 import AdminLayout from './components/common/Layout/AdminLayout';
 
@@ -30,123 +35,43 @@ import OrderDetails from './pages/OrderDetail';
 // import NotFound from './pages/NotFound';
 // import Unauthorized from './pages/Unauthorized';
 
-const router = createBrowserRouter([
-    {
-        path: '/login',
-        element: <Login />
-    },
-    {
-        path: '/forgot-password',
-        element: <ForgotPassword />
-    },
-    {
-        path: '/reset-password/:uid/:token',
-        element: <ResetPassword />
-    },
-    {
-        path: '/',
-        element: (
-            <ProtectedRoute>
-                <AdminLayout />
-            </ProtectedRoute>
-        ),
-        errorElement: <ErrorPage />,
-        children: [
-            {
-                index: true,
-                element: <Navigate to="/dashboard" replace />
-            },
-            {
-                path: 'dashboard',
-                element: <Dashboard />
-            },
-            {
-                path: 'profile',
-                element: <Profile />
-            },
-            {
-                path: 'change-password',
-                element: <ChangePassword />
-            },
-            {
-                path: 'add-admin',
-                element: (
-                    <ProtectedRoute is_super_admin={true}>
-                        <AddAdmin />
-                    </ProtectedRoute>
-                )
-            },
-            {
-                path: 'products',
-                element: <Products />
-            },
-            {
-                path: 'categories',
-                element: <Categories />
-            },
-            {
-                path: 'brands',
-                element: <Brands />
-            },
-            {
-                path: 'customers',
-                element: <CustomerPage />
-            },
-            {
-                path: 'orders',
-                children: [
-                    {
-                        index: true,
-                        element: <OrdersList />
-                    },
-                    {
-                        path: ':orderId',
-                        element: <OrderDetails />
-                    },
-                    {
-                        path: 'analytics',
-                        element: <OrdersDashboard />
-                    }
-                ]
-            },
-            // {
-            //     path: 'customers',
-            //     element: <Customers />
-            // },
-            // {
-            //     path: 'transactions',
-            //     element: <Transactions />
-            // },
-            {
-                path: 'blog',
-                element: <Blog />
-            },
-            {
-                path: 'blog/categories',
-                element: <BlogCategories />
-            },
-            // {
-            //     path: 'reviews',
-            //     element: <Reviews />
-            // },
-            // {
-            //     path: 'settings',
-            //     element: (
-            //         <ProtectedRoute requiredRole="admin">
-            //             <Settings />
-            //         </ProtectedRoute>
-            //     )
-            // }
-        ]
-    },
-    // {
-    //     path: '/unauthorized',
-    //     element: <Unauthorized />
-    // },
-    {
-        path: '*',
-        element: <NotFound />
-    }
-]);
+const routes = createRoutesFromElements(
+    <>
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
+
+        <Route
+            path="/"
+            element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}
+            errorElement={<ErrorPage />}
+        >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="change-password" element={<ChangePassword />} />
+            <Route path="add-admin" element={
+                <ProtectedRoute is_super_admin={true}><AddAdmin /></ProtectedRoute>
+            } />
+            <Route path="products" element={<Products />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="brands" element={<Brands />} />
+            <Route path="customers" element={<CustomerPage />} />
+            <Route path="orders">
+                <Route index element={<OrdersList />} />
+                <Route path=":orderId" element={<OrderDetails />} />
+                <Route path="analytics" element={<OrdersDashboard />} />
+            </Route>
+            <Route path="blog" element={<Blog />} />
+            <Route path="blog/categories" element={<BlogCategories />} />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+    </>
+);
+
+const router = createBrowserRouter(routes, {
+    basename: '/admin',
+});
 
 export default router;
